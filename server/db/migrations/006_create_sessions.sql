@@ -5,4 +5,6 @@ CREATE TABLE sessions (
     date DATE,
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
+
+    UNIQUE(user_id, split_day_id, date),
 );

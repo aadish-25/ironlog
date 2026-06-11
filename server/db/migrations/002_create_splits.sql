@@ -4,5 +4,5 @@ CREATE TABLE splits(
     name TEXT NOT NULL,
     is_active BOOLEAN DEFAULT false,
     created_at TIMESTAMPTZ DEFAULT now(),
-    updated_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
 );
