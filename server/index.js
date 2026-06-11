@@ -1,14 +1,16 @@
 import express from "express";
 import dotenv from "dotenv";
 
+import pool from "./db/connection.js";
+
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.get('/', (req, res) => {
-    res.send("<h1>Hello World</h1>")
-})
+app.get("/", (req, res) => {
+    res.send("<h1>Hello World</h1>");
+});
 
 app.listen(PORT, () => {
     console.log(
