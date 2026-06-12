@@ -10,6 +10,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use(
     cors({
         origin: "http://localhost:5173",
@@ -22,7 +25,6 @@ app.use(clerkMiddleware());
 app.get("/", (req, res) => {
     res.send("<h1>Hello World</h1>");
 });
-
 
 app.get("/protected", auth, (req, res) => {
     res.json({
@@ -38,7 +40,7 @@ app.listen(PORT, () => {
 });
 
 // Import routes
-import userRoutes from "./routes/user.route.js"
+import userRoutes from "./routes/user.route.js";
 
 // Routes
 app.use("/api/users", userRoutes);

@@ -1,4 +1,4 @@
-import { updateUser } from "../services/user.services";
+import { updateUser } from "../services/user.services.js";
 
 // / GET /users/me
 async function getCurrentUser(req, res) {
@@ -17,11 +17,9 @@ async function updateCurrentUser(req, res) {
     } catch (error) {
         res.status(400).json({
             message: "Error while updating information",
-            error: error,
+            error: error instanceof Error ? error.message : String(error),
         });
     }
-
-    return res.status(200).json({});
 }
 
 export { getCurrentUser, updateCurrentUser };
