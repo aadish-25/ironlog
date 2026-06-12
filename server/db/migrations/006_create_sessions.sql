@@ -4,7 +4,7 @@ CREATE TABLE sessions (
     split_day_id UUID REFERENCES split_days(id) ON DELETE CASCADE,
     date DATE,
     created_at TIMESTAMPTZ DEFAULT now(),
-    updated_at TIMESTAMPTZ DEFAULT now()
+    updated_at TIMESTAMPTZ DEFAULT now(),
 
-    UNIQUE(user_id, split_day_id, date),
+    UNIQUE(user_id, split_day_id, date)
 );
