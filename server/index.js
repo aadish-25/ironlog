@@ -36,3 +36,9 @@ app.listen(PORT, () => {
         `App successfully running on PORT ${PORT} at http://localhost:${PORT}`,
     );
 });
+
+// Import routes
+import userRoutes from "./routes/user.route.js"
+
+// Routes
+app.use("/api/users", userRoutes);
