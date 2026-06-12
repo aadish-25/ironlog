@@ -1,4 +1,4 @@
-import { getAuth } from "@clerk/express";
+import { getAuth, clerkClient } from "@clerk/express";
 import pool from "../db/connection.js";
 
 const auth = async (req, res, next) => {
@@ -11,21 +11,27 @@ const auth = async (req, res, next) => {
         }
 
         let result = await pool.query(
-            "SELECT id, clerk_id from users WHERE clerk_id = $1",
+            "SELECT id, clerk_id, name FROM users WHERE clerk_id = $1",
             [userId],
         );
         let user = result.rows[0];
 
         if (!user) {
+            const clerkUser = await clerkClient.users.getUser(userId);
+
+            const name =
+                `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim();
+
             await pool.query(
-                "INSERT INTO users (clerk_id) VALUES ($1) ON CONFLICT (clerk_id) DO NOTHING",
-                [userId],
+                "INSERT INTO users (clerk_id, name) VALUES ($1, $2) ON CONFLICT (clerk_id) DO NOTHING",
+                [userId, name],
             );
 
             let new_result = await pool.query(
-                "SELECT id, clerk_id from users WHERE clerk_id = $1",
+                "SELECT id, clerk_id, name from users WHERE clerk_id = $1",
                 [userId],
             );
+
             user = new_result.rows[0];
         }
 
