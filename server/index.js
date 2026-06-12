@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { clerkMiddleware } from "@clerk/express";
-import { auth } from "./middlewares/auth.js";
+import { auth } from "./middlewares/clerkAuth.middleware.js";
 
 import pool from "./db/connection.js";
 
