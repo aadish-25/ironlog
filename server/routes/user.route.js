@@ -1,6 +1,10 @@
 import express from "express";
-import clerkAuth from "../middlewares/clerkAuth.middleware.js";
-import { getCurrentUser, updateCurrentUser } from "../controllers/user.controller.js";
+// import clerkAuth from "../middlewares/clerkAuth.middleware.js";
+import clerkAuth from "../middlewares/devAuth.middleware.js";
+import {
+    getCurrentUser,
+    updateCurrentUser,
+} from "../controllers/user.controller.js";
 
 const router = express.Router();
 
