@@ -17,3 +17,5 @@ router.get("/:id", clerkAuth, getSplitById);
 router.put("/:id", clerkAuth, updateSplit);
 router.delete("/:id", clerkAuth, deleteSplit);
 router.patch("/:id/activate", clerkAuth, activateSplit);
+
+export default router;

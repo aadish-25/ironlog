@@ -1,9 +1,10 @@
 import {
-    createSplitWithDays,
-    getSplitsByUser,
-    updateSplit,
-    deleteSplit,
-    setActiveSplit,
+    createSplitWithDays as createSplitWithDaysService,
+    getSplitsByUser as getSplitsByUserService,
+    getSplitById as getSplitByIdService,
+    updateSplit as updateSplitService,
+    deleteSplit as deleteSplitService,
+    setActiveSplit as setActiveSplitService,
 } from "../services/splits.services.js";
 
 async function createSplit(req, res) {
@@ -12,7 +13,7 @@ async function createSplit(req, res) {
     const { name } = req.body;
 
     try {
-        const result = await createSplitWithDays(id, name);
+        const result = await createSplitWithDaysService(id, name);
         res.status(200).json({
             message: "Split created succesfully",
             data: result,
@@ -26,12 +27,12 @@ async function createSplit(req, res) {
     }
 }
 
-async function getSplits(req, res) {
+async function getSplitsByUser(req, res) {
     const user = req.user;
     const id = user?.id;
 
     try {
-        const result = await getSplitsByUser(id);
+        const result = await getSplitsByUserService(id);
         res.status(200).json({
             message: "Split fetched succesfully",
             data: result,
@@ -48,7 +49,7 @@ async function getSplits(req, res) {
 async function getSplitById(req, res) {
     const { id } = req.params;
     try {
-        const result = await splitsService.getSplitById(id);
+        const result = await getSplitByIdService(id);
         res.status(200).json({
             message: "Split fetched successfully",
             data: result,
@@ -71,7 +72,7 @@ async function updateSplit(req, res) {
     }
 
     try {
-        const result = await splitsService.updateSplit(id, name);
+        const result = await updateSplitService(id, name);
         res.status(200).json({
             message: "Split updated successfully",
             data: result,
@@ -88,7 +89,7 @@ async function updateSplit(req, res) {
 async function deleteSplit(req, res) {
     const { id } = req.params;
     try {
-        await splitsService.deleteSplit(id);
+        await deleteSplitService(id);
         res.status(200).json({ message: "Split deleted successfully" });
     } catch (error) {
         console.error(error);
@@ -103,7 +104,7 @@ async function activateSplit(req, res) {
     const user = req.user;
     const { id } = req.params;
     try {
-        const result = await splitsService.setActiveSplit(user.id, id);
+        const result = await setActiveSplitService(user.id, id);
         res.status(200).json({ message: "Split activated", data: result });
     } catch (error) {
         console.error(error);

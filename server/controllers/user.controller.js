@@ -1,4 +1,4 @@
-import { updateUser } from "../services/user.services.js";
+import { updateUser as updateUserService } from "../services/user.services.js";
 
 // / GET /users/me
 async function getCurrentUser(req, res) {
@@ -12,7 +12,7 @@ async function updateCurrentUser(req, res) {
     const data = req.body;
 
     try {
-        const result = await updateUser(id, data);
+        const result = await updateUserService(id, data);
         res.status(200).json({ message: "Updated succesfully" });
     } catch (error) {
         res.status(400).json({
