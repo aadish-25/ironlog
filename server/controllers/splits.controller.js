@@ -50,6 +50,9 @@ async function getSplitById(req, res) {
     const { id } = req.params;
     try {
         const result = await getSplitByIdService(id);
+        if (!result) {
+            return res.status(404).json({ message: "Split not found" });
+        }
         res.status(200).json({
             message: "Split fetched successfully",
             data: result,

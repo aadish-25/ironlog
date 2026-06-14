@@ -80,6 +80,10 @@ const getSplitByIdService = async (splitId) => {
             [splitId],
         );
 
+        if (!splitResult.rows[0]) {
+            return null;
+        }
+
         const daysResult = await pool.query(
             "SELECT * FROM split_days WHERE split_id = $1 ORDER BY day_of_week",
             [splitId],

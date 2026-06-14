@@ -3,6 +3,9 @@ import { updateUserService } from "../services/user.services.js";
 // / GET /users/me
 async function getCurrentUser(req, res) {
     const user = req.user;
+    if (!user) {
+        return res.status(404).json({ message: "User not found" });
+    }
     return res.status(200).json({ current_user: user });
 }
 
