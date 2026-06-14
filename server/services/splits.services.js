@@ -1,6 +1,5 @@
 import pool from "../db/connection.js";
 
-// TODO 1: check the count of splits, if no split then make it active
 const createSplitWithDays = async (userId, name) => {
     let client;
 
@@ -8,9 +7,15 @@ const createSplitWithDays = async (userId, name) => {
         client = await pool.connect();
         await client.query("BEGIN");
 
+        const countResult = await client.query(
+            "SELECT COUNT(*) FROM splits WHERE user_id = $1",
+            [userId],
+        );
+        const isFirstSplit = parseInt(countResult.rows[0].count) === 0;
+
         const created_split = await client.query(
-            "INSERT INTO splits(user_id, name) VALUES($1, $2) RETURNING id;",
-            [userId, name],
+            "INSERT INTO splits(user_id, name, is_active) VALUES($1, $2, $3) RETURNING id;",
+            [userId, name, isFirstSplit],
         );
 
         const splitId = created_split.rows[0].id;
@@ -39,7 +44,7 @@ const createSplitWithDays = async (userId, name) => {
 
         await client.query("COMMIT");
 
-        return { id: splitId, name };
+        return { id: splitId, name, is_active: isFirstSplit };
     } catch (error) {
         if (client) await client.query("ROLLBACK");
         throw new Error("Could not create split, faced an issue");
@@ -123,7 +128,7 @@ const setActiveSplit = async (userId, splitId) => {
         );
 
         await client.query("COMMIT");
-        
+
         return result.rows[0];
     } catch (error) {
         if (client) await client.query("ROLLBACK");
