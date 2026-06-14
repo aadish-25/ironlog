@@ -1,4 +1,4 @@
-import { updateUser as updateUserService } from "../services/user.services.js";
+import { updateUserService } from "../services/user.services.js";
 
 // / GET /users/me
 async function getCurrentUser(req, res) {

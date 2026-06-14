@@ -1,10 +1,10 @@
 import {
-    createSplitWithDays as createSplitWithDaysService,
-    getSplitsByUser as getSplitsByUserService,
-    getSplitById as getSplitByIdService,
-    updateSplit as updateSplitService,
-    deleteSplit as deleteSplitService,
-    setActiveSplit as setActiveSplitService,
+    createSplitWithDaysService,
+    getSplitsByUserService,
+    getSplitByIdService,
+    updateSplitService,
+    deleteSplitService,
+    setActiveSplitService,
 } from "../services/splits.services.js";
 
 async function createSplit(req, res) {

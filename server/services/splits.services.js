@@ -1,6 +1,6 @@
 import pool from "../db/connection.js";
 
-const createSplitWithDays = async (userId, name) => {
+const createSplitWithDaysService = async (userId, name) => {
     let client;
 
     try {
@@ -53,7 +53,7 @@ const createSplitWithDays = async (userId, name) => {
     }
 };
 
-const getSplitsByUser = async (userId) => {
+const getSplitsByUserService = async (userId) => {
     try {
         const result = await pool.query(
             "SELECT * FROM splits WHERE user_id = $1",
@@ -73,7 +73,7 @@ const getSplitsByUser = async (userId) => {
 //     // split_day service not split service
 // };
 
-const getSplitById = async (splitId) => {
+const getSplitByIdService = async (splitId) => {
     try {
         const splitResult = await pool.query(
             "SELECT * FROM splits WHERE id = $1",
@@ -91,7 +91,7 @@ const getSplitById = async (splitId) => {
     }
 };
 
-const updateSplit = async (splitId, name) => {
+const updateSplitService = async (splitId, name) => {
     try {
         const result = await pool.query(
             "UPDATE splits SET name = $1 WHERE id = $2 RETURNING *",
@@ -104,7 +104,7 @@ const updateSplit = async (splitId, name) => {
     }
 };
 
-const deleteSplit = async (splitId) => {
+const deleteSplitService = async (splitId) => {
     try {
         await pool.query("DELETE FROM splits WHERE id = $1", [splitId]);
     } catch (error) {
@@ -112,7 +112,7 @@ const deleteSplit = async (splitId) => {
     }
 };
 
-const setActiveSplit = async (userId, splitId) => {
+const setActiveSplitService = async (userId, splitId) => {
     let client;
     try {
         client = await pool.connect();
@@ -139,10 +139,10 @@ const setActiveSplit = async (userId, splitId) => {
 };
 
 export {
-    createSplitWithDays,
-    getSplitsByUser,
-    getSplitById,
-    updateSplit,
-    deleteSplit,
-    setActiveSplit,
+    createSplitWithDaysService,
+    getSplitsByUserService,
+    getSplitByIdService,
+    updateSplitService,
+    deleteSplitService,
+    setActiveSplitService,
 };

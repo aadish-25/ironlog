@@ -1,6 +1,6 @@
 import pool from "../db/connection.js";
 
-const updateSplitDay = async (id, label) => {
+const updateSplitDayService = async (id, label) => {
     try {
         const result = await pool.query(
             "UPDATE split_days SET label = $1 WHERE id = $2 RETURNING *",
@@ -13,4 +13,4 @@ const updateSplitDay = async (id, label) => {
     }
 };
 
-export { updateSplitDay };
+export { updateSplitDayService };

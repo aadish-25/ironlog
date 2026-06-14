@@ -1,24 +1,23 @@
 import pool from "../db/connection.js";
 
-
-const getUserById = async (id) => {
+const getUserByIdService = async (id) => {
     const result = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
     return result.rows[0];
 };
 
-const updateUser = async (id, data) => {
+const updateUserService = async (id, data) => {
     const allowList = ["name", "profile_picture_url", "preferred_workout_time"];
     const keys = Object.keys(data);
 
     const invalidKey = keys.find((key) => !allowList.includes(key));
 
     if (invalidKey) {
-        console.log("Invalid update parameter: ${invalidKey}")
+        console.log("Invalid update parameter: ${invalidKey}");
         throw new Error(`Invalid update parameter: ${invalidKey}`);
     }
 
     if (keys.length === 0) {
-        console.log("No valid fields provided for update")
+        console.log("No valid fields provided for update");
         throw new Error("No valid fields provided for update");
     }
 
@@ -33,7 +32,7 @@ const updateUser = async (id, data) => {
     values.push(id);
 
     // Keys are valid, extract and query
-    
+
     const query = `
         UPDATE users
         SET ${setClauses.join(", ")}
@@ -46,4 +45,4 @@ const updateUser = async (id, data) => {
     return result.rows[0];
 };
 
-export { getUserById, updateUser };
+export { getUserByIdService, updateUserService };

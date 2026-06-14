@@ -1,4 +1,4 @@
-import { updateSplitDay as updateSplitDayService } from "../services/splitDays.services.js";
+import { updateSplitDayService } from "../services/splitDays.services.js";
 
 async function updateSplitDay(req, res) {
     const { id } = req.params;
