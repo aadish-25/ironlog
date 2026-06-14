@@ -10,7 +10,7 @@ import {
 const router = Router();
 
 router.get("/", getExercises);
-router.get("/:id", getExercise);
-router.get("/:id/progress", devAuth, getProgress);
+router.get("/:id", getExerciseById);
+router.get("/:id/progress", clerkAuth, getExerciseProgress);
 
 export default router;
