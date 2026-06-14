@@ -14,11 +14,11 @@ const createSplitWithDaysService = async (userId, name) => {
         const isFirstSplit = parseInt(countResult.rows[0].count) === 0;
 
         const created_split = await client.query(
-            "INSERT INTO splits(user_id, name, is_active) VALUES($1, $2, $3) RETURNING id;",
+            "INSERT INTO splits(user_id, name, is_active) VALUES($1, $2, $3) RETURNING *;",
             [userId, name, isFirstSplit],
         );
 
-        const splitId = created_split.rows[0].id;
+        const splitId = created_split.rows[0];
         const days = [
             "Monday",
             "Tuesday",
