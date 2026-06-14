@@ -41,10 +41,12 @@ app.listen(PORT, () => {
 
 // Import routes
 import userRoutes from "./routes/user.route.js";
-import splitsRoutes from "./routes/splits.route.js"
-import splitDaysRoutes from "./routes/splitDays.route.js"
+import splitsRoutes from "./routes/splits.route.js";
+import splitDaysRoutes from "./routes/splitDays.route.js";
+import exerciseRoutes from "./routes/exercises.route.js";
 
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/splits", splitsRoutes);
-app.user("/api/split-days", splitDaysRoutes)
+app.use("/api/split-days", splitDaysRoutes);
+app.use("/api/exercise", exerciseRoutes);
