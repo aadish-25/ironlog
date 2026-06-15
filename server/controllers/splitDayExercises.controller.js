@@ -29,7 +29,7 @@ async function addExercise(req, res) {
 async function removeExercise(req, res) {
     const { id } = req.params;
     try {
-        await removeExerciseService(id);-
+        await removeExerciseService(id);
         res.status(200).json({
             message: "Exercise deleted succesfully",
         });

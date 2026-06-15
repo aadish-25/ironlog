@@ -52,7 +52,7 @@ const getExerciseProgressService = async (userId, exerciseId) => {
         );
         return result.rows;
     } catch (error) {
-        throw new Error("Could not get exercise list");
+        throw new Error("Could not get exercise progres");
     }
 };
 

@@ -32,9 +32,9 @@ const removeExerciseService = async (exerciseId) => {
 };
 
 const reorderExerciseService = async (splitDayExerciseId, newOrderIndex) => {
-    const client = await pool.connect();
-
+    let client;
     try {
+        client = await pool.connect();
         await client.query("BEGIN");
 
         const currentResult = await client.query(

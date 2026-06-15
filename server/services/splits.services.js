@@ -2,7 +2,6 @@ import pool from "../db/connection.js";
 
 const createSplitWithDaysService = async (userId, name) => {
     let client;
-
     try {
         client = await pool.connect();
         await client.query("BEGIN");
