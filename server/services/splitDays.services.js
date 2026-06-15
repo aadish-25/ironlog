@@ -9,7 +9,7 @@ const updateSplitDayService = async (id, label) => {
         if (!result.rows[0]) throw new Error("Split day not found, invalid ID");
         return result.rows[0];
     } catch (error) {
-        throw new Error(`Error while updating/renaming label: ${error}`);
+        throw new Error("Could not update split day label", { cause: error });
     }
 };
 

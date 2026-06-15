@@ -18,9 +18,10 @@ async function updateCurrentUser(req, res) {
         const result = await updateUserService(id, data);
         res.status(200).json({ message: "Updated succesfully" });
     } catch (error) {
+        console.error(error);
         res.status(400).json({
             message: "Error while updating information",
-            error: error instanceof Error ? error.message : String(error),
+            error: error.message,
         });
     }
 }

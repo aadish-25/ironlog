@@ -46,7 +46,7 @@ const createSplitWithDaysService = async (userId, name) => {
         return { id: splitId, name, is_active: isFirstSplit };
     } catch (error) {
         if (client) await client.query("ROLLBACK");
-        throw new Error("Could not create split, faced an issue");
+        throw new Error("Could not create split", { cause: error });
     } finally {
         if (client) client.release();
     }
@@ -60,7 +60,7 @@ const getSplitsByUserService = async (userId) => {
         );
         return result.rows;
     } catch (error) {
-        throw new Error("Could not retrieve splits for user");
+        throw new Error("Could not retrieve splits for user", { cause: error });
     }
 };
 
@@ -90,7 +90,7 @@ const getSplitByIdService = async (splitId) => {
 
         return { ...splitResult.rows[0], days: daysResult.rows };
     } catch (error) {
-        throw new Error("Could not retrieve split");
+        throw new Error("Could not retrieve split", { cause: error });
     }
 };
 
@@ -103,7 +103,7 @@ const updateSplitService = async (splitId, name) => {
 
         return result.rows[0];
     } catch (error) {
-        throw new Error("Could not update split");
+        throw new Error("Could not update split", { cause: error });
     }
 };
 
@@ -111,7 +111,7 @@ const deleteSplitService = async (splitId) => {
     try {
         await pool.query("DELETE FROM splits WHERE id = $1", [splitId]);
     } catch (error) {
-        throw new Error("Could not delete split");
+        throw new Error("Could not delete split", { cause: error });
     }
 };
 
@@ -135,7 +135,7 @@ const setActiveSplitService = async (userId, splitId) => {
         return result.rows[0];
     } catch (error) {
         if (client) await client.query("ROLLBACK");
-        throw new Error("Could not set active split");
+        throw new Error("Could not set active split", { cause: error });
     } finally {
         if (client) client.release();
     }

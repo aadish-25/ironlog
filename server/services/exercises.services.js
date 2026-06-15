@@ -23,7 +23,7 @@ const getExercisesService = async (muscleGroups, equipment) => {
         const result = await pool.query(query, values);
         return result.rows;
     } catch (error) {
-        throw new Error(`Error while fetching exercises: ${error.message}`);
+        throw new Error("Could not fetch exercises", { cause: error });
     }
 };
 
@@ -35,7 +35,7 @@ const getExerciseByIdService = async (id) => {
         );
         return result.rows[0];
     } catch (error) {
-        throw new Error("Could not get exercise list");
+        throw new Error("Could not fetch exercise by id", { cause: error });
     }
 };
 
@@ -52,7 +52,7 @@ const getExerciseProgressService = async (userId, exerciseId) => {
         );
         return result.rows;
     } catch (error) {
-        throw new Error("Could not get exercise progres");
+        throw new Error("Could not fetch exercise progress", { cause: error });
     }
 };
 

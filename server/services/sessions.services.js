@@ -8,7 +8,7 @@ const createSessionService = async (userId, splitDayId, date, isSkipped = false)
         );
         return result.rows[0];
     } catch (error) {
-        throw new Error("Error while creating session");
+        throw new Error("Could not create session", { cause: error });
     }
 };
 
@@ -20,7 +20,7 @@ const getSessionsService = async (userId) => {
         );
         return result.rows;
     } catch (error) {
-        throw new Error("Error while fetching sessions list for a user");
+        throw new Error("Could not fetch sessions", { cause: error });
     }
 };
 
@@ -46,9 +46,7 @@ const getSessionByIdService = async (sessionId, userId) => {
             sets: setDetailsOfSession.rows,
         };
     } catch (error) {
-        throw new Error(
-            "Error while fetching complete session details with sets and exercises",
-        );
+        throw new Error("Could not fetch session details", { cause: error });
     }
 };
 
@@ -61,7 +59,7 @@ const deleteSessionService = async (sessionId, userId) => {
 
         return result;
     } catch (error) {
-        throw new Error("Error while deleting session");
+        throw new Error("Could not delete session", { cause: error });
     }
 };
 
@@ -119,7 +117,7 @@ const getMissedSessionsService = async (userId) => {
 
         return missedDays;
     } catch (error) {
-        throw new Error("Error while fetching missed sessions");
+        throw new Error("Could not fetch missed sessions", { cause: error });
     }
 };
 

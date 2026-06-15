@@ -33,7 +33,7 @@ const createSetService = async (
 
         return result.rows[0];
     } catch (error) {
-        throw new Error("Could not log set");
+        throw new Error("Could not log set", { cause: error });
     }
 };
 
@@ -83,7 +83,7 @@ const deleteSetService = async (setId, userId) => {
     try {
         await pool.query(`DELETE FROM sets WHERE id = $1 AND user_id = $2`, [setId, userId]);
     } catch (error) {
-        throw new Error("Could not delete set");
+        throw new Error("Could not delete set", { cause: error });
     }
 };
 

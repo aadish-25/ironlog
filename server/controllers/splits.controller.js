@@ -22,7 +22,7 @@ async function createSplit(req, res) {
         console.error(error);
         res.status(400).json({
             message: "Error while creating split",
-            error: error,
+            error: error.message,
         });
     }
 }
@@ -41,7 +41,7 @@ async function getSplitsByUser(req, res) {
         console.error(error);
         res.status(400).json({
             message: "Error while fetching splits",
-            error: error,
+            error: error.message,
         });
     }
 }

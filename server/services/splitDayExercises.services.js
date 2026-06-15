@@ -16,7 +16,7 @@ const addExerciseService = async (splitDayId, exerciseId, orderIndex) => {
         );
         return result.rows[0];
     } catch (error) {
-        throw new Error("Could not add exercise to the split day");
+        throw new Error("Could not add exercise to split day", { cause: error });
     }
 };
 
@@ -27,7 +27,7 @@ const removeExerciseService = async (exerciseId) => {
             [exerciseId],
         );
     } catch (error) {
-        throw new Error("Could not delete exercise");
+        throw new Error("Could not remove exercise from split day", { cause: error });
     }
 };
 
