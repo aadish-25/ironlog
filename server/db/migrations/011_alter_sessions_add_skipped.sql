@@ -1,0 +1,1 @@
+ALTER TABLE sessions ADD COLUMN is_skipped BOOLEAN DEFAULT false NOT NULL;

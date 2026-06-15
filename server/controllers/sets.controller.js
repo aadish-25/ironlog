@@ -33,10 +33,11 @@ async function createSet(req, res) {
 
 async function updateSet(req, res) {
     const { id } = req.params;
+    const userId = req.user.id;
     const data = req.body;
 
     try {
-        const result = await updateSetService(id, data);
+        const result = await updateSetService(id, userId, data);
 
         res.status(200).json({
             message: "Set updated successfully",
@@ -53,9 +54,10 @@ async function updateSet(req, res) {
 
 async function deleteSet(req, res) {
     const { id } = req.params;
+    const userId = req.user.id;
 
     try {
-        await deleteSetService(id);
+        await deleteSetService(id, userId);
 
         res.status(200).json({
             message: "Set deleted successfully",

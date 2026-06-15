@@ -37,7 +37,7 @@ const createSetService = async (
     }
 };
 
-const updateSetService = async (setId, updateData) => {
+const updateSetService = async (setId, userId, updateData) => {
     try {
         const allowedFields = ["weight_kg", "reps"];
         const updateKeys = Object.keys(updateData);
@@ -63,11 +63,12 @@ const updateSetService = async (setId, updateData) => {
         });
 
         values.push(setId);
+        values.push(userId);
 
         const result = await pool.query(
             `UPDATE sets 
              SET ${setClauses.join(", ")}
-             WHERE id = $${values.length}
+             WHERE id = $${values.length - 1} AND user_id = $${values.length}
              RETURNING *`,
             values
         );
@@ -78,9 +79,9 @@ const updateSetService = async (setId, updateData) => {
     }
 };
 
-const deleteSetService = async (setId) => {
+const deleteSetService = async (setId, userId) => {
     try {
-        await pool.query(`DELETE FROM sets WHERE id = $1`, [setId]);
+        await pool.query(`DELETE FROM sets WHERE id = $1 AND user_id = $2`, [setId, userId]);
     } catch (error) {
         throw new Error("Could not delete set");
     }

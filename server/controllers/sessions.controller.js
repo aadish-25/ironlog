@@ -3,6 +3,7 @@ import {
     getSessionsService,
     getSessionByIdService,
     deleteSessionService,
+    getMissedSessionsService,
 } from "../services/sessions.services.js";
 
 async function createSession(req, res) {
@@ -90,4 +91,20 @@ async function deleteSession(req, res) {
     }
 }
 
-export { createSession, getSessions, getSessionById, deleteSession };
+async function getMissedSessions(req, res) {
+    try {
+        const result = await getMissedSessionsService(req.user.id);
+        res.status(200).json({
+            message: "Missed sessions retrieved successfully",
+            data: result,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({
+            message: "Error while fetching missed sessions",
+            error: error.message,
+        });
+    }
+}
+
+export { createSession, getSessions, getSessionById, deleteSession, getMissedSessions };
