@@ -48,7 +48,7 @@ async function getExerciseById(req, res) {
 async function getExerciseProgress(req, res) {
     const user = req.user;
     const id = user.id;
-    const { exerciseId } = req.params;
+    const { id: exerciseId } = req.params;
 
     try {
         const result = getExerciseProgressService(id, exerciseId);
