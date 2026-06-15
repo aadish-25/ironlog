@@ -51,7 +51,7 @@ async function getExerciseProgress(req, res) {
     const { id: exerciseId } = req.params;
 
     try {
-        const result = getExerciseProgressService(id, exerciseId);
+        const result = await getExerciseProgressService(id, exerciseId);
         if (!result) {
             return res
                 .status(404)
