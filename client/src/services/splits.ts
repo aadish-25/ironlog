@@ -1,50 +1,26 @@
-import axios from 'axios';
+import { api } from "./api";
+import { type Split } from "../types";
 
-// ---------------------------------------------------------
-// DUMMY FUNCTION: This is an example, not your actual logic
-// ---------------------------------------------------------
-export const getDummyBananaSplits = async () => {
-  const response = await axios.get('https://dummyapi.com/desserts/banana-splits');
-  return response.data;
+export const getSplits = async (): Promise<Split[]> => {
+    const response = await api.get("/splits");
+    return response.data.data as Split[];
 };
 
-/*
- * HOW TO USE THIS SERVICE FUNCTION IN A COMPONENT OR HOOK:
- * 
- * import { useEffect, useState } from 'react';
- * import { getDummyBananaSplits } from '../services/splits';
- * 
- * export default function BananaSplitMenu() {
- *   const [desserts, setDesserts] = useState([]);
- *   
- *   useEffect(() => {
- *     const fetchData = async () => {
- *       try {
- *         // Call the service function
- *         const data = await getDummyBananaSplits();
- *         setDesserts(data);
- *       } catch (error) {
- *         console.error("Failed to fetch desserts", error);
- *       }
- *     };
- *     
- *     fetchData();
- *   }, []); // Empty array means this runs once on mount
- *   
- *   return (
- *     <div>
- *       {desserts.length === 0 ? "Loading..." : `Found ${desserts.length} desserts`}
- *     </div>
- *   );
- * }
- */
+export const createSplit = async (name: string): Promise<Split> => {
+    const response = await api.post("/splits", { name });
+    return response.data.data as Split;
+};
 
+export const activateSplit = async (id: string): Promise<Split> => {
+    const response = await api.patch(`/splits/${id}/activate`);
+    return response.data.data as Split;
+};
 
-// import { api } from './api';
-// import type { Split } from '../types';
+export const deleteSplit = async (id: string): Promise<void> => {
+    await api.delete(`/splits/${id}`);
+};
 
-// export const getSplits = async () => {
-//   // Notice we don't need the API_URL anymore, just the specific route!
-//   const response = await api.get('/splits'); 
-//   return response.data as Split[];
-// };
+export const updateSplit = async (id: string, name: string): Promise<Split> => {
+    const response = await api.put(`/splits/${id}`, { name });
+    return response.data.data as Split;
+};
