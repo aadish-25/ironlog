@@ -1,6 +1,6 @@
 import express from "express";
 // import clerkAuth from "../middlewares/clerkAuth.middleware.js";
-import devAuth from "../middlewares/devAuth.middleware.js";
+import clerkAuth from "../middlewares/clerkAuth.middleware.js";
 import {
     createSet,
     updateSet,
@@ -9,8 +9,8 @@ import {
 
 const router = express.Router();
 
-router.post("/", devAuth, createSet);
-router.put("/:id", devAuth, updateSet);
-router.delete("/:id", devAuth, deleteSet);
+router.post("/", clerkAuth, createSet);
+router.put("/:id", clerkAuth, updateSet);
+router.delete("/:id", clerkAuth, deleteSet);
 
 export default router;

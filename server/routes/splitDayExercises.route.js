@@ -1,6 +1,6 @@
 import express from "express";
 // import clerkAuth from "../middlewares/clerkAuth.middleware.js";
-import devAuth from "../middlewares/devAuth.middleware.js";
+import clerkAuth from "../middlewares/clerkAuth.middleware.js";
 import {
     addExercise,
     removeExercise,
@@ -8,8 +8,8 @@ import {
 } from "../controllers/splitDayExercises.controller.js";
 
 const router = express.Router();
-router.post("/", devAuth, addExercise);
-router.delete("/:id", devAuth, removeExercise);
-router.patch("/:id", devAuth, reorderExercise);
+router.post("/", clerkAuth, addExercise);
+router.delete("/:id", clerkAuth, removeExercise);
+router.patch("/:id", clerkAuth, reorderExercise);
 
 export default router;

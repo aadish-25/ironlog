@@ -16,7 +16,7 @@ async function updateCurrentUser(req, res) {
 
     try {
         const result = await updateUserService(id, data);
-        res.status(200).json({ message: "Updated succesfully" });
+        res.status(200).json({ message: "Updated successfully", updated_user: result });
     } catch (error) {
         console.error(error);
         res.status(400).json({

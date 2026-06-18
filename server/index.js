@@ -15,7 +15,9 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
     cors({
-        origin: "http://localhost:5173",
+        origin: process.env.NODE_ENV === "production"
+            ? "https://your-production-domain.com"
+            : true, // allow all origins in dev (covers localhost + network IP)
         credentials: true,
     }),
 );
