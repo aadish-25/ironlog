@@ -1,5 +1,4 @@
-@import "tailwindcss";
-
+/* IronLog Theme Tokens */
 @theme {
   /* Backgrounds */
   --color-bg:      #0f0f0f;
@@ -21,6 +20,6 @@
   --color-gold:     #c97a00;
 
   /* Fonts */
-  --font-display: "Bebas Neue", sans-serif;
-  --font-body:    "Inter", sans-serif;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body:    'Inter', sans-serif;
 }
