@@ -1,4 +1,5 @@
 import { LogOut } from "lucide-react";
+import { useClerk } from "@clerk/clerk-react";
 import { ProfileHeader } from "../components/Profile/ProfileHeader";
 import { JourneyStrip } from "../components/Profile/JourneyStrip";
 import { MonthlyStats } from "../components/Profile/MonthlyStats";
@@ -7,6 +8,8 @@ import type { StatCard, SettingsItem } from "../components/Profile/types";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function ProfilePage() {
+  const { signOut } = useClerk();
+
   // ─── USER IDENTITY ──────────────────────────────────────────────────────────
   // TODO: This component needs the user's display name.
   const userName: string | null = null;
@@ -48,7 +51,9 @@ export function ProfilePage() {
   const handleToggleNotifications = () => {};
 
   // TODO: Handle user logout.
-  const handleLogout = () => {};
+  const handleLogout = () => {
+    signOut();
+  };
 
   return (
     <section
