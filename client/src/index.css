@@ -1,5 +1,30 @@
 @import "tailwindcss";
-@import "./styles/tokens.css";
+
+/* IronLog Theme Tokens */
+@theme {
+  /* Backgrounds */
+  --color-bg:      #0f0f0f;
+  --color-card:    #161616;
+  --color-raised:  #1a1a1a;
+  --color-border:  #242424;
+
+  /* Text */
+  --color-ink:     #ffffff;
+  --color-dim:     #a3a3a3;
+  --color-ghost:   #737373;
+
+  /* Accents */
+  --color-heat:     #e8460a;
+  --color-heat-dim: rgba(232,70,10,0.08);
+  --color-done:     #2ecc71;
+  --color-done-dim: rgba(46,204,113,0.10);
+  --color-skip:     #2a7abf;
+  --color-gold:     #c97a00;
+
+  /* Fonts */
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body:    'Inter', sans-serif;
+}
 
 @layer utilities {
   .font-display {
