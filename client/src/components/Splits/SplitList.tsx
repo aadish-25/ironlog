@@ -4,10 +4,12 @@ import { DayPips } from "./DayPips";
 interface SplitListProps {
   splits: Split[];
   onSelectSplit: (split: Split) => void;
+  onActivateSplit: (split: Split) => void;
+  hasActiveSplit?: boolean;
 }
 
-export function SplitList({ splits, onSelectSplit }: SplitListProps) {
-  if (splits.length === 0) {
+export function SplitList({ splits, onSelectSplit, onActivateSplit, hasActiveSplit = false }: SplitListProps) {
+  if (splits.length === 0 && !hasActiveSplit) {
     return (
       <div className="mx-5 mt-4 bg-[#111111] border border-dashed border-[#333333] rounded-[14px] p-8 flex flex-col items-center gap-3 text-center">
         <div className="text-[32px] opacity-50 grayscale">📋</div>
@@ -44,6 +46,12 @@ export function SplitList({ splits, onSelectSplit }: SplitListProps) {
             {split.days.filter((d) => d.type === "rest").length} rest days
           </p>
           <DayPips days={split.days} />
+          <button
+            onClick={(e) => { e.stopPropagation(); onActivateSplit(split); }}
+            className="mt-3 text-[11px] tracking-[1.5px] uppercase text-done border border-done/40 bg-done/5 px-3 py-1.5 rounded-lg hover:bg-done/10 transition-colors"
+          >
+            Set as Active
+          </button>
         </article>
       ))}
     </>
