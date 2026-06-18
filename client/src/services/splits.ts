@@ -38,3 +38,13 @@ export const getDummyBananaSplits = async () => {
  *   );
  * }
  */
+
+
+// import { api } from './api';
+// import type { Split } from '../types';
+
+// export const getSplits = async () => {
+//   // Notice we don't need the API_URL anymore, just the specific route!
+//   const response = await api.get('/splits'); 
+//   return response.data as Split[];
+// };
