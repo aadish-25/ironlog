@@ -1,39 +1,12 @@
-import axios from 'axios';
+import { api } from "./api";
+import { type User } from "../types";
 
-// ---------------------------------------------------------
-// DUMMY FUNCTION: This is an example, not your actual logic
-// ---------------------------------------------------------
-export const fetchDummyAlienProfile = async (alienId: string) => {
-  const response = await axios.get(`https://dummyapi.com/aliens/${alienId}`);
-  return response.data;
+export const getUser = async (): Promise<User> => {
+    const response = await api.get("/users/me");
+    return response.data.current_user as User;
 };
 
-/*
- * HOW TO USE THIS SERVICE FUNCTION IN A COMPONENT OR HOOK:
- * 
- * import { useEffect, useState } from 'react';
- * import { fetchDummyAlienProfile } from '../services/users';
- * 
- * export default function AlienProfileViewer({ alienId }) {
- *   const [profile, setProfile] = useState(null);
- *   
- *   useEffect(() => {
- *     // Only fetch if we have an ID
- *     if (!alienId) return;
- *     
- *     const fetchProfile = async () => {
- *       try {
- *         // Call the service function with a parameter
- *         const data = await fetchDummyAlienProfile(alienId);
- *         setProfile(data);
- *       } catch (error) {
- *         console.error("Failed to fetch alien profile", error);
- *       }
- *     };
- *     
- *     fetchProfile();
- *   }, [alienId]); // Run this effect again if alienId changes
- *   
- *   return <div>{profile ? `Alien Name: ${profile.name}` : "Scanning for alien..."}</div>;
- * }
- */
+export const updateUser = async (data: Partial <User>): Promise <User> => {
+    const response = await api.patch("/users/me", data);
+    return response.data.updated_user as User;
+}
