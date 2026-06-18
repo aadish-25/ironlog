@@ -1,1 +1,26 @@
-/* Design tokens */
+@import "tailwindcss";
+
+@theme {
+  /* Backgrounds */
+  --color-bg:      #0f0f0f;
+  --color-card:    #161616;
+  --color-raised:  #1a1a1a;
+  --color-border:  #242424;
+
+  /* Text */
+  --color-ink:     #ffffff;
+  --color-dim:     #666666;
+  --color-ghost:   #444444;
+
+  /* Accents */
+  --color-heat:     #e8460a;
+  --color-heat-dim: rgba(232,70,10,0.08);
+  --color-done:     #2ecc71;
+  --color-done-dim: rgba(46,204,113,0.10);
+  --color-skip:     #2a7abf;
+  --color-gold:     #c97a00;
+
+  /* Fonts */
+  --font-display: "Bebas Neue", sans-serif;
+  --font-body:    "Inter", sans-serif;
+}
