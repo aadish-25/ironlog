@@ -11,7 +11,7 @@ export function SearchBar({ searchQuery, onSearchChange }: SearchBarProps) {
     <div className="mx-5 mb-2.5 relative shrink-0">
       <Search
         size={15}
-        className="absolute left-3 top-1/2 -translate-y-1/2 text-ghost pointer-events-none"
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none"
         aria-hidden="true"
       />
       <input
@@ -19,7 +19,7 @@ export function SearchBar({ searchQuery, onSearchChange }: SearchBarProps) {
         value={searchQuery}
         onChange={onSearchChange}
         placeholder="Search exercises..."
-        className="w-full bg-card border border-border rounded-[10px] py-[11px] pl-[38px] pr-4 text-[13px] text-white outline-none font-body placeholder:text-ghost"
+        className="w-full bg-card border border-border rounded-[10px] py-[11px] pl-[38px] pr-4 text-[13px] text-white outline-none font-body placeholder:text-zinc-500"
         aria-label="Search exercises"
       />
     </div>

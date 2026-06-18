@@ -5,177 +5,208 @@ import { SearchBar } from "../components/Exercises/SearchBar";
 import { ExerciseList } from "../components/Exercises/ExerciseList";
 import { MUSCLE_ORDER, EQUIPMENT_OPTIONS } from "../components/Exercises/types";
 import type { Exercise, MuscleGroup } from "../components/Exercises/types";
+import { useExercises } from "../hooks/useExercises";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function ExercisesPage() {
-  // ─── EXERCISE DATA ──────────────────────────────────────────────────────────
-  // TODO: This component needs the full list of exercises the user has added.
-  const exercises: Exercise[] = [];
+    const { exercisesList } = useExercises();
+    // ─── EXERCISE DATA ──────────────────────────────────────────────────────────
+    // TODO: This component needs the full list of exercises the user has added.
+    const exercises: Exercise[] = exercisesList ?? [];
 
-  // ─── SEARCH & FILTER STATE ──────────────────────────────────────────────────
-  // TODO: This component needs a search query filter.
-  const [searchQuery, setSearchQuery] = useState("");
+    // ─── SEARCH & FILTER STATE ──────────────────────────────────────────────────
 
-  // TODO: This component needs muscle group and equipment filters.
-  const [selectedMuscles, setSelectedMuscles] = useState<Set<string>>(new Set());
-  const [selectedEquipment, setSelectedEquipment] = useState<Set<string>>(new Set(["All"]));
+    const [searchQuery, setSearchQuery] = useState("");
+    const [selectedMuscles, setSelectedMuscles] = useState<Set<string>>(
+        new Set(),
+    );
+    const [selectedEquipment, setSelectedEquipment] = useState<Set<string>>(
+        new Set(["All"]),
+    );
 
-  // TODO: This component needs collapsible sections by muscle group.
-  const [collapsedSections] = useState<Set<string>>(new Set());
-  
-  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
-
-  // ─── DERIVED DATA ───────────────────────────────────────────────────────────
-  const isSearching = searchQuery.trim().length > 0;
-  const activeFilterCount =
-    selectedMuscles.size +
-    (selectedEquipment.has("All") ? 0 : selectedEquipment.size);
-
-  // Group exercises by muscle (preserving display order)
-  const grouped: MuscleGroup[] = MUSCLE_ORDER.map((muscle) => ({
-    muscle,
-    exercises: exercises.filter((ex) => ex.muscle === muscle),
-  })).filter((group) => group.exercises.length > 0);
-
-  // ─── EVENT HANDLERS ─────────────────────────────────────────────────────────
-  // TODO: Handle search input changes.
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
-
-  // TODO: Handle opening the filter bottom sheet.
-  const handleOpenFilters = () => setIsFilterSheetOpen(true);
-  const handleCloseFilters = () => setIsFilterSheetOpen(false);
-
-  const toggleMuscleFilter = (muscle: string) => {
-    setSelectedMuscles((prev) => {
-      const next = new Set(prev);
-      if (next.has(muscle)) next.delete(muscle);
-      else next.add(muscle);
-      return next;
+    const filteredExercises = exercises.filter((ex) => {
+        if (
+            searchQuery &&
+            !ex.name.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+            return false;
+        if (selectedMuscles.size > 0 && !selectedMuscles.has(ex.muscle))
+            return false;
+        if (
+            !selectedEquipment.has("All") &&
+            !selectedEquipment.has(ex.equipment)
+        ) {
+            return false;
+        }
+        return true;
     });
-  };
 
-  const toggleEquipmentFilter = (eq: string) => {
-    setSelectedEquipment((prev) => {
-      const next = new Set(prev);
-      if (eq === "All") {
-        return new Set(["All"]);
-      }
-      next.delete("All");
-      if (next.has(eq)) {
-        next.delete(eq);
-        if (next.size === 0) next.add("All");
-      } else {
-        next.add(eq);
-      }
-      return next;
-    });
-  };
+    // TODO: This component needs collapsible sections by muscle group.
+    const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
+        new Set(),
+    );
 
+    const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
 
+    // ─── DERIVED DATA ───────────────────────────────────────────────────────────
+    const isSearching = searchQuery.trim().length > 0;
+    const activeFilterCount =
+        selectedMuscles.size +
+        (selectedEquipment.has("All") ? 0 : selectedEquipment.size);
 
-  // TODO: Implement viewing exercise details (bottom sheet or new page)
-  const handleSelectExercise = () => {};
+    // Group exercises by muscle (preserving display order)
+    const grouped: MuscleGroup[] = MUSCLE_ORDER.map((muscle) => ({
+        muscle,
+        exercises: filteredExercises.filter((ex) => ex.muscle === muscle),
+    })).filter((group) => group.exercises.length > 0);
 
-  // TODO: Implement toggling collapsed state of a muscle group section.
-  const handleToggleSection = () => {};
+    // ─── EVENT HANDLERS ─────────────────────────────────────────────────────────
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+    };
 
-  return (
-    <section
-      className="min-h-screen bg-bg text-white font-body flex flex-col"
-      aria-label="Exercises library"
-    >
-      {/* ── Header ── */}
-      <ExercisesHeader
-        activeFilterCount={activeFilterCount}
-        onOpenFilters={handleOpenFilters}
-      />
+    const handleOpenFilters = () => setIsFilterSheetOpen(true);
+    const handleCloseFilters = () => setIsFilterSheetOpen(false);
 
-      {/* ── Search bar ── */}
-      <SearchBar
-        searchQuery={searchQuery}
-        onSearchChange={handleSearchChange}
-      />
+    const toggleMuscleFilter = (muscle: string) => {
+        setSelectedMuscles((prev) => {
+            const next = new Set(prev);
+            if (next.has(muscle)) next.delete(muscle);
+            else next.add(muscle);
+            return next;
+        });
+    };
 
-      {/* ── Count ── */}
-      <p className="px-5 py-1 text-[11px] text-ghost/50 shrink-0">
-        {isSearching
-          ? `${exercises.length} results for "${searchQuery}"`
-          : `${exercises.length} exercises`}
-      </p>
+    const toggleEquipmentFilter = (eq: string) => {
+        setSelectedEquipment((prev) => {
+            const next = new Set(prev);
+            if (eq === "All") {
+                return new Set(["All"]);
+            }
+            next.delete("All");
+            if (next.has(eq)) {
+                next.delete(eq);
+                if (next.size === 0) next.add("All");
+            } else {
+                next.add(eq);
+            }
+            return next;
+        });
+    };
 
-      {/* ── Exercise list ── */}
-      <ExerciseList
-        exercises={exercises}
-        grouped={grouped}
-        isSearching={isSearching}
-        collapsedSections={collapsedSections}
-        onSelectExercise={handleSelectExercise}
-        onToggleSection={handleToggleSection}
-      />
+    // TODO: Implement viewing exercise details (bottom sheet or new page)
+    const handleSelectExercise = (ex: Exercise) => {
+        console.log("Navigate to /exercises/:id", ex.id);
+    };
 
-      {/* ── Exercise Filters Bottom Sheet ── */}
-      <BottomSheet
-        isOpen={isFilterSheetOpen}
-        onClose={handleCloseFilters}
-        title="FILTER"
-      >
-        <div className="flex flex-col">
-          {/* Muscles */}
-          <div className="mb-2.5">
-            <h3 className="text-[10px] tracking-[2px] text-ghost uppercase mb-2.5">Muscle Group</h3>
-            <div className="flex flex-wrap gap-2 mb-5">
-              {MUSCLE_ORDER.map((muscle) => (
-                <button
-                  key={muscle}
-                  onClick={() => toggleMuscleFilter(muscle)}
-                  className={`px-[14px] py-2 rounded-lg text-xs font-body border cursor-pointer transition-colors ${
-                    selectedMuscles.has(muscle)
-                      ? "bg-[#1a0800] border-heat text-white"
-                      : "bg-[#1a1a1a] border-[#1f1f1f] text-dim hover:text-white"
-                  }`}
-                >
-                  {muscle}
-                </button>
-              ))}
-            </div>
-          </div>
+    // TODO: Implement toggling collapsed state of a muscle group section.
+    const handleToggleSection = (muscle: string) => {
+        setCollapsedSections((prev) => {
+            const next = new Set(prev);
+            if (next.has(muscle)) {
+                next.delete(muscle);
+            } else {
+                next.add(muscle);
+            }
+            return next;
+        });
+    };
 
-          {/* Equipment */}
-          <div className="mb-6">
-            <h3 className="text-[10px] tracking-[2px] text-ghost uppercase mb-2.5">Equipment</h3>
-            <div className="flex flex-wrap gap-2 mb-6">
-              {EQUIPMENT_OPTIONS.map((eq) => (
-                <button
-                  key={eq}
-                  onClick={() => toggleEquipmentFilter(eq)}
-                  className={`px-[14px] py-2 rounded-lg text-xs font-body border cursor-pointer transition-colors ${
-                    selectedEquipment.has(eq)
-                      ? "bg-[#1a0800] border-heat text-white"
-                      : "bg-[#1a1a1a] border-[#1f1f1f] text-dim hover:text-white"
-                  }`}
-                >
-                  {eq}
-                </button>
-              ))}
-            </div>
-          </div>
+    return (
+        <section
+            className="min-h-screen bg-bg text-white font-body flex flex-col"
+            aria-label="Exercises library"
+        >
+            {/* ── Header ── */}
+            <ExercisesHeader
+                activeFilterCount={activeFilterCount}
+                onOpenFilters={handleOpenFilters}
+            />
+            {/* ── Search bar ── */}
+            <SearchBar
+                searchQuery={searchQuery}
+                onSearchChange={handleSearchChange}
+            />
+            {/* ── Count ── */}
+            <p className="px-5 py-1 text-[11px] text-ghost/50 shrink-0">
+                {isSearching
+                    ? `${exercises.length} results for "${searchQuery}"`
+                    : `${exercises.length} exercises`}
+            </p>
+            {/* ── Exercise list ── */}
+            <ExerciseList
+                exercises={filteredExercises}
+                grouped={grouped}
+                isSearching={isSearching}
+                collapsedSections={collapsedSections}
+                onSelectExercise={handleSelectExercise}
+                onToggleSection={handleToggleSection}
+            />
+            {/* ── Exercise Filters Bottom Sheet ── */}
+            <BottomSheet
+                isOpen={isFilterSheetOpen}
+                onClose={handleCloseFilters}
+                title="FILTER"
+            >
+                <div className="flex flex-col">
+                    {/* Muscles */}
+                    <div className="mb-2.5">
+                        <h3 className="text-[10px] tracking-[2px] text-ghost uppercase mb-2.5">
+                            Muscle Group
+                        </h3>
+                        <div className="flex flex-wrap gap-2 mb-5">
+                            {MUSCLE_ORDER.map((muscle) => (
+                                <button
+                                    key={muscle}
+                                    onClick={() => toggleMuscleFilter(muscle)}
+                                    className={`px-[14px] py-2 rounded-lg text-xs font-body border cursor-pointer transition-colors ${
+                                        selectedMuscles.has(muscle)
+                                            ? "bg-[#1a0800] border-heat text-white"
+                                            : "bg-[#1a1a1a] border-[#1f1f1f] text-dim hover:text-white"
+                                    }`}
+                                >
+                                    {muscle}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
 
-          {/* Actions */}
-          <button
-            onClick={() => {
-              // Apply is basically just closing since state updates immediately
-              handleCloseFilters();
-            }}
-            className="w-full py-[15px] rounded-xl bg-heat text-white font-display text-xl tracking-[2px] border-none cursor-pointer hover:opacity-90 transition-opacity"
-          >
-            APPLY FILTERS
-          </button>
-        </div>
-      </BottomSheet>
-    </section>
-  );
+                    {/* Equipment */}
+                    <div className="mb-6">
+                        <h3 className="text-[10px] tracking-[2px] text-ghost uppercase mb-2.5">
+                            Equipment
+                        </h3>
+                        <div className="flex flex-wrap gap-2 mb-6">
+                            {EQUIPMENT_OPTIONS.map((eq) => (
+                                <button
+                                    key={eq}
+                                    onClick={() => toggleEquipmentFilter(eq)}
+                                    className={`px-[14px] py-2 rounded-lg text-xs font-body border cursor-pointer transition-colors ${
+                                        selectedEquipment.has(eq)
+                                            ? "bg-[#1a0800] border-heat text-white"
+                                            : "bg-[#1a1a1a] border-[#1f1f1f] text-dim hover:text-white"
+                                    }`}
+                                >
+                                    {eq}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Actions */}
+                    <button
+                        onClick={() => {
+                            // Apply is basically just closing since state updates immediately
+                            handleCloseFilters();
+                        }}
+                        className="w-full py-[15px] rounded-xl bg-heat text-white font-display text-xl tracking-[2px] border-none cursor-pointer hover:opacity-90 transition-opacity"
+                    >
+                        APPLY FILTERS
+                    </button>
+                </div>
+            </BottomSheet>
+        </section>
+    );
 }
 
 /*

@@ -41,7 +41,7 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
       {/* Sheet */}
       <div 
         ref={sheetRef}
-        className="fixed bottom-0 left-0 right-0 z-[101] bg-[#161616] rounded-t-[20px] p-5 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col max-h-[72vh]"
+        className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[101] bg-[#161616] rounded-t-[20px] border-t border-x border-border p-5 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col max-h-[72vh]"
         role="dialog"
         aria-modal="true"
         aria-labelledby="sheet-title"

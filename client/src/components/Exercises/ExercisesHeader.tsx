@@ -17,7 +17,7 @@ export function ExercisesHeader({ activeFilterCount, onOpenFilters }: ExercisesH
         className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs cursor-pointer font-body border transition-colors ${
           activeFilterCount > 0
             ? "bg-heat-dim border-heat text-heat"
-            : "bg-card border-border text-ghost hover:text-dim"
+            : "bg-card border-border text-zinc-400 hover:text-zinc-200"
         }`}
         aria-label={`Filters${activeFilterCount > 0 ? ` (${activeFilterCount} active)` : ""}`}
       >

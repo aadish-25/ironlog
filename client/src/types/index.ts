@@ -45,7 +45,6 @@ export type Exercise = {
   equipment: string;
   demo_url: string | null;
   demo_type: "youtube" | "gif" | null;
-  is_custom: boolean;
 };
 
 export type ExerciseProgress = {

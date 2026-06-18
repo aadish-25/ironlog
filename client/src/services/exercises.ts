@@ -1,40 +1,17 @@
-import axios from 'axios';
+import { api } from "./api";
+import { type Exercise, type ExerciseProgress } from "../types";
 
-// ---------------------------------------------------------
-// DUMMY FUNCTION: This is an example, not your actual logic
-// ---------------------------------------------------------
-export const getDummyPizzaToppings = async () => {
-  const response = await axios.get('https://dummyapi.com/pizza/toppings');
-  return response.data;
+export const getExercises = async (): Promise<Exercise[]> => {
+    const response = await api.get("/exercise");
+    return response.data.data as Exercise[];
 };
 
-/*
- * HOW TO USE THIS SERVICE FUNCTION IN A COMPONENT OR HOOK:
- * 
- * import { useEffect, useState } from 'react';
- * import { getDummyPizzaToppings } from '../services/exercises';
- * 
- * export default function PizzaToppingsComponent() {
- *   const [toppings, setToppings] = useState([]);
- *   
- *   useEffect(() => {
- *     const fetchData = async () => {
- *       try {
- *         // Call the service function
- *         const data = await getDummyPizzaToppings();
- *         setToppings(data);
- *       } catch (error) {
- *         console.error("Failed to fetch toppings", error);
- *       }
- *     };
- *     
- *     fetchData();
- *   }, []); // Empty array means this runs once on mount
- *   
- *   return (
- *     <ul>
- *       {toppings.map((topping, idx) => <li key={idx}>{topping}</li>)}
- *     </ul>
- *   );
- * }
- */
+export const getExerciseById = async (id: string): Promise<Exercise> => {
+    const response = await api.get(`/exercise/${id}`);
+    return response.data.data as Exercise;
+};
+
+export const getExerciseProgress = async (id: string): Promise<ExerciseProgress[]> => {
+    const response = await api.get(`/exercise/${id}/progress`);
+    return response.data.data as ExerciseProgress[];
+};

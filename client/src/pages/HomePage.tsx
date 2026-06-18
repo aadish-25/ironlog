@@ -171,7 +171,7 @@ exerciseCount       → nested in GET /api/splits (count of records in split_day
 weekHistory         → GET /api/sessions (filter for current week's dates), match dates to weekday index (0 = Monday, 6 = Sunday) to output WeekDot types
 workoutDone         → GET /api/sessions, check if completed session exists for today's date with is_skipped = false
 skipped             → GET /api/sessions, check if session exists for today's date with is_skipped = true
-setsLogged          → GET /api/sessions/:id or GET /api/sessions/today, count rows in "sets" table joined to today's session
+setsLogged          → GET /api/sessions/:id or GET /api/sessionsPLAN SPLIT/today, count rows in "sets" table joined to today's session
 volumeKg            → GET /api/sessions/:id or GET /api/sessions/today, calculate SUM(weight_kg * reps) from "sets" table joined to today's session
 newPRs              → GET /api/sessions/:id, filter "sets" table where session_id === today's session and is_pr = true, grouped by exercise_id
 tomorrowWorkout     → GET /api/splits, find split where is_active === true, filter split_days by day_of_week = (new Date().getDay() + 1) % 7
