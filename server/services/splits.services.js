@@ -17,7 +17,7 @@ const createSplitWithDaysService = async (userId, name) => {
             [userId, name, isFirstSplit],
         );
 
-        const splitId = created_split.rows[0];
+        const split = created_split.rows[0];
         const days = [
             "Monday",
             "Tuesday",
@@ -31,7 +31,7 @@ const createSplitWithDaysService = async (userId, name) => {
         const values = [];
         const rows = days
             .map((day, i) => {
-                values.push(splitId, i, day);
+                values.push(split.id, i, day);
                 return `($${values.length - 2}, $${values.length - 1}, $${values.length})`;
             })
             .join(",");
@@ -43,7 +43,7 @@ const createSplitWithDaysService = async (userId, name) => {
 
         await client.query("COMMIT");
 
-        return { id: splitId, name, is_active: isFirstSplit };
+        return { ...split, days: [] };
     } catch (error) {
         if (client) await client.query("ROLLBACK");
         throw new Error("Could not create split", { cause: error });
@@ -54,11 +54,32 @@ const createSplitWithDaysService = async (userId, name) => {
 
 const getSplitsByUserService = async (userId) => {
     try {
-        const result = await pool.query(
-            "SELECT * FROM splits WHERE user_id = $1",
+        const splitsResult = await pool.query(
+            "SELECT * FROM splits WHERE user_id = $1 ORDER BY created_at ASC",
             [userId],
         );
-        return result.rows;
+
+        const splits = splitsResult.rows;
+        if (splits.length === 0) return [];
+
+        // Fetch all days for all user splits in a single query
+        const splitIds = splits.map((s) => s.id);
+        const daysResult = await pool.query(
+            "SELECT * FROM split_days WHERE split_id = ANY($1) ORDER BY day_of_week",
+            [splitIds],
+        );
+
+        // Group days by split_id
+        const daysBySplit = {};
+        for (const day of daysResult.rows) {
+            if (!daysBySplit[day.split_id]) daysBySplit[day.split_id] = [];
+            daysBySplit[day.split_id].push(day);
+        }
+
+        return splits.map((split) => ({
+            ...split,
+            days: daysBySplit[split.id] ?? [],
+        }));
     } catch (error) {
         throw new Error("Could not retrieve splits for user", { cause: error });
     }

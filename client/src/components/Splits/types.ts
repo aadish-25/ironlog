@@ -1,16 +1,19 @@
 export type DayType = "train" | "rest";
 
 export interface SplitDay {
-  abbr: string;
-  name: string;
-  type: DayType;
+  id: string;
+  split_id: string;
+  day_of_week: number;
+  label: string;
   muscles: string;
-  exerciseCount: number;
+  type: DayType;
+  exercises: { id: string; exercise_id: string; name: string; sets: number; reps: number; order_index: number }[];
 }
 
 export interface Split {
   id: string;
   name: string;
-  isActive: boolean;
+  is_active: boolean;
+  created_at: string;
   days: SplitDay[];
 }
