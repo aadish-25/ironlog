@@ -17,12 +17,6 @@ export function HomePage() {
   // Think about: is today's date fetched from the server or generated on the client?
   const formattedDate = null;
 
-  // ─── TIME OF DAY GREETING ───────────────────────────────────────────────────
-  const hour = new Date().getHours();
-  let timeGreeting = "Evening";
-  if (hour >= 5 && hour < 12) timeGreeting = "Morning";
-  else if (hour >= 12 && hour < 17) timeGreeting = "Afternoon";
-
   // TODO: This component needs to show the user's current workout streak.
   // Think about: where does the streak number come from? Is it computed in backend SQL?
   const streak = null;
@@ -30,10 +24,10 @@ export function HomePage() {
   // ─── ACTIVE SPLIT / WORKOUT PLAN ──────────────────────────────────────────
   // TODO: This component needs to know the active split day label for today.
   // Think about: how do we determine today's split day?
-  const activeSplitName = null;
+  const activeSplitDayName = null;
 
   // TODO: This component needs to know target muscles for today's active split day.
-  const activeSplitMuscles = null;
+  const activeSplitDayMuscles = null;
 
   // TODO: This component needs to know how many exercises are planned for today's active split day.
   const exerciseCount = null;
@@ -107,7 +101,7 @@ export function HomePage() {
         {/* ── Greeting ── */}
         <div className="px-5 pt-0.5 pb-[18px]">
           <div className="font-display text-[32px] leading-none tracking-[1px] text-white">
-            {timeGreeting}, <em className="not-italic text-heat">{userName || "Lifter"}.</em>
+            Morning, <em className="not-italic text-heat">{userName || "Lifter"}.</em>
           </div>
           <div className="text-[10px] text-ghost tracking-[2px] uppercase mt-1">
             {formattedDate || "Date Loading..."}
@@ -118,8 +112,8 @@ export function HomePage() {
           skipped={skipped}
           workoutDone={workoutDone}
           streak={streak}
-          activeSplitName={activeSplitName}
-          activeSplitMuscles={activeSplitMuscles}
+          activeSplitDayName={activeSplitDayName}
+          activeSplitDayMuscles={activeSplitDayMuscles}
           exerciseCount={exerciseCount}
           weekHistory={weekHistory}
           setsLogged={setsLogged}
@@ -151,8 +145,8 @@ ANSWERS (read only after you've thought through the TODOs above)
 userName            → GET /api/users/me, read "name" field from "users" table
 formattedDate       → client-side: new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })
 streak              → GET /api/users/me, read "created_at" membership age or calculate via consecutive logged days in "sessions" table
-activeSplitName     → GET /api/splits, find split where is_active === true, then map split_days by matching day_of_week with today's JS day (new Date().getDay())
-activeSplitMuscles  → nested in GET /api/splits (joined via split_days, split_day_exercises, and exercises to list targeted muscle groups)
+activeSplitDayName     → GET /api/splits, find split where is_active === true, then map split_days by matching day_of_week with today's JS day (new Date().getDay())
+activeSplitDayMuscles  → nested in GET /api/splits (joined via split_days, split_day_exercises, and exercises to list targeted muscle groups)
 exerciseCount       → nested in GET /api/splits (count of records in split_day_exercises for the active split_day_id)
 weekHistory         → GET /api/sessions (filter for current week's dates), match dates to weekday index (0 = Monday, 6 = Sunday) to output WeekDot types
 workoutDone         → GET /api/sessions, check if completed session exists for today's date with is_skipped = false

@@ -6,8 +6,8 @@ interface HeroCardProps {
   skipped: boolean | null;
   workoutDone: boolean | null;
   streak: number | null;
-  activeSplitName: string | null;
-  activeSplitMuscles: string | null;
+  activeSplitDayName: string | null;
+  activeSplitDayMuscles: string | null;
   exerciseCount: number | null;
   weekHistory: { label: string; type: "done" | "rest" | "today" | "future" }[] | null;
   setsLogged: number | null;
@@ -23,8 +23,8 @@ export function HeroCard({
   skipped,
   workoutDone,
   streak,
-  activeSplitName,
-  activeSplitMuscles,
+  activeSplitDayName,
+  activeSplitDayMuscles,
   exerciseCount,
   weekHistory,
   setsLogged,
@@ -57,7 +57,7 @@ export function HeroCard({
             </div>
             <div className="pt-1">
               <div className="text-[9px] tracking-[2px] text-skip uppercase mb-1">
-                Today · {activeSplitName || "Rest Day"}
+                Today · {activeSplitDayName || "Rest Day"}
               </div>
               <div className="font-display text-[36px] leading-[0.93] tracking-[2px] text-skip mb-3 pr-16 truncate">
                 SKIPPED<br />TODAY.
@@ -112,14 +112,14 @@ export function HeroCard({
             </div>
             <div className="pt-1">
               <div className="text-[9px] tracking-[2px] text-ghost uppercase mb-1">
-                Today · {activeSplitName || "Workout Plan"}
+                Today · {activeSplitDayName || "Workout Plan"}
               </div>
               <div className="font-display text-[36px] leading-[0.93] tracking-[2px] text-white mb-1.5 uppercase pr-16 truncate">
-                {activeSplitName || "PLAN SPLIT"}
+                {activeSplitDayName || "PLAN SPLIT"}
               </div>
               <div className="text-[11px] text-ghost mb-3">
                 <strong className="text-dim font-medium">
-                  {activeSplitMuscles || "No training days scheduled"}
+                  {activeSplitDayMuscles || "No training days scheduled"}
                 </strong>{" "}
                 &nbsp;·&nbsp; {exerciseCount ?? 0} exercises
               </div>
@@ -178,7 +178,7 @@ export function HeroCard({
                 Completed · Today
               </div>
               <div className="font-display text-[36px] leading-[0.93] tracking-[2px] text-white mb-3 uppercase pr-16 truncate">
-                {activeSplitName || "WORKOUT"}
+                {activeSplitDayName || "WORKOUT"}
               </div>
               <div className="grid grid-cols-2 gap-2 mb-3">
                 <div className="bg-bg rounded-[10px] p-[10px_12px]">
