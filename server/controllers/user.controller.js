@@ -1,4 +1,4 @@
-import { updateUserService } from "../services/user.services.js";
+import { updateUserService, getUserStatsService } from "../services/user.services.js";
 
 // / GET /users/me
 async function getCurrentUser(req, res) {
@@ -26,4 +26,20 @@ async function updateCurrentUser(req, res) {
     }
 }
 
-export { getCurrentUser, updateCurrentUser };
+async function getUserStats(req, res) {
+    const user = req.user;
+    const id = user?.id;
+
+    try {
+        const stats = await getUserStatsService(id);
+        res.status(200).json({ message: "Stats retrieved successfully", data: stats });
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({
+            message: "Error while fetching stats",
+            error: error.message,
+        });
+    }
+}
+
+export { getCurrentUser, updateCurrentUser, getUserStats };
