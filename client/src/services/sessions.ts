@@ -1,39 +1,53 @@
-import axios from 'axios';
+import { api } from "./api";
+import type { Session, SessionExercise } from "../types";
 
-// ---------------------------------------------------------
-// DUMMY FUNCTION: This is an example, not your actual logic
-// ---------------------------------------------------------
-export const startDummyMovieSession = async (movieId: string) => {
-  const response = await axios.post('https://dummyapi.com/movies/start', { movieId });
-  return response.data;
+export const createSession = async (
+    splitDayId: string,
+    date?: string,
+    isSkipped?: boolean
+): Promise<Session> => {
+    const response = await api.post("/sessions", {
+        split_day_id: splitDayId,
+        date,
+        is_skipped: isSkipped
+    });
+    return response.data.data as Session;
 };
 
-/*
- * HOW TO USE THIS SERVICE FUNCTION IN A COMPONENT OR HOOK:
- * 
- * import { useState } from 'react';
- * import { startDummyMovieSession } from '../services/sessions';
- * 
- * export default function StartMovieButton() {
- *   const [isStarting, setIsStarting] = useState(false);
- *   
- *   const handleStart = async () => {
- *     setIsStarting(true);
- *     try {
- *       // Call the service function and pass data
- *       const result = await startDummyMovieSession("movie-123");
- *       console.log("Movie started successfully", result);
- *     } catch (error) {
- *       console.error("Failed to start movie", error);
- *     } finally {
- *       setIsStarting(false);
- *     }
- *   };
- *   
- *   return (
- *     <button onClick={handleStart} disabled={isStarting}>
- *       {isStarting ? "Starting..." : "Start Movie"}
- *     </button>
- *   );
- * }
- */
+export const getSessions = async (): Promise<Session[]> => {
+    const response = await api.get("/sessions");
+    return response.data.data as Session[];
+};
+
+export const getMissedSessions = async (): Promise<Session[]> => {
+    const response = await api.get("/sessions/missed");
+    return response.data.data as Session[];
+};
+
+export const getSessionsHistory = async (limit: number, offset: number): Promise<any[]> => {
+    const response = await api.get(`/sessions/history?limit=${limit}&offset=${offset}`);
+    return response.data.data;
+};
+
+export const getSessionsSummary = async (month: string): Promise<any> => {
+    const response = await api.get(`/sessions/summary?month=${month}`);
+    return response.data.data;
+};
+
+export const getSessionById = async (
+    id: string,
+): Promise<Session & { exercises: SessionExercise[] }> => {
+    const response = await api.get(`/sessions/${id}`);
+    const rawData = response.data.data;
+
+    return rawData as Session & { exercises: SessionExercise[] };
+};
+
+export const deleteSession = async (id: string): Promise<void> => {
+    await api.delete(`/sessions/${id}`);
+};
+
+export const completeSession = async (id: string): Promise<Session> => {
+    const response = await api.patch(`/sessions/${id}/complete`);
+    return response.data.data as Session;
+};
