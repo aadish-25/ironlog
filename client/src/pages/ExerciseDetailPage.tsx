@@ -25,7 +25,7 @@ export function ExerciseDetailPage() {
             fetchExerciseById(id);
             fetchExerciseProgress(id);
         }
-    }, [id]);
+    }, [id, fetchExerciseById, fetchExerciseProgress]);
 
     if (loading && !exercise) {
         return (

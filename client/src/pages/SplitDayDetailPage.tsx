@@ -15,7 +15,6 @@ import {
 } from "@dnd-kit/core";
 import type { DragEndEvent } from "@dnd-kit/core";
 import {
-    arrayMove,
     SortableContext,
     sortableKeyboardCoordinates,
     verticalListSortingStrategy,
@@ -51,7 +50,7 @@ function SortableExerciseItem({ ex, index, onRemoveExercise }: SortableExerciseI
         <div
             ref={setNodeRef}
             style={style}
-            className={`flex items-center gap-3 bg-[#1a1a1a] border border-[#2a2a2a] rounded-[10px] p-3 mb-2 transition-colors ${isDragging ? 'opacity-75 shadow-2xl border-heat' : 'opacity-100'}`}
+            className={`flex items-center gap-3 bg-raised border border-[#2a2a2a] rounded-[10px] p-3 mb-2 transition-colors ${isDragging ? 'opacity-75 shadow-2xl border-heat' : 'opacity-100'}`}
         >
             <div 
                 {...attributes} 
@@ -67,7 +66,7 @@ function SortableExerciseItem({ ex, index, onRemoveExercise }: SortableExerciseI
                 <p className="text-sm font-medium text-white truncate">{ex.name}</p>
             </div>
             {ex.muscle_groups && ex.muscle_groups.length > 0 && (
-                <span className="px-1.5 py-0.5 rounded-[4px] bg-[#222] border border-[#333] text-ghost text-[9px] uppercase font-semibold tracking-wider shrink-0">
+                <span className="px-1.5 py-0.5 rounded-sm bg-[#222] border border-[#333] text-ghost text-[9px] uppercase font-semibold tracking-wider shrink-0">
                     {ex.muscle_groups[0]}
                 </span>
             )}
@@ -108,6 +107,7 @@ export function SplitDayDetailPage() {
 
     useEffect(() => {
         if (day && !isEditingLabel) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setEditLabelValue(day.label);
         }
     }, [day, isEditingLabel]);
@@ -168,10 +168,10 @@ export function SplitDayDetailPage() {
         <section className="min-h-screen bg-bg text-white font-body flex flex-col pb-24">
 
             {/* Header */}
-            <div className="flex items-center gap-4 px-5 py-[14px] bg-bg sticky top-0 z-20 shrink-0 border-b border-[#1f1f1f]">
+            <div className="flex items-center gap-4 px-5 py-3.5 bg-bg sticky top-0 z-20 shrink-0 border-b border-[#1f1f1f]">
                 <button 
                     onClick={() => navigate(`/splits/${splitId}`)}
-                    className="w-10 h-10 bg-[#161616] rounded-[10px] flex items-center justify-center text-[#888] cursor-pointer hover:bg-[#1f1f1f] transition-colors"
+                    className="w-10 h-10 bg-card rounded-[10px] flex items-center justify-center text-[#888] cursor-pointer hover:bg-[#1f1f1f] transition-colors"
                 >
                     <ArrowLeft size={20} />
                 </button>
@@ -200,7 +200,7 @@ export function SplitDayDetailPage() {
             <div className="flex-1 overflow-y-auto px-5 pt-6">
                 
                 {/* Rest Day Toggle */}
-                <div className="flex items-center justify-between bg-[#1a1a1a] border border-[#1f1f1f] rounded-[14px] p-4 mb-8">
+                <div className="flex items-center justify-between bg-raised border border-[#1f1f1f] rounded-[14px] p-4 mb-8">
                     <div>
                         <h3 className="text-white font-medium mb-1">Rest Day</h3>
                         <p className="text-xs text-ghost">Take a break and recover</p>
@@ -244,7 +244,7 @@ export function SplitDayDetailPage() {
 
                         <button
                             onClick={() => setIsModalOpen(true)}
-                            className="w-full mt-4 py-[14px] border border-dashed border-[#444] rounded-[10px] text-[13px] font-semibold text-ghost tracking-wide hover:border-white hover:text-white transition-colors flex items-center justify-center gap-2"
+                            className="w-full mt-4 py-3.5 border border-dashed border-[#444] rounded-[10px] text-[13px] font-semibold text-ghost tracking-wide hover:border-white hover:text-white transition-colors flex items-center justify-center gap-2"
                         >
                             <Plus size={16} />
                             ADD EXERCISE
@@ -252,11 +252,11 @@ export function SplitDayDetailPage() {
                     </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center text-center mt-10 px-4 mb-6">
-                        <div className="w-16 h-16 rounded-full bg-[#1a1a1a] border border-[#2a2a2a] flex items-center justify-center mb-5">
+                        <div className="w-16 h-16 rounded-full bg-raised border border-[#2a2a2a] flex items-center justify-center mb-5">
                             <span className="text-2xl">🔋</span>
                         </div>
                         <h3 className="text-white font-display text-xl tracking-[1px] mb-2">Rest Day</h3>
-                        <p className="text-[#888] text-[13px] leading-relaxed max-w-[260px]">
+                        <p className="text-[#888] text-[13px] leading-relaxed max-w-65">
                             This day is marked as a rest day. Toggle the switch above if you want to train.
                         </p>
                     </div>

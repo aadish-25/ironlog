@@ -9,7 +9,7 @@ const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    {/* @ts-ignore - ui prop required by Clerk warning but types are outdated */}
+    {/* @ts-expect-error - ui prop required by Clerk warning but types are outdated */}
     <ClerkProvider publishableKey={publishableKey} ui={ui}>
       <App />
     </ClerkProvider>

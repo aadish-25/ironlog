@@ -7,7 +7,7 @@ import {
     removeExerciseFromDay, 
     reorderExerciseInDay 
 } from "../services/splitDays";
-import { type Split, type SplitDay } from "../types";
+import type { Split } from "../types";
 
 export function useSplitDetail(splitId: string) {
     const [split, setSplit] = useState<Split | null>(null);
@@ -32,6 +32,7 @@ export function useSplitDetail(splitId: string) {
     }, [splitId]);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         if (splitId) fetchSplit();
     }, [fetchSplit, splitId]);
 

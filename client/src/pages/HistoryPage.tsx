@@ -9,8 +9,7 @@ export function HistoryPage() {
     monthSummary, 
     loading, 
     hasMore, 
-    loadMore, 
-    loadingMore 
+    loadMore 
   } = useHistory();
 
   if (loading && sessions.length === 0) {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { getUserStats, type UserStats } from "../services/users";
 import { useCurrentUser } from "./useCurrentUser";
 
@@ -38,9 +38,11 @@ export function useProfile() {
     }, [user]);
 
     // Calculate days since joined
-    const daysSinceJoined = user?.created_at 
-        ? Math.floor((Date.now() - new Date(user.created_at).getTime()) / 86400000) 
-        : null;
+    const daysSinceJoined = useMemo(() => {
+        return user?.created_at 
+            ? Math.floor((Date.now() - new Date(user.created_at).getTime()) / 86400000) 
+            : null;
+    }, [user?.created_at]);
 
     const memberSince = user?.created_at
         ? new Date(user.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short" })
