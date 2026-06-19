@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import {
     getSplits,
@@ -14,36 +14,37 @@ export function useSplit() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        async function fetchUserSplits() {
-            try {
-                const result = await getSplits();
-                setSplits(result);
-            } catch (err) {
-                if (axios.isAxiosError(err)) {
-                    const backendMsg = err.response?.data?.message;
-                    const axiosMsg = err.message;
-                    setError(backendMsg ?? axiosMsg);
-                } else {
-                    setError((err as Error).message);
-                }
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        fetchUserSplits();
-    }, []);
-
-    async function createUserSplit(name: string) {
+    const fetchUserSplits = useCallback(async () => {
         try {
-            const result = await createSplit(name);
-            setSplits((prev) => (prev ? [...prev, result] : [result]));
+            setLoading(true);
+            setError(null);
+            const result = await getSplits();
+            setSplits(result);
         } catch (err) {
             if (axios.isAxiosError(err)) {
                 const backendMsg = err.response?.data?.message;
                 const axiosMsg = err.message;
                 setError(backendMsg ?? axiosMsg);
+            } else {
+                setError((err as Error).message);
+            }
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchUserSplits();
+    }, [fetchUserSplits]);
+
+    async function createUserSplit(name: string) {
+        try {
+            const result = await createSplit(name);
+            setSplits((prev) => (prev ? [...prev, result] : [result]));
+            return result;
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                setError(err.response?.data?.message ?? err.message);
             } else {
                 setError((err as Error).message);
             }

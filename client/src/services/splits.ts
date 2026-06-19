@@ -6,6 +6,11 @@ export const getSplits = async (): Promise<Split[]> => {
     return response.data.data as Split[];
 };
 
+export const getSplitById = async (id: string): Promise<Split> => {
+    const response = await api.get(`/splits/${id}`);
+    return response.data.data as Split;
+};
+
 export const createSplit = async (name: string): Promise<Split> => {
     const response = await api.post("/splits", { name });
     return response.data.data as Split;
