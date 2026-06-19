@@ -22,6 +22,15 @@ const createSetService = async (
     reps
 ) => {
     try {
+        const sessionResult = await pool.query(
+            "SELECT id FROM sessions WHERE id = $1 AND user_id = $2",
+            [sessionId, userId]
+        );
+        
+        if (sessionResult.rows.length === 0) {
+            throw new Error("Session not found or not authorized");
+        }
+
         const isPR = await checkIsPR(userId, exerciseId, weightKg);
 
         const result = await pool.query(
