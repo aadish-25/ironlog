@@ -8,8 +8,9 @@ const checkIsPR = async (userId, exerciseId, weightKg) => {
         [userId, exerciseId]
     );
 
-    const currentMaxWeight = result.rows[0].max_weight;
-    return currentMaxWeight === null || weightKg > currentMaxWeight;
+    const currentMaxWeight = result.rows[0]?.max_weight !== undefined ? result.rows[0].max_weight : null;
+    if (currentMaxWeight === null) return true;
+    return Number(weightKg) > Number(currentMaxWeight);
 };
 
 const createSetService = async (
