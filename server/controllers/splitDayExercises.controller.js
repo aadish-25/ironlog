@@ -9,12 +9,13 @@ async function addExercise(req, res) {
 
     // Accept either exercise_id (string) or exercise_ids (array)
     const exerciseIds = req.body.exercise_ids || req.body.exercise_id;
-    
+    const userId = req.user.id;
     try {
         const result = await addExerciseService(
             split_day_id,
             exerciseIds,
             order_index || 0,
+            userId,
         );
         res.status(200).json({
             message: "Exercise added succesfully",
@@ -31,8 +32,9 @@ async function addExercise(req, res) {
 
 async function removeExercise(req, res) {
     const { id } = req.params;
+    const userId = req.user.id;
     try {
-        await removeExerciseService(id);
+        await removeExerciseService(id, userId);
         res.status(200).json({
             message: "Exercise deleted succesfully",
         });
@@ -48,8 +50,9 @@ async function removeExercise(req, res) {
 async function reorderExercise(req, res) {
     const { id } = req.params;
     const { order_index } = req.body;
+    const userId = req.user.id;
     try {
-        const result = await reorderExerciseService(id, order_index);
+        const result = await reorderExerciseService(id, order_index, userId);
         res.status(200).json({
             message: "Exercise reordered successfully",
             data: result,

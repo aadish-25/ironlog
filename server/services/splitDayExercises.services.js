@@ -1,6 +1,6 @@
 import pool from "../db/connection.js";
 
-const addExerciseService = async (splitDayId, exerciseIds, startingOrderIndex) => {
+const addExerciseService = async (splitDayId, exerciseIds, startingOrderIndex, userId) => {
     let client;
     try {
         // If single ID passed, convert to array
@@ -10,8 +10,11 @@ const addExerciseService = async (splitDayId, exerciseIds, startingOrderIndex) =
         await client.query("BEGIN");
 
         const splitDayResult = await client.query(
-            "SELECT is_rest FROM split_days WHERE id = $1",
-            [splitDayId]
+            `SELECT sd.is_rest 
+             FROM split_days sd
+             JOIN splits s ON sd.split_id = s.id
+             WHERE sd.id = $1 AND s.user_id = $2`,
+            [splitDayId, userId]
         );
 
         if (splitDayResult.rows.length === 0) {
@@ -49,18 +52,23 @@ const addExerciseService = async (splitDayId, exerciseIds, startingOrderIndex) =
     }
 };
 
-const removeExerciseService = async (exerciseId) => {
+const removeExerciseService = async (exerciseId, userId) => {
     try {
         const result = await pool.query(
-            `DELETE FROM split_day_exercises WHERE id = $1`,
-            [exerciseId],
+            `DELETE FROM split_day_exercises sde
+             USING split_days sd, splits s
+             WHERE sde.split_day_id = sd.id 
+               AND sd.split_id = s.id 
+               AND sde.id = $1 
+               AND s.user_id = $2`,
+            [exerciseId, userId],
         );
     } catch (error) {
         throw new Error("Could not remove exercise from split day", { cause: error });
     }
 };
 
-const reorderExerciseService = async (splitDayExerciseId, newOrderIndex) => {
+const reorderExerciseService = async (splitDayExerciseId, newOrderIndex, userId) => {
     let client;
     try {
         client = await pool.connect();
@@ -85,10 +93,16 @@ const reorderExerciseService = async (splitDayExerciseId, newOrderIndex) => {
         const splitDayId = row.split_day_id;
 
         const splitDayResult = await client.query(
-            "SELECT is_rest FROM split_days WHERE id = $1",
-            [splitDayId]
+            `SELECT sd.is_rest 
+             FROM split_days sd
+             JOIN splits s ON sd.split_id = s.id
+             WHERE sd.id = $1 AND s.user_id = $2`,
+            [splitDayId, userId]
         );
-        if (splitDayResult.rows.length > 0 && splitDayResult.rows[0].is_rest) {
+        if (splitDayResult.rows.length === 0) {
+            throw new Error("Split day not found or not authorized");
+        }
+        if (splitDayResult.rows[0].is_rest) {
             throw new Error("Cannot reorder exercises on a rest day");
         }
 
