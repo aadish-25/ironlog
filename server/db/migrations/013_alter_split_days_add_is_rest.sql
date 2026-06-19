@@ -1,0 +1,1 @@
+ALTER TABLE split_days ADD COLUMN is_rest BOOLEAN DEFAULT false;
