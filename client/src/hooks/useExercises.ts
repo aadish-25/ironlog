@@ -21,22 +21,28 @@ export function useExercises() {
             setError(null);
             const data = await getExercises();
 
-            // Map raw backend fields to the component's Exercise fields
             const mapped: Exercise[] = data.map((ex: any) => {
-                const rawMuscle =
-                    ex.muscle_groups?.[0] || ex.muscle_group || "";
-                const muscle =
-                    rawMuscle.charAt(0).toUpperCase() + rawMuscle.slice(1);
+                const rawMuscles = Array.isArray(ex.muscle_groups)
+                    ? ex.muscle_groups
+                    : (ex.muscle_group ? [ex.muscle_group] : []);
+                
+                const muscles = rawMuscles.map((m: string) => 
+                    m.charAt(0).toUpperCase() + m.slice(1)
+                );
 
-                const rawEq = ex.equipment?.[0] || ex.equipment || "";
-                const equipment =
-                    rawEq.charAt(0).toUpperCase() + rawEq.slice(1);
+                const rawEquipments = Array.isArray(ex.equipment)
+                    ? ex.equipment
+                    : (ex.equipment ? [ex.equipment] : []);
+                
+                const equipments = rawEquipments.map((e: string) =>
+                    e.charAt(0).toUpperCase() + e.slice(1)
+                );
 
                 return {
                     id: ex.id,
                     name: ex.name,
-                    muscle,
-                    equipment,
+                    muscles,
+                    equipments,
                     prKg: ex.pr_kg ?? null,
                 };
             });
@@ -58,23 +64,26 @@ export function useExercises() {
             setLoading(true);
             const data = await getExerciseById(id);
 
-            const rawMuscle =
-                data.muscle_group?.[0] || data.muscle_group || "";
-            const muscle =
-                rawMuscle.charAt(0).toUpperCase() + rawMuscle.slice(1);
-
-            const rawEq = data.equipment?.[0] || data.equipment || "";
-            const equipment = rawEq.charAt(0).toUpperCase() + rawEq.slice(1);
+            const rawMuscles = Array.isArray(data.muscle_groups) 
+                ? data.muscle_groups 
+                : (data.muscle_group ? [data.muscle_group] : []);
+            const muscles = rawMuscles.map((m: string) => m.charAt(0).toUpperCase() + m.slice(1));
+            
+            const rawEquipments = Array.isArray(data.equipment)
+                ? data.equipment
+                : (data.equipment ? [data.equipment] : []);
+            const equipments = rawEquipments.map((e: string) => e.charAt(0).toUpperCase() + e.slice(1));
 
             const mapped = {
                 id: data.id,
                 name: data.name,
-                muscle,
-                equipment,
+                muscles,
+                equipments,
                 prKg: null,
+                formGuide: Array.isArray(data.form_guide) ? data.form_guide : [],
             };
 
-            setExercise(mapped);
+            setExercise(mapped as any);
         } catch (err) {
             if (axios.isAxiosError(err)) {
                 const backendMsg = err.response?.data?.message;

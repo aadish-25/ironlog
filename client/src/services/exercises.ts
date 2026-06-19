@@ -1,17 +1,17 @@
 import { api } from "./api";
 import { type Exercise, type ExerciseProgress } from "../types";
 
-export const getExercises = async (): Promise<Exercise[]> => {
+export const getExercises = async (): Promise<any[]> => {
     const response = await api.get("/exercise");
-    return response.data.data as Exercise[];
+    return response.data.data;
 };
 
-export const getExerciseById = async (id: string): Promise<Exercise> => {
+export const getExerciseById = async (id: string): Promise<any> => {
     const response = await api.get(`/exercise/${id}`);
-    return response.data.data as Exercise;
+    return response.data.data;
 };
 
-export const getExerciseProgress = async (id: string): Promise<ExerciseProgress[]> => {
+export const getExerciseProgress = async (id: string): Promise<any[]> => {
     const response = await api.get(`/exercise/${id}/progress`);
-    return response.data.data as ExerciseProgress[];
+    return response.data.data;
 };
