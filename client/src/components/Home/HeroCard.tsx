@@ -5,6 +5,7 @@ import { WeekDot } from "../ui/WeekDot";
 interface HeroCardProps {
   skipped: boolean | null;
   workoutDone: boolean | null;
+  inProgress: boolean | null;
   streak: number | null;
   activeSplitDayName: string | null;
   activeSplitDayMuscles: string | null;
@@ -14,6 +15,7 @@ interface HeroCardProps {
   volumeKg: number | null;
   newPRs: { name: string; kg: number }[] | null;
   tomorrowWorkout: { name: string; muscles: string; exercisesCount: number } | null;
+  isRestDay?: boolean;
   onStartWorkout: () => void;
   onSkipToday: (() => void) | null;
   onUndoSkip: (() => void) | null;
@@ -22,6 +24,7 @@ interface HeroCardProps {
 export function HeroCard({
   skipped,
   workoutDone,
+  inProgress,
   streak,
   activeSplitDayName,
   activeSplitDayMuscles,
@@ -31,6 +34,7 @@ export function HeroCard({
   volumeKg,
   newPRs,
   tomorrowWorkout,
+  isRestDay = false,
   onStartWorkout,
   onSkipToday,
   onUndoSkip,
@@ -140,18 +144,44 @@ export function HeroCard({
                   <div className="h-[38px]" />
                 )}
               </div>
-              <button
-                onClick={onStartWorkout}
-                className="block w-full py-[10px] bg-heat border-none rounded-xl text-white font-display text-[16px] tracking-[3px] cursor-pointer hover:opacity-90 transition-opacity"
-              >
-                START WORKOUT &nbsp;→
-              </button>
-              <div
-                onClick={onSkipToday || undefined}
-                className="text-center mt-2.5 text-[12px] text-ghost cursor-pointer tracking-[0.3px] hover:text-white transition-colors"
-              >
-                skip today
-              </div>
+              
+              {isRestDay ? (
+                <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-4 text-center mt-3">
+                  <div className="text-[24px] mb-2">🔋</div>
+                  <p className="text-[13px] text-white font-medium mb-1">
+                    Scheduled Rest Day
+                  </p>
+                  <p className="text-[11px] text-[#666] leading-relaxed">
+                    Take time to recover. Your streak is protected today.
+                  </p>
+                </div>
+              ) : exerciseCount === 0 ? (
+                <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-4 text-center mt-3">
+                  <div className="text-[20px] mb-2">📋</div>
+                  <p className="text-[12px] text-ghost leading-relaxed mb-3">
+                    No exercises added to this training day yet.
+                  </p>
+                  <p className="text-[11px] text-[#555] leading-relaxed">
+                    Head over to your split to add exercises or explicitly mark this day as a Rest Day.
+                  </p>
+                </div>
+              ) : (
+                <button
+                  onClick={onStartWorkout}
+                  className="block w-full py-[10px] bg-heat border-none rounded-xl text-white font-display text-[16px] tracking-[3px] cursor-pointer hover:opacity-90 transition-opacity"
+                >
+                  {inProgress ? "RESUME WORKOUT \u00a0\u2192" : activeSplitDayName ? "START WORKOUT \u00a0\u2192" : "CREATE SPLIT \u00a0\u2192"}
+                </button>
+              )}
+
+              {!isRestDay && (
+                <div
+                  onClick={activeSplitDayName ? (onSkipToday || undefined) : undefined}
+                  className={`text-center mt-2.5 text-[12px] text-ghost tracking-[0.3px] transition-colors ${activeSplitDayName ? 'cursor-pointer hover:text-white' : 'opacity-0 pointer-events-none'}`}
+                >
+                  skip today
+                </div>
+              )}
             </div>
           </div>
         </motion.div>
@@ -216,6 +246,12 @@ export function HeroCard({
                   No PRs logged in today's session.
                 </div>
               )}
+              <button
+                onClick={onUndoSkip || undefined}
+                className="w-full mt-1 mb-2 py-2 border border-heat/30 text-heat rounded-[10px] text-[11px] font-semibold tracking-wide uppercase hover:bg-heat/10 transition-colors"
+              >
+                TEMP: Reset Session
+              </button>
               <div className="mt-3 pt-3 border-t border-raised">
                 <div className="text-[9px] tracking-[2px] text-ghost uppercase mb-0.5">
                   Tomorrow
