@@ -3,11 +3,18 @@ import pool from "../db/connection.js";
 const createSessionService = async (userId, splitDayId, date, isSkipped = false) => {
     try {
         const splitDayResult = await pool.query(
-            "SELECT is_rest FROM split_days WHERE id = $1",
-            [splitDayId]
+            `SELECT sd.is_rest 
+             FROM split_days sd
+             JOIN splits s ON sd.split_id = s.id
+             WHERE sd.id = $1 AND s.user_id = $2`,
+            [splitDayId, userId]
         );
         
-        if (splitDayResult.rows.length > 0 && splitDayResult.rows[0].is_rest) {
+        if (splitDayResult.rows.length === 0) {
+            throw new Error("Split day not found or not authorized");
+        }
+        
+        if (splitDayResult.rows[0].is_rest) {
             throw new Error("Cannot create a session for a rest day");
         }
 
