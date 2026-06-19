@@ -25,6 +25,7 @@ export type SplitDay = {
   label: string;       // "Push Day"
   muscles: string;     // "Chest · Shoulders · Triceps"
   type: "train" | "rest";
+  is_rest?: boolean;
   exercises: SplitDayExercise[];
 };
 
@@ -35,14 +36,16 @@ export type SplitDayExercise = {
   sets: number;
   reps: number;
   order_index: number;
+  muscle_groups?: string[];
 };
 
 // ─── Exercises ────────────────────────────────────────────────────────────────
 export type Exercise = {
   id: string;
   name: string;
-  muscle_group: string;
-  equipment: string;
+  muscles: string[];
+  equipments: string[];
+  formGuide?: { step: number; instruction: string }[];
   demo_url: string | null;
   demo_type: "youtube" | "gif" | null;
 };
@@ -64,14 +67,17 @@ export type Session = {
   is_skipped: boolean;
   total_volume: number;
   sets_logged: number;
+  is_completed: boolean;
 };
 
-export type SessionExercise = {
+export interface SessionExercise {
   id: string;
   exercise_id: string;
   name: string;
   sets: SetRecord[];
-};
+  muscles?: string[];
+  previous_best?: string | null;
+}
 
 export type SetRecord = {
   id: string;
