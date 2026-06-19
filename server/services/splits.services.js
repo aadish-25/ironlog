@@ -116,11 +116,11 @@ const getSplitsByUserService = async (userId) => {
 //     // split_day service not split service
 // };
 
-const getSplitByIdService = async (splitId) => {
+const getSplitByIdService = async (splitId, userId) => {
     try {
         const splitResult = await pool.query(
-            "SELECT * FROM splits WHERE id = $1",
-            [splitId],
+            "SELECT * FROM splits WHERE id = $1 AND user_id = $2",
+            [splitId, userId],
         );
 
         if (!splitResult.rows[0]) {
@@ -163,11 +163,11 @@ const getSplitByIdService = async (splitId) => {
     }
 };
 
-const updateSplitService = async (splitId, name) => {
+const updateSplitService = async (splitId, name, userId) => {
     try {
         const result = await pool.query(
-            "UPDATE splits SET name = $1 WHERE id = $2 RETURNING *",
-            [name, splitId],
+            "UPDATE splits SET name = $1 WHERE id = $2 AND user_id = $3 RETURNING *",
+            [name, splitId, userId],
         );
 
         return result.rows[0];
@@ -176,9 +176,9 @@ const updateSplitService = async (splitId, name) => {
     }
 };
 
-const deleteSplitService = async (splitId) => {
+const deleteSplitService = async (splitId, userId) => {
     try {
-        await pool.query("DELETE FROM splits WHERE id = $1", [splitId]);
+        await pool.query("DELETE FROM splits WHERE id = $1 AND user_id = $2", [splitId, userId]);
     } catch (error) {
         throw new Error("Could not delete split", { cause: error });
     }

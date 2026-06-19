@@ -48,8 +48,9 @@ async function getSplitsByUser(req, res) {
 
 async function getSplitById(req, res) {
     const { id } = req.params;
+    const userId = req.user.id;
     try {
-        const result = await getSplitByIdService(id);
+        const result = await getSplitByIdService(id, userId);
         if (!result) {
             return res.status(404).json({ message: "Split not found" });
         }
@@ -69,13 +70,14 @@ async function getSplitById(req, res) {
 async function updateSplit(req, res) {
     const { id } = req.params;
     const { name } = req.body;
+    const userId = req.user.id;
 
     if (!name) {
         return res.status(400).json({ message: "name is required" });
     }
 
     try {
-        const result = await updateSplitService(id, name);
+        const result = await updateSplitService(id, name, userId);
         res.status(200).json({
             message: "Split updated successfully",
             data: result,
@@ -91,8 +93,9 @@ async function updateSplit(req, res) {
 
 async function deleteSplit(req, res) {
     const { id } = req.params;
+    const userId = req.user.id;
     try {
-        await deleteSplitService(id);
+        await deleteSplitService(id, userId);
         res.status(200).json({ message: "Split deleted successfully" });
     } catch (error) {
         console.error(error);
