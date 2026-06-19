@@ -37,7 +37,8 @@
 
 @layer base {
   html, body, #root {
-    height: 100%;
+    min-height: 100vh;
+    height: auto;
     background-color: var(--color-bg, #0f0f0f);
     font-family: var(--font-body, 'Inter', sans-serif);
     -webkit-font-smoothing: antialiased;
@@ -56,4 +57,12 @@
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+}
+
+/* Force disable all focus outlines on Recharts to prevent visual artifacts */
+.recharts-wrapper, 
+.recharts-surface, 
+.recharts-responsive-container, 
+.recharts-wrapper * {
+  outline: none !important;
 }

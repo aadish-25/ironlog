@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { SignedIn, SignedOut, RedirectToSignIn, useAuth } from "@clerk/clerk-react";
 import { AxiosInterceptor } from "./components/Auth/AxiosInterceptor";
 
@@ -41,9 +42,20 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <AxiosInterceptor />
       <Routes>
         {/* Public Routes */}
