@@ -7,11 +7,14 @@ import {
 async function addExercise(req, res) {
     const { split_day_id, exercise_id, order_index } = req.body;
 
+    // Accept either exercise_id (string) or exercise_ids (array)
+    const exerciseIds = req.body.exercise_ids || req.body.exercise_id;
+    
     try {
         const result = await addExerciseService(
             split_day_id,
-            exercise_id,
-            order_index,
+            exerciseIds,
+            order_index || 0,
         );
         res.status(200).json({
             message: "Exercise added succesfully",

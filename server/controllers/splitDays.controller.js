@@ -2,10 +2,10 @@ import { updateSplitDayService } from "../services/splitDays.services.js";
 
 async function updateSplitDay(req, res) {
     const { id } = req.params;
-    const { label } = req.body;
+    const { label, is_rest } = req.body;
 
     try {
-        const result = await updateSplitDayService(id, label);
+        const result = await updateSplitDayService(id, label, is_rest);
         res.status(200).json({
             message: "Split day renamed succesfully",
             data: result,

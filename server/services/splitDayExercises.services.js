@@ -1,22 +1,51 @@
 import pool from "../db/connection.js";
 
-const addExerciseService = async (splitDayId, exerciseId, orderIndex) => {
+const addExerciseService = async (splitDayId, exerciseIds, startingOrderIndex) => {
+    let client;
     try {
-        const result = await pool.query(
-            `
-            INSERT INTO split_day_exercises (
-                split_day_id,
-                exercise_id,
-                order_index
-            )
-            VALUES ($1, $2, $3)
-            RETURNING *
-            `,
-            [splitDayId, exerciseId, orderIndex],
+        // If single ID passed, convert to array
+        const ids = Array.isArray(exerciseIds) ? exerciseIds : [exerciseIds];
+        
+        client = await pool.connect();
+        await client.query("BEGIN");
+
+        const splitDayResult = await client.query(
+            "SELECT is_rest FROM split_days WHERE id = $1",
+            [splitDayId]
         );
-        return result.rows[0];
+
+        if (splitDayResult.rows.length === 0) {
+            throw new Error("Split day not found");
+        }
+
+        if (splitDayResult.rows[0].is_rest) {
+            throw new Error("Cannot add exercises to a rest day");
+        }
+        
+        const results = [];
+        for (let i = 0; i < ids.length; i++) {
+            const result = await client.query(
+                `
+                INSERT INTO split_day_exercises (
+                    split_day_id,
+                    exercise_id,
+                    order_index
+                )
+                VALUES ($1, $2, $3)
+                RETURNING *
+                `,
+                [splitDayId, ids[i], startingOrderIndex + i],
+            );
+            results.push(result.rows[0]);
+        }
+        
+        await client.query("COMMIT");
+        return results;
     } catch (error) {
-        throw new Error("Could not add exercise to split day", { cause: error });
+        if (client) await client.query("ROLLBACK");
+        throw new Error("Could not add exercises to split day", { cause: error });
+    } finally {
+        if (client) client.release();
     }
 };
 
@@ -54,6 +83,14 @@ const reorderExerciseService = async (splitDayExerciseId, newOrderIndex) => {
 
         const currentOrderIndex = row.order_index;
         const splitDayId = row.split_day_id;
+
+        const splitDayResult = await client.query(
+            "SELECT is_rest FROM split_days WHERE id = $1",
+            [splitDayId]
+        );
+        if (splitDayResult.rows.length > 0 && splitDayResult.rows[0].is_rest) {
+            throw new Error("Cannot reorder exercises on a rest day");
+        }
 
         if (currentOrderIndex === newOrderIndex) {
             await client.query("COMMIT");
