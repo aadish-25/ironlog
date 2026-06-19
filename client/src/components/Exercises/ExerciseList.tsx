@@ -38,9 +38,9 @@ export function ExerciseList({
             key={ex.id}
             onClick={() => onSelectExercise(ex)}
             className="w-full flex items-center gap-3 px-5 py-3 border-b border-[#141414] bg-transparent border-none cursor-pointer text-left hover:bg-raised transition-colors"
-            aria-label={`${ex.name} — ${ex.muscle}`}
+            aria-label={`${ex.name} — ${ex.muscles?.[0] || 'Unknown'}`}
           >
-            <MuscleBadge muscle={ex.muscle} />
+            <MuscleBadge muscle={ex.muscles?.[0] || 'Unknown'} />
             <div className="flex-1 min-w-0">
               <p className="text-sm text-zinc-200 font-medium truncate">{ex.name}</p>
             </div>
@@ -86,9 +86,9 @@ export function ExerciseList({
                     key={ex.id}
                     onClick={() => onSelectExercise(ex)}
                     className="w-full flex items-center gap-3 px-5 py-3 border-b border-[#141414] bg-transparent border-none cursor-pointer text-left hover:bg-raised transition-colors"
-                    aria-label={`${ex.name} — ${ex.muscle}`}
+                    aria-label={`${ex.name} — ${ex.muscles?.[0] || 'Unknown'}`}
                   >
-                    <MuscleBadge muscle={ex.muscle} />
+                    <MuscleBadge muscle={ex.muscles?.[0] || 'Unknown'} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-zinc-200 font-medium truncate">
                         {ex.name}

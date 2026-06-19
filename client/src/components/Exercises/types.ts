@@ -1,9 +1,10 @@
 export interface Exercise {
   id: string;
   name: string;
-  muscle: string;
-  equipment: string;
+  muscles: string[];
+  equipments: string[];
   prKg: number | null;
+  formGuide?: { step: number; instruction: string }[];
 }
 
 export interface MuscleGroup {

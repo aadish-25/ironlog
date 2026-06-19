@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { BottomSheet } from "../components/ui/BottomSheet";
 import { ExercisesHeader } from "../components/Exercises/ExercisesHeader";
 import { SearchBar } from "../components/Exercises/SearchBar";
@@ -10,6 +11,7 @@ import { useExercises } from "../hooks/useExercises";
 // ─── Component ────────────────────────────────────────────────────────────────
 export function ExercisesPage() {
     const { exercisesList } = useExercises();
+    const navigate = useNavigate();
     // ─── EXERCISE DATA ──────────────────────────────────────────────────────────
     // TODO: This component needs the full list of exercises the user has added.
     const exercises: Exercise[] = exercisesList ?? [];
@@ -30,11 +32,11 @@ export function ExercisesPage() {
             !ex.name.toLowerCase().includes(searchQuery.toLowerCase())
         )
             return false;
-        if (selectedMuscles.size > 0 && !selectedMuscles.has(ex.muscle))
+        if (selectedMuscles.size > 0 && !ex.muscles.some(m => selectedMuscles.has(m)))
             return false;
         if (
             !selectedEquipment.has("All") &&
-            !selectedEquipment.has(ex.equipment)
+            !ex.equipments.some(e => selectedEquipment.has(e))
         ) {
             return false;
         }
@@ -57,7 +59,7 @@ export function ExercisesPage() {
     // Group exercises by muscle (preserving display order)
     const grouped: MuscleGroup[] = MUSCLE_ORDER.map((muscle) => ({
         muscle,
-        exercises: filteredExercises.filter((ex) => ex.muscle === muscle),
+        exercises: filteredExercises.filter((ex) => ex.muscles.includes(muscle)),
     })).filter((group) => group.exercises.length > 0);
 
     // ─── EVENT HANDLERS ─────────────────────────────────────────────────────────
@@ -96,7 +98,7 @@ export function ExercisesPage() {
 
     // TODO: Implement viewing exercise details (bottom sheet or new page)
     const handleSelectExercise = (ex: Exercise) => {
-        console.log("Navigate to /exercises/:id", ex.id);
+        navigate(`/exercises/${ex.id}`);
     };
 
     // TODO: Implement toggling collapsed state of a muscle group section.
