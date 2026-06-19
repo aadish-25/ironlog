@@ -13,11 +13,19 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://localhost:5173",
+    "http://172.25.208.1:5173",
+    "https://172.25.208.1:5173",
+    "http://172.31.183.44:5173",
+    "https://172.31.183.44:5173",
+    "https://192.168.1.5:5173" 
+];
+
 app.use(
     cors({
-        origin: process.env.NODE_ENV === "production"
-            ? "https://your-production-domain.com"
-            : true, // allow all origins in dev (covers localhost + network IP)
+        origin: allowedOrigins,
         credentials: true,
     }),
 );
