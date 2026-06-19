@@ -26,15 +26,15 @@ export function ActiveSplitCard({ split, onSelectSplit }: ActiveSplitCardProps) 
           <span className="font-display text-[22px] tracking-[1.5px] text-white">
             {split.name}
           </span>
-          <span className="text-[9px] text-done tracking-[1.5px] uppercase bg-[#0d2a0d] px-2 py-[3px] rounded border border-[#1a4a1a]">
+          <span className="text-[9px] text-done tracking-[1.5px] uppercase bg-[#0d2a0d] px-2 py-0.75 rounded border border-[#1a4a1a]">
             ● ACTIVE
           </span>
         </div>
 
         <p className="text-xs text-ghost">
-          {split.days.filter((d) => d.type === "train").length} training days ·{" "}
-          {split.days.filter((d) => d.type === "rest").length} rest day
-          {split.days.filter((d) => d.type === "rest").length !== 1 ? "s" : ""}
+          {split.days.filter((d) => !d.is_rest).length} training days ·{" "}
+          {split.days.filter((d) => d.is_rest).length} rest day
+          {split.days.filter((d) => d.is_rest).length !== 1 ? "s" : ""}
         </p>
 
         <DayPips days={split.days} />

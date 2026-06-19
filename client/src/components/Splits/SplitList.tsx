@@ -41,9 +41,9 @@ export function SplitList({ splits, onSelectSplit, onActivateSplit, hasActiveSpl
             {split.name}
           </h2>
           <p className="text-xs text-ghost">
-            {split.days.filter((d) => d.type === "train").length} training
+            {split.days.filter((d) => !d.is_rest).length} training
             days ·{" "}
-            {split.days.filter((d) => d.type === "rest").length} rest days
+            {split.days.filter((d) => d.is_rest).length} rest days
           </p>
           <DayPips days={split.days} />
           <button

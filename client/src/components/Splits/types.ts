@@ -7,6 +7,7 @@ export interface SplitDay {
   label: string;
   muscles: string;
   type: DayType;
+  is_rest?: boolean;
   exercises: { id: string; exercise_id: string; name: string; sets: number; reps: number; order_index: number }[];
 }
 

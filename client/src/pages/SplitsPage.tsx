@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { SplitsHeader } from "../components/Splits/SplitsHeader";
 import { ActiveSplitCard } from "../components/Splits/ActiveSplitCard";
 import { SplitList } from "../components/Splits/SplitList";
@@ -8,7 +9,7 @@ import { useSplit } from "../hooks/useSplit";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function SplitsPage() {
-    const { splits, createUserSplit, activateUserSplit } = useSplit();
+    const { splits, loading, createUserSplit, activateUserSplit } = useSplit();
     // ─── SPLITS DATA ────────────────────────────────────────────────────────────
     // TODO: This component needs the list of all splits created by the user.
     const currentUserSplits: Split[] = splits ?? [];
@@ -20,20 +21,23 @@ export function SplitsPage() {
     // ─── NAVIGATION STATE ───────────────────────────────────────────────────────
     const [view, setView] = useState<"list" | "create">("list");
     const [newSplitName, setNewSplitName] = useState("");
+    const navigate = useNavigate();
 
     // ─── EVENT HANDLERS ─────────────────────────────────────────────────────────
     const handleCreateSplitSubmit = async () => {
         if (!newSplitName.trim()) return;
 
-        await createUserSplit(newSplitName.trim());
+        const newSplit = await createUserSplit(newSplitName.trim());
         setView("list");
         setNewSplitName("");
+        if (newSplit) {
+            navigate(`/splits/${newSplit.id}`);
+        }
     };
 
-    // TODO: Handle selecting a split to view its details.
+    // Handle selecting a split to view its details.
     const handleSelectSplit = (split: Split) => {
-        // navigate to detail view e.g. navigate(`/splits/${split.id}`)
-        console.log("View split details:", split.id);
+        navigate(`/splits/${split.id}`);
     };
 
     // Handle setting a split as active.
@@ -46,7 +50,13 @@ export function SplitsPage() {
             className="min-h-screen bg-bg text-white font-body"
             aria-label="Training splits"
         >
-            {view === "list" && (
+            {loading ? (
+                <div className="flex items-center justify-center min-h-screen">
+                    <span className="text-white text-opacity-50 tracking-widest text-xs uppercase animate-pulse">
+                        Loading splits...
+                    </span>
+                </div>
+            ) : view === "list" ? (
                 <div className="overflow-y-auto pb-[90px] no-scrollbar">
                     {/* ── Header ── */}
                     <SplitsHeader onOpenCreateModal={() => setView("create")} />
@@ -71,17 +81,14 @@ export function SplitsPage() {
                         hasActiveSplit={!!activeSplit}
                     />
                 </div>
-            )}
-
-            {/* ── Create Split View ── */}
-            {view === "create" && (
+            ) : view === "create" ? (
                 <CreateSplitView
                     onBack={() => setView("list")}
                     splitName={newSplitName}
                     onSplitNameChange={setNewSplitName}
                     onSubmit={handleCreateSplitSubmit}
                 />
-            )}
+            ) : null}
         </section>
     );
 }

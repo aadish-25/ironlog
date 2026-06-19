@@ -15,11 +15,11 @@ export function DayPips({ days }: DayPipsProps) {
           <div
             key={idx}
             className={`w-7 h-7 rounded-md flex items-center justify-center text-[9px] tracking-[0.5px] uppercase font-semibold ${
-              day.type === "train"
+              !day.is_rest
                 ? "bg-raised text-ghost"
                 : "bg-[#141414] text-ghost/40"
             }`}
-            aria-label={`${abbr} — ${day.type}`}
+            aria-label={`${abbr} — ${day.is_rest ? "rest" : "train"}`}
           >
             {abbr}
           </div>
