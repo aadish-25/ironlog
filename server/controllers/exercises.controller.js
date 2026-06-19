@@ -6,12 +6,13 @@ import {
 
 async function getExercises(req, res) {
     const { muscle_group, equipment } = req.query;
+    const userId = req.user?.id;
 
     const muscleGroups = muscle_group?.split(",") || undefined;
     const equipmentList = equipment?.split(",") || undefined;
 
     try {
-        const result = await getExercisesService(muscleGroups, equipmentList);
+        const result = await getExercisesService(muscleGroups, equipmentList, userId);
         res.status(200).json({
             message: "Exercises fetched successfully",
             data: result,

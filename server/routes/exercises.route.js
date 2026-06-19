@@ -9,7 +9,7 @@ import {
 
 const router = Router();
 
-router.get("/", getExercises);
+router.get("/", clerkAuth, getExercises);
 router.get("/:id", getExerciseById);
 router.get("/:id/progress", clerkAuth, getExerciseProgress);
 
