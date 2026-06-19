@@ -33,9 +33,8 @@ export function SignInPage() {
               borderRadius: '0.75rem',
             },
             elements: {
+              header: 'hidden',
               card: 'border border-border/20 shadow-2xl bg-card/90 backdrop-blur-xl w-full',
-              headerTitle: 'font-display text-3xl tracking-wide',
-              headerSubtitle: 'font-body',
               formButtonPrimary: 'font-body font-semibold tracking-wide shadow-lg shadow-heat/20',
               socialButtonsBlockButton: 'border-border/40 hover:bg-raised transition-colors',
             }

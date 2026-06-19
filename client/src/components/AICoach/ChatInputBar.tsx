@@ -1,4 +1,4 @@
-import React, { ChangeEvent, KeyboardEvent } from "react";
+import React, { type ChangeEvent, type KeyboardEvent } from "react";
 import { Send, Mic } from "lucide-react";
 
 interface ChatInputBarProps {
@@ -15,14 +15,14 @@ export function ChatInputBar({ chatInput, onInputChange, onSendMessage }: ChatIn
   };
 
   return (
-    <div className="fixed bottom-[82px] left-1/2 -translate-x-1/2 w-full max-w-[430px] px-4 py-2.5 bg-bg/97 border-t border-card flex items-center gap-2 z-50">
+    <div className="fixed bottom-20.5 left-1/2 -translate-x-1/2 w-full max-w-107.5 px-4 py-2.5 bg-bg/97 border-t border-card flex items-center gap-2 z-50">
       <input
         type="text"
         value={chatInput}
         onChange={onInputChange}
         onKeyDown={handleKeyDown}
         placeholder="Ask your coach..."
-        className="flex-1 bg-card border border-border rounded-[10px] py-[11px] px-3.5 text-[13px] text-white outline-none font-body placeholder:text-ghost"
+        className="flex-1 bg-card border border-border rounded-[10px] py-2.75 px-3.5 text-[13px] text-white outline-none font-body placeholder:text-ghost"
         aria-label="Chat message input"
       />
       <button

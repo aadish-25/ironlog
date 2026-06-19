@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, RedirectToSignIn, useAuth } from "@clerk/clerk-react";
 import { AxiosInterceptor } from "./components/Auth/AxiosInterceptor";
 
 import { AppLayout }     from "./components/layout/AppLayout";
@@ -12,6 +12,34 @@ import { ProfilePage }   from "./pages/ProfilePage";
 import { AICoachPage }   from "./pages/AICoachPage";
 import { SignInPage }    from "./pages/SignInPage";
 import { SignUpPage }    from "./pages/SignUpPage";
+import { ExerciseDetailPage } from "./pages/ExerciseDetailPage";
+import { SplitDetailPage } from "./pages/SplitDetailPage";
+import { SplitDayDetailPage } from "./pages/SplitDayDetailPage";
+
+function AuthGate({ children }: { children: React.ReactNode }) {
+  const { isLoaded, isSignedIn } = useAuth();
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-bg flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-[30px] h-[30px] bg-heat rounded-lg flex items-center justify-center font-display text-[13px] text-white tracking-[0.5px] animate-pulse">
+            IL
+          </div>
+          <span className="text-ghost text-xs tracking-[2px] uppercase animate-pulse">
+            IRONLOG
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isSignedIn) {
+    return <Navigate to="/sign-in" replace />;
+  }
+
+  return <>{children}</>;
+}
 
 export default function App() {
   return (
@@ -25,20 +53,19 @@ export default function App() {
         {/* Protected Routes */}
         <Route
           element={
-            <>
-              <SignedIn>
-                <AppLayout />
-              </SignedIn>
-              <SignedOut>
-                <RedirectToSignIn />
-              </SignedOut>
-            </>
+            <AuthGate>
+              <AppLayout />
+            </AuthGate>
           }
         >
           <Route path="/"           element={<HomePage />} />
           <Route path="/splits"     element={<SplitsPage />} />
+          <Route path="/splits/:id" element={<SplitDetailPage />} />
+          <Route path="/splits/:splitId/day/:dayId" element={<SplitDayDetailPage />} />
           <Route path="/session"    element={<SessionPage />} />
+          <Route path="/session/:id" element={<SessionPage />} />
           <Route path="/exercises"  element={<ExercisesPage />} />
+          <Route path="/exercises/:id" element={<ExerciseDetailPage />} />
           <Route path="/history"    element={<HistoryPage />} />
           <Route path="/profile"    element={<ProfilePage />} />
           <Route path="/coach"      element={<AICoachPage />} />

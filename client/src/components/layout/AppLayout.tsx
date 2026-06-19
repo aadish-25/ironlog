@@ -3,7 +3,7 @@ import { TabBar } from "./TabBar";
 
 export function AppLayout() {
   const location = useLocation();
-  const isSessionActive = location.pathname === "/session";
+  const isSessionActive = location.pathname.startsWith("/session");
 
   return (
     <div className="w-full max-w-[430px] mx-auto min-h-screen relative bg-bg border-x border-border/10 flex flex-col justify-between">
