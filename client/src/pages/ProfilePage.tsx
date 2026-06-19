@@ -5,31 +5,23 @@ import { JourneyStrip } from "../components/Profile/JourneyStrip";
 import { MonthlyStats } from "../components/Profile/MonthlyStats";
 import { SettingsList } from "../components/Profile/SettingsList";
 import type { StatCard, SettingsItem } from "../components/Profile/types";
+import { useProfile } from "../hooks/useProfile";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function ProfilePage() {
   const { signOut } = useClerk();
+  const { user, stats, daysSinceJoined, memberSince, loading } = useProfile();
 
   // ─── USER IDENTITY ──────────────────────────────────────────────────────────
-  // TODO: This component needs the user's display name.
-  const userName: string | null = null;
-
-  // TODO: This component needs the user's membership start date and total session count.
-  const memberSince: string | null = null;
-  const totalSessions: number | null = null;
-
-  // TODO: This component needs the user's current streak count.
-  const currentStreak: number | null = null;
-
-  // TODO: This component needs the user's journey progress (days since joining).
-  const daysSinceJoined: number | null = null;
+  const userName = user?.name || "Lifter";
+  const totalSessions = stats?.totalSessions ?? 0;
+  const currentStreak = stats?.currentStreak ?? 0;
 
   // ─── MONTHLY STATS ──────────────────────────────────────────────────────────
-  // TODO: This component needs this month's session count, weekly session count, and best streak.
   const monthlyStats: StatCard[] = [
-    { icon: "→→", label: "Sessions", value: totalSessions?.toString() ?? "0" },
-    { icon: "📅", label: "This week", value: "0" },
-    { icon: "🔥", label: "Best streak", value: "0" },
+    { icon: "→→", label: "Sessions", value: String(stats?.monthlySessions ?? 0) },
+    { icon: "📅", label: "This week", value: String(stats?.weeklySessions ?? 0) },
+    { icon: "🔥", label: "Best streak", value: String(stats?.bestStreak ?? 0) },
   ];
 
   // ─── SETTINGS ───────────────────────────────────────────────────────────────
@@ -44,16 +36,21 @@ export function ProfilePage() {
     { icon: "ℹ️", label: "About" },
   ];
 
-  // TODO: This component needs notification toggle state.
-  const notificationsEnabled: boolean | null = null;
+  const notificationsEnabled = false; // TBD
 
-  // TODO: Handle toggling notification state.
   const handleToggleNotifications = () => {};
 
-  // TODO: Handle user logout.
   const handleLogout = () => {
     signOut();
   };
+
+  if (loading && !stats) {
+    return (
+      <div className="bg-bg min-h-screen flex items-center justify-center">
+        <span className="text-white text-opacity-50 text-xs tracking-widest uppercase animate-pulse">Loading profile...</span>
+      </div>
+    );
+  }
 
   return (
     <section

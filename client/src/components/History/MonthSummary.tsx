@@ -38,7 +38,7 @@ export function MonthSummary({ summary }: MonthSummaryProps) {
 
       {/* Month-over-month comparison */}
       {summary?.comparisonText && (
-        <div className="flex items-center gap-[5px] mt-4 pt-3.5 border-t border-border">
+        <div className="flex items-center gap-1.25 mt-4 pt-3.5 border-t border-border">
           <TrendingUp size={11} className="text-heat" strokeWidth={2} />
           <span className="text-[11px] text-heat">
             {summary.comparisonText}

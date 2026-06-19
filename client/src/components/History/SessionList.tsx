@@ -38,7 +38,7 @@ export function SessionList({ sessions, hasMore, onLoadMore }: SessionListProps)
             >
               {/* Color indicator strip */}
               <div
-                className="w-[3px] self-stretch rounded-sm shrink-0 bg-heat"
+                className="w-0.75 self-stretch rounded-sm shrink-0 bg-heat"
                 aria-hidden="true"
               />
 
@@ -46,7 +46,7 @@ export function SessionList({ sessions, hasMore, onLoadMore }: SessionListProps)
                 <div className="text-[13px] font-bold truncate">
                   {session.name}
                 </div>
-                <div className="text-[11px] text-ghost mt-[3px]">
+                <div className="text-[11px] text-ghost mt-0.75">
                   {session.date}
                 </div>
               </div>
@@ -63,7 +63,7 @@ export function SessionList({ sessions, hasMore, onLoadMore }: SessionListProps)
       {hasMore && (
         <button
           onClick={onLoadMore}
-          className="w-full mt-2.5 py-3 bg-transparent border-[1.5px] border-border rounded text-ghost text-[11px] font-semibold uppercase tracking-wider cursor-pointer flex items-center justify-center gap-[5px] hover:text-dim transition-colors"
+          className="w-full mt-2.5 py-3 bg-transparent border-[1.5px] border-border rounded text-ghost text-[11px] font-semibold uppercase tracking-wider cursor-pointer flex items-center justify-center gap-1.25 hover:text-dim transition-colors"
           aria-label="Load more sessions"
         >
           <ChevronDown size={13} strokeWidth={2} />
