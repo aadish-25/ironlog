@@ -76,10 +76,33 @@ const getSplitsByUserService = async (userId) => {
             daysBySplit[day.split_id].push(day);
         }
 
-        return splits.map((split) => ({
-            ...split,
-            days: daysBySplit[split.id] ?? [],
-        }));
+        const exercisesResult = await pool.query(
+            `SELECT sde.*, e.name, e.muscle_groups, e.equipment
+            FROM split_day_exercises sde
+            JOIN exercises e ON sde.exercise_id = e.id
+            JOIN split_days sd ON sde.split_day_id = sd.id
+            WHERE sd.split_id = ANY($1)
+            ORDER BY sde.split_day_id, sde.order_index`,
+            [splitIds]
+        );
+
+        const exercisesByDay = {};
+        for (const ex of exercisesResult.rows) {
+            if (!exercisesByDay[ex.split_day_id]) exercisesByDay[ex.split_day_id] = [];
+            exercisesByDay[ex.split_day_id].push(ex);
+        }
+
+        return splits.map((split) => {
+            const days = (daysBySplit[split.id] ?? []).map(day => {
+                const dayExercises = exercisesByDay[day.id] || [];
+                return {
+                    ...day,
+                    type: day.is_rest ? "rest" : "train",
+                    exercises: dayExercises
+                };
+            });
+            return { ...split, days };
+        });
     } catch (error) {
         throw new Error("Could not retrieve splits for user", { cause: error });
     }
@@ -109,7 +132,32 @@ const getSplitByIdService = async (splitId) => {
             [splitId],
         );
 
-        return { ...splitResult.rows[0], days: daysResult.rows };
+        const exercisesResult = await pool.query(
+            `SELECT sde.*, e.name, e.muscle_groups, e.equipment
+            FROM split_day_exercises sde
+            JOIN exercises e ON sde.exercise_id = e.id
+            JOIN split_days sd ON sde.split_day_id = sd.id
+            WHERE sd.split_id = $1
+            ORDER BY sde.split_day_id, sde.order_index`,
+            [splitId]
+        );
+
+        const exercisesByDay = {};
+        for (const ex of exercisesResult.rows) {
+            if (!exercisesByDay[ex.split_day_id]) exercisesByDay[ex.split_day_id] = [];
+            exercisesByDay[ex.split_day_id].push(ex);
+        }
+
+        const days = daysResult.rows.map(day => {
+            const dayExercises = exercisesByDay[day.id] || [];
+            return {
+                ...day,
+                type: day.is_rest ? "rest" : "train",
+                exercises: dayExercises
+            };
+        });
+
+        return { ...splitResult.rows[0], days };
     } catch (error) {
         throw new Error("Could not retrieve split", { cause: error });
     }
