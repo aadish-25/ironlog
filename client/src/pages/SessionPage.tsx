@@ -1,162 +1,317 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useSession } from "../hooks/useSession";
+import { useSet } from "../hooks/useSet";
 import { EmptySessionState } from "../components/Session/EmptySessionState";
 import { SessionHeader } from "../components/Session/SessionHeader";
 import { ExerciseView } from "../components/Session/ExerciseView";
-import type { SessionExercise } from "../components/Session/ExerciseView";
 import { BottomNav } from "../components/Session/BottomNav";
 import { ExercisePicker } from "../components/Session/ExercisePicker";
 import { CompletionScreen } from "../components/Session/CompletionScreen";
 import { AllExercisesSheet } from "../components/Session/AllExercisesSheet";
 import { EndSessionDialog } from "../components/Session/EndSessionDialog";
+import { SessionSummary } from "../components/Session/SessionSummary";
+import type { SessionExercise } from "../types";
 
 export function SessionPage() {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  // ─── OVERLAY STATE ──────────────────────────────────────────────────────────
-  const [pickerMode, setPickerMode] = useState<"add" | "swap" | null>(null);
-  const [showAllExercises, setShowAllExercises] = useState(false);
-  const [showEndConfirm, setShowEndConfirm] = useState(false);
-  const [showCompletion, setShowCompletion] = useState(false);
+    const { id: sessionId } = useParams();
+    const {
+        session,
+        exercises,
+        setExercises,
+        currentExerciseIndex,
+        setCurrentExerciseIndex,
+        loading,
+        completeUserSession
+    } = useSession(sessionId || null);
 
-  // ─── SESSION DATA ───────────────────────────────────────────────────────────
-  // TODO: This component needs the list of exercises for today's active session.
-  const exercises: SessionExercise[] = [];
+    const { addUserSet, saveUserSet, removeUserSet } = useSet(setExercises);
 
-  // TODO: This component needs the current exercise index for navigation.
-  const currentExerciseIndex = 0;
+    // ─── OVERLAY STATE ──────────────────────────────────────────────────────────
+    const [pickerMode, setPickerMode] = useState<"add" | "swap" | null>(null);
+    const [showAllExercises, setShowAllExercises] = useState(false);
+    const [showEndConfirm, setShowEndConfirm] = useState(false);
+    const [showCompletionOverride, setShowCompletionOverride] = useState<boolean | null>(null);
+    const [showSummary, setShowSummary] = useState(false);
 
-  // TODO: This component needs the session's split day name for the header.
-  const splitDayName: string | null = null;
+    const splitDayName = session?.split_day_label ?? null;
 
-  // TODO: This component needs the previous best for the current exercise.
-  const previousBest: string | null = null;
+    // ─── COMPUTED VALUES ────────────────────────────────────────────────────────
+    const currentExercise = exercises[currentExerciseIndex] ?? null;
+    const previousBest = currentExercise?.previous_best ?? null;
+    const totalSets = exercises.reduce((n, e) => n + e.sets.length, 0);
+    const completedSets = exercises.reduce(
+        (n, e) => n + e.sets.filter((s) => s.is_logged).length,
+        0,
+    );
+    const progressPercent =
+        totalSets > 0 ? (completedSets / totalSets) * 100 : 0;
 
-  // ─── COMPUTED VALUES ────────────────────────────────────────────────────────
-  const currentExercise = exercises[currentExerciseIndex] ?? null;
-  const totalSets = exercises.reduce((n, e) => n + e.sets.length, 0);
-  const completedSets = exercises.reduce(
-    (n, e) => n + e.sets.filter((s) => s.logged).length,
-    0
-  );
-  const progressPercent = totalSets > 0 ? (completedSets / totalSets) * 100 : 0;
+    // ─── EVENT HANDLERS ─────────────────────────────────────────────────────────
+    const handleLogSet = async (index: number) => {
+        if (!session || !currentExercise) return;
+        const targetSet = currentExercise.sets[index];
+        const result = await saveUserSet(
+            session.id,
+            currentExercise.exercise_id,
+            targetSet.id,
+            targetSet.set_number,
+            targetSet.weight,
+            targetSet.reps,
+        );
 
-  // ─── EVENT HANDLERS ─────────────────────────────────────────────────────────
-  // TODO: Handle logging a set
-  const handleLogSet = () => {};
+        if (result) {
+            // Count logged sets (using state from currentExercise, but this set will be true)
+            const loggedCount = currentExercise.sets.filter((s) => s.is_logged).length;
+            if (loggedCount + 1 >= currentExercise.sets.length) {
+                setTimeout(() => handleNextExercise(), 500);
+            }
+        }
+    };
 
-  // TODO: Handle navigating to the next exercise.
-  const handleNextExercise = () => {
-    if (currentExerciseIndex < exercises.length - 1) {
-      // Navigate to next
-    } else {
-      setShowCompletion(true);
+    const handleNextExercise = () => {
+        if (currentExerciseIndex < exercises.length - 1) {
+            setCurrentExerciseIndex((prev) => prev + 1);
+        } else {
+            setShowCompletionOverride(true);
+        }
+    };
+
+    const handlePrevExercise = () => {
+        setCurrentExerciseIndex((prev) => Math.max(0, prev - 1));
+    };
+
+    const handleAddSet = () => {
+        if (currentExercise) {
+            addUserSet(currentExercise.exercise_id);
+        }
+    };
+
+    const handleRemoveSet = (index: number) => {
+        if (currentExercise) {
+            const setId = currentExercise.sets[index].id;
+            removeUserSet(currentExercise.exercise_id, setId);
+        }
+    };
+
+    const handleWeightChange = (index: number, val: number) => {
+        if (!currentExercise) return;
+        setExercises((prev) =>
+            prev.map((ex) => {
+                if (ex.exercise_id === currentExercise.exercise_id) {
+                    const newSets = [...ex.sets];
+                    newSets[index] = { ...newSets[index], weight: val };
+                    
+                    // Propagate downwards to unlogged sets
+                    for (let i = index + 1; i < newSets.length; i++) {
+                        if (!newSets[i].is_logged) {
+                            newSets[i] = { ...newSets[i], weight: val };
+                        }
+                    }
+                    
+                    return { ...ex, sets: newSets };
+                }
+                return ex;
+            }),
+        );
+    };
+
+    const handleRepChange = (index: number, val: number) => {
+        if (!currentExercise) return;
+        setExercises((prev) =>
+            prev.map((ex) => {
+                if (ex.exercise_id === currentExercise.exercise_id) {
+                    const newSets = [...ex.sets];
+                    newSets[index] = { ...newSets[index], reps: val };
+                    
+                    // Propagate downwards to unlogged sets
+                    for (let i = index + 1; i < newSets.length; i++) {
+                        if (!newSets[i].is_logged) {
+                            newSets[i] = { ...newSets[i], reps: val };
+                        }
+                    }
+                    
+                    return { ...ex, sets: newSets };
+                }
+                return ex;
+            }),
+        );
+    };
+
+    const handleEditSet = (index: number) => {
+        if (!currentExercise) return;
+        setExercises((prev) =>
+            prev.map((ex) => {
+                if (ex.exercise_id === currentExercise.exercise_id) {
+                    const newSets = [...ex.sets];
+                    newSets[index] = { ...newSets[index], is_logged: false };
+                    return { ...ex, sets: newSets };
+                }
+                return ex;
+            }),
+        );
+    };
+
+    const handleAddExerciseToSession = (id: string, name: string) => {
+        const newEx: SessionExercise = {
+            id: `temp-ex-${Date.now()}`,
+            exercise_id: id,
+            name,
+            sets: [],
+            muscles: []
+        };
+        setExercises((prev) => [...prev, newEx]);
+        setPickerMode(null);
+        // Switch to the newly added exercise
+        setCurrentExerciseIndex(exercises.length);
+    };
+
+    const handleSwapExerciseInSession = (id: string, name: string) => {
+        setExercises((prev) =>
+            prev.map((ex, i) =>
+                i === currentExerciseIndex ? { ...ex, exercise_id: id, name, sets: [] } : ex
+            )
+        );
+        setPickerMode(null);
+    };
+
+    const handleSwapExerciseClick = () => setPickerMode("swap");
+    const handleAddExerciseClick = () => setPickerMode("add");
+
+    const handleEndSession = () => setShowEndConfirm(true);
+
+    const handleConfirmEnd = async () => {
+        if (session) {
+            await completeUserSession(session.id);
+        }
+        navigate("/");
+    };
+
+    // ─── LOADING STATE ──────────────────────────────────────────────────────────
+    if (loading) {
+        return (
+            <div className="bg-bg min-h-screen text-ink font-body flex items-center justify-center">
+                <span className="text-white text-opacity-50 tracking-widest text-xs uppercase animate-pulse">
+                    Loading session...
+                </span>
+            </div>
+        );
     }
-  };
 
-  // TODO: Handle navigating to the previous exercise.
-  const handlePrevExercise = () => {};
+    // ─── EMPTY STATE ────────────────────────────────────────────────────────────
+    if (exercises.length === 0) {
+        return (
+            <EmptySessionState
+                onBack={() => navigate("/")}
+                onCreateSplit={() => navigate("/splits")}
+            />
+        );
+    }
 
-  // TODO: Handle adding an extra set to the current exercise.
-  const handleAddSet = () => {};
+    const showCompletion = showCompletionOverride ?? session?.is_completed ?? false;
 
-  // TODO: Handle removing a set from the current exercise.
-  const handleRemoveSet = () => {};
+    if (showCompletion) {
+        return (
+            <CompletionScreen
+                splitDayName={splitDayName}
+                exercises={exercises}
+                onComplete={handleConfirmEnd}
+                onBackToWorkout={() => {
+                    setShowCompletionOverride(false);
+                    setShowSummary(true);
+                }}
+            />
+        );
+    }
 
-  // TODO: Handle swapping the current exercise for a different one.
-  const handleSwapExercise = () => setPickerMode("swap");
+    if (showSummary) {
+        return (
+            <SessionSummary
+                splitDayName={splitDayName}
+                exercises={exercises}
+                onBack={() => setShowCompletionOverride(true)}
+                onEdit={() => setShowSummary(false)}
+            />
+        );
+    }
 
-  // TODO: Handle adding a new exercise to the session.
-  const handleAddExercise = () => setPickerMode("add");
-
-  // TODO: Handle ending the session and navigating back.
-  const handleEndSession = () => setShowEndConfirm(true);
-
-  // ─── EMPTY STATE ────────────────────────────────────────────────────────────
-  if (exercises.length === 0) {
     return (
-      <EmptySessionState
-        onBack={() => navigate("/")}
-        onCreateSplit={() => navigate("/splits")}
-      />
+        <section
+            className="min-h-screen bg-bg text-white font-body flex flex-col"
+            aria-label="Active session"
+        >
+            {/* ── Header ── */}
+            <SessionHeader
+                splitDayName={splitDayName}
+                completedSets={completedSets}
+                totalSets={totalSets}
+                progressPercent={progressPercent}
+                onEndSession={handleEndSession}
+            />
+
+            {/* ── Exercise content ── */}
+            {currentExercise && (
+                <ExerciseView
+                    currentExerciseIndex={currentExerciseIndex}
+                    totalExercises={exercises.length}
+                    exercise={currentExercise}
+                    previousBest={previousBest}
+                    onRemoveSet={handleRemoveSet}
+                    onLogSet={handleLogSet}
+                    onAddSet={handleAddSet}
+                    onWeightChange={handleWeightChange}
+                    onRepChange={handleRepChange}
+                    onEditSet={handleEditSet}
+                    onViewAllExercises={() => setShowAllExercises(true)}
+                />
+            )}
+
+            {/* ── Bottom navigation bar ── */}
+            <BottomNav
+                currentExerciseIndex={currentExerciseIndex}
+                totalExercises={exercises.length}
+                activeSetsLogged={
+                    currentExercise?.sets.filter((s) => s.is_logged).length ?? 0
+                }
+                activeSetsTotal={currentExercise?.sets.length ?? 0}
+                sessionSetsLogged={completedSets}
+                onSwapExercise={handleSwapExerciseClick}
+                onAddExercise={handleAddExerciseClick}
+                onPrevExercise={handlePrevExercise}
+                onNextExercise={handleNextExercise}
+            />
+
+            {/* ── Overlays ── */}
+            <ExercisePicker
+                isOpen={pickerMode !== null}
+                mode={pickerMode}
+                currentName={currentExercise?.name ?? null}
+                existingExercises={exercises.map(e => e.name)}
+                onClose={() => setPickerMode(null)}
+                onAdd={handleAddExerciseToSession}
+                onSwap={handleSwapExerciseInSession}
+            />
+
+            <AllExercisesSheet
+                isOpen={showAllExercises}
+                onClose={() => setShowAllExercises(false)}
+                exercises={exercises}
+                currentExerciseIndex={currentExerciseIndex}
+                onSelectExercise={(idx) => {
+                    setCurrentExerciseIndex(idx);
+                    setShowAllExercises(false);
+                }}
+            />
+
+            <EndSessionDialog
+                isOpen={showEndConfirm}
+                onClose={() => setShowEndConfirm(false)}
+                onConfirmEnd={handleConfirmEnd}
+            />
+        </section>
     );
-  }
-
-  // ─── COMPLETION SCREEN ──────────────────────────────────────────────────────
-  if (showCompletion) {
-    return (
-      <CompletionScreen
-        exercises={exercises}
-        onComplete={() => navigate("/")}
-        onBackToWorkout={() => setShowCompletion(false)}
-      />
-    );
-  }
-
-  return (
-    <section
-      className="min-h-screen bg-bg text-white font-body flex flex-col"
-      aria-label="Active session"
-    >
-      {/* ── Header ── */}
-      <SessionHeader
-        splitDayName={splitDayName}
-        completedSets={completedSets}
-        totalSets={totalSets}
-        progressPercent={progressPercent}
-        onEndSession={handleEndSession}
-      />
-
-      {/* ── Exercise content ── */}
-      {currentExercise && (
-        <ExerciseView
-          currentExerciseIndex={currentExerciseIndex}
-          totalExercises={exercises.length}
-          exercise={currentExercise}
-          previousBest={previousBest}
-          onRemoveSet={handleRemoveSet}
-          onLogSet={handleLogSet}
-          onAddSet={handleAddSet}
-          onViewAllExercises={() => setShowAllExercises(true)}
-        />
-      )}
-
-      {/* ── Bottom navigation bar ── */}
-      <BottomNav
-        currentExerciseIndex={currentExerciseIndex}
-        activeSetsLogged={currentExercise?.sets.filter((s) => s.logged).length ?? 0}
-        activeSetsTotal={currentExercise?.sets.length ?? 0}
-        onSwapExercise={handleSwapExercise}
-        onAddExercise={handleAddExercise}
-        onPrevExercise={handlePrevExercise}
-        onNextExercise={handleNextExercise}
-      />
-
-      {/* ── Overlays ── */}
-      <ExercisePicker
-        isOpen={pickerMode !== null}
-        mode={pickerMode}
-        currentName={currentExercise?.name ?? null}
-        onClose={() => setPickerMode(null)}
-        onAdd={() => setPickerMode(null)}
-        onSwap={() => setPickerMode(null)}
-      />
-
-      <AllExercisesSheet
-        isOpen={showAllExercises}
-        onClose={() => setShowAllExercises(false)}
-        exercises={exercises}
-        currentExerciseIndex={currentExerciseIndex}
-        onSelectExercise={() => setShowAllExercises(false)}
-      />
-
-      <EndSessionDialog
-        isOpen={showEndConfirm}
-        onClose={() => setShowEndConfirm(false)}
-        onConfirmEnd={() => navigate("/")}
-      />
-    </section>
-  );
 }
 
 /*

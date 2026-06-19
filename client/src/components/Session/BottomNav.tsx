@@ -1,10 +1,12 @@
 import React from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 
 interface BottomNavProps {
   currentExerciseIndex: number;
+  totalExercises: number;
   activeSetsLogged: number;
   activeSetsTotal: number;
+  sessionSetsLogged: number;
   onSwapExercise: () => void;
   onAddExercise: () => void;
   onPrevExercise: () => void;
@@ -13,8 +15,10 @@ interface BottomNavProps {
 
 export function BottomNav({
   currentExerciseIndex,
+  totalExercises,
   activeSetsLogged,
   activeSetsTotal,
+  sessionSetsLogged,
   onSwapExercise,
   onAddExercise,
   onPrevExercise,
@@ -39,26 +43,20 @@ export function BottomNav({
       </div>
 
       {/* Navigation row */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 mt-3">
         <button
           onClick={onPrevExercise}
           disabled={currentExerciseIndex === 0}
-          className={`w-11 h-11 rounded-[10px] border-none flex items-center justify-center shrink-0 transition-opacity ${
-            currentExerciseIndex > 0
-              ? "bg-heat cursor-pointer"
-              : "bg-card opacity-35 cursor-default"
+          className={`w-[44px] h-[44px] rounded-[10px] bg-heat border-none flex items-center justify-center shrink-0 transition-opacity ${
+            currentExerciseIndex === 0 ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:opacity-90"
           }`}
           aria-label="Previous exercise"
         >
-          <ChevronLeft
-            size={20}
-            className={currentExerciseIndex > 0 ? "text-white" : "text-ghost/30"}
-            strokeWidth={2}
-          />
+          <ChevronLeft size={22} className="text-white" strokeWidth={2.5} />
         </button>
 
         {/* Center pill */}
-        <div className="flex-1 h-11 bg-card rounded-[10px] flex items-center justify-center">
+        <div className="flex-1 h-[44px] bg-[#1a1a1a] rounded-[10px] flex items-center justify-center border border-[#333]">
           <span className="font-display text-lg tracking-[2px] text-ghost">
             <b className="font-display text-white font-normal">
               {activeSetsLogged}
@@ -67,13 +65,28 @@ export function BottomNav({
           </span>
         </div>
 
-        <button
-          onClick={onNextExercise}
-          className="w-11 h-11 rounded-[10px] bg-heat border-none flex items-center justify-center cursor-pointer shrink-0"
-          aria-label="Next exercise"
-        >
-          <ChevronRight size={20} className="text-white" strokeWidth={2} />
-        </button>
+        {currentExerciseIndex >= totalExercises - 1 ? (
+          <button
+            onClick={onNextExercise}
+            disabled={sessionSetsLogged === 0}
+            className={`w-[44px] h-[44px] rounded-[10px] border-none flex items-center justify-center shrink-0 transition-opacity ${
+              sessionSetsLogged === 0 
+                ? "bg-[#333] cursor-not-allowed opacity-50" 
+                : "bg-done cursor-pointer hover:opacity-90"
+            }`}
+            aria-label="Finish session"
+          >
+            <Check size={22} className={sessionSetsLogged === 0 ? "text-ghost" : "text-[#0f0f0f]"} strokeWidth={3} />
+          </button>
+        ) : (
+          <button
+            onClick={onNextExercise}
+            className="w-[44px] h-[44px] rounded-[10px] bg-heat border-none flex items-center justify-center shrink-0 transition-opacity cursor-pointer hover:opacity-90"
+            aria-label="Next exercise"
+          >
+            <ChevronRight size={22} className="text-white" strokeWidth={2.5} />
+          </button>
+        )}
       </div>
     </div>
   );

@@ -1,11 +1,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { SetList, type SetRecord } from "./SetList";
-
-export interface SessionExercise {
-  name: string;
-  sets: SetRecord[];
-}
+import { SetList } from "./SetList";
+import type { SessionExercise } from "../../types";
 
 interface ExerciseViewProps {
   currentExerciseIndex: number;
@@ -16,6 +12,9 @@ interface ExerciseViewProps {
   onLogSet: (index: number) => void;
   onAddSet: () => void;
   onViewAllExercises: () => void;
+  onWeightChange: (index: number, val: number) => void;
+  onRepChange: (index: number, val: number) => void;
+  onEditSet: (index: number) => void;
 }
 
 export function ExerciseView({
@@ -27,6 +26,9 @@ export function ExerciseView({
   onLogSet,
   onAddSet,
   onViewAllExercises,
+  onWeightChange,
+  onRepChange,
+  onEditSet,
 }: ExerciseViewProps) {
   return (
     <div className="flex-1 overflow-y-auto px-5 pb-[160px]">
@@ -66,6 +68,9 @@ export function ExerciseView({
             onRemoveSet={onRemoveSet}
             onLogSet={onLogSet}
             onAddSet={onAddSet}
+            onWeightChange={onWeightChange}
+            onRepChange={onRepChange}
+            onEditSet={onEditSet}
           />
         </motion.div>
       </AnimatePresence>

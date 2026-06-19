@@ -1,6 +1,6 @@
 import React from "react";
 import { BottomSheet } from "../ui/BottomSheet";
-import type { SessionExercise } from "./ExerciseView";
+import type { SessionExercise } from "../../types";
 
 interface AllExercisesSheetProps {
   isOpen: boolean;
@@ -23,7 +23,7 @@ export function AllExercisesSheet({
         {exercises.map((exercise, index) => {
           const isCurrent = index === currentExerciseIndex;
           const setsTotal = exercise.sets.length;
-          const setsDone = exercise.sets.filter((s) => s.logged).length;
+          const setsDone = exercise.sets.filter((s) => s.is_logged).length;
           const allDone = setsTotal > 0 && setsDone === setsTotal;
 
           return (

@@ -21,18 +21,18 @@ export function EmptySessionState({ onBack, onCreateSplit }: EmptySessionStatePr
       </button>
 
       <div className="text-[56px] opacity-40 mb-5">🏋️</div>
-      <h1 className="font-display text-[32px] tracking-[3px] text-dim mb-3">
-        NO ACTIVE SESSION
+      <h1 className="font-display text-[32px] tracking-[3px] text-dim mb-3 uppercase leading-none">
+        No Exercises<br/>Scheduled
       </h1>
       <p className="text-[13px] text-ghost leading-relaxed mb-10 max-w-[260px]">
-        You don't have an active training split. Head over to the Splits page to build your routine before starting a session.
+        You don't have any exercises assigned for today's session. Head over to the Splits page to add exercises to your routine.
       </p>
 
       <button
         onClick={onCreateSplit}
         className="w-full max-w-[220px] py-[15px] bg-[#141414] border border-border rounded-xl text-white font-display text-[22px] tracking-[3px] cursor-pointer hover:bg-raised transition-colors flex items-center justify-center gap-2"
       >
-        CREATE SPLIT
+        EDIT SPLIT
       </button>
     </section>
   );
