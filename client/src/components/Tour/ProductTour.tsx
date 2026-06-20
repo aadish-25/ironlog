@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Joyride, STATUS, EVENTS } from "react-joyride";
-import type { Step, CallBackProps, TooltipRenderProps } from "react-joyride";
+import type { Step, EventData, TooltipRenderProps } from "react-joyride";
 
 const CustomTooltip = ({
   index,
@@ -15,7 +15,7 @@ const CustomTooltip = ({
   return (
     <div
       {...tooltipProps}
-      className="bg-card border border-border rounded-2xl p-5 max-w-[320px] font-body shadow-2xl z-[1000]"
+      className="bg-card border border-border rounded-2xl p-5 max-w-[320px] font-body shadow-2xl z-1000"
     >
       {step.title && (
         <h3 className="font-display text-lg text-white mb-2 uppercase tracking-[1px]">{step.title}</h3>
@@ -95,7 +95,7 @@ export function ProductTour() {
                     target: "body",
                     content: "Welcome to IronLog! Let's get you set up with your first workout plan.",
                     placement: "center",
-                    disableBeacon: true,
+                    skipBeacon: true,
                 },
                 {
                     target: ".tour-profile",
@@ -114,13 +114,13 @@ export function ProductTour() {
                     target: "body",
                     content: "You made it! This is where all your workout programs live.",
                     placement: "center",
-                    disableBeacon: true,
+                    skipBeacon: true,
                 },
                 {
                     target: ".tour-new-split",
                     content: "Tap 'NEW' to create and name your first split.",
                     placement: "bottom",
-                    disableBeacon: true,
+                    skipBeacon: true,
                 }
             ]);
         } else if (isSplitDetail && phase3Done !== "true") {
@@ -129,13 +129,13 @@ export function ProductTour() {
                     target: "body",
                     content: "Awesome! Your 7-day split has been generated.",
                     placement: "center",
-                    disableBeacon: true,
+                    skipBeacon: true,
                 },
                 {
                     target: ".tour-day-card",
                     content: "Tap on a day to assign muscles, add exercises, or mark it as a Rest Day.",
                     placement: "bottom",
-                    disableBeacon: true,
+                    skipBeacon: true,
                 }
             ]);
         } else {
@@ -143,7 +143,7 @@ export function ProductTour() {
         }
     }, [location.pathname]);
 
-    const handleJoyrideCallback = (data: CallBackProps) => {
+    const handleJoyrideCallback = (data: EventData) => {
         const { status, type } = data;
         const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
@@ -168,13 +168,11 @@ export function ProductTour() {
             showProgress
             showSkipButton
             tooltipComponent={CustomTooltip}
-            callback={handleJoyrideCallback}
-            styles={{
-                options: {
-                    arrowColor: '#121212', // matches bg-card roughly, though custom tooltip handles box
-                    overlayColor: 'rgba(0, 0, 0, 0.7)', // Slightly lighter overlay
-                    zIndex: 1000,
-                }
+            onEvent={handleJoyrideCallback}
+            options={{
+                arrowColor: '#121212', // matches bg-card roughly, though custom tooltip handles box
+                overlayColor: 'rgba(0, 0, 0, 0.7)', // Slightly lighter overlay
+                zIndex: 1000,
             }}
         />
     );
