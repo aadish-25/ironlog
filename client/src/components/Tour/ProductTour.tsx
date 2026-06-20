@@ -109,6 +109,12 @@ export function ProductTour() {
         } else if (isSplitsList && !phase2Done && phase1Done) {
             return startTourWhenReady(".tour-new-split", [
                 {
+                    target: "body",
+                    content: "You made it! This is where all your workout programs live.",
+                    placement: "center",
+                    disableBeacon: true,
+                },
+                {
                     target: ".tour-new-split",
                     content: "Tap 'NEW' to create and name your first split.",
                     placement: "bottom",
