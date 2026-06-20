@@ -30,7 +30,8 @@ export function HomePage() {
         lifetimeStats,
         recentSessions,
         isRestDay,
-        streak
+        streak,
+        hasActiveSplit
     } = useHomeDashboard();
 
     const hour = new Date().getHours();
@@ -137,6 +138,7 @@ export function HomePage() {
                     newPRs={newPRs}
                     tomorrowWorkout={tomorrowWorkout}
                     isRestDay={isRestDay}
+                    hasActiveSplit={hasActiveSplit}
                     onStartWorkout={handleStartWorkout}
                     onSkipToday={handleSkipToday}
                     onUndoSkip={handleUndoSkip}

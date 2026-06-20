@@ -221,6 +221,7 @@ export function useHomeDashboard() {
         lifetimeStats,
         recentSessions,
         isRestDay: activeSplitDay?.type === "rest",
-        streak: stats?.currentStreak ?? 0
+        streak: stats?.currentStreak ?? 0,
+        hasActiveSplit: !!activeSplit
     };
 }

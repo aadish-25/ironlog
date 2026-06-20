@@ -16,6 +16,7 @@ interface HeroCardProps {
   newPRs: { name: string; kg: number }[] | null;
   tomorrowWorkout: { name: string; muscles: string; exercisesCount: number } | null;
   isRestDay?: boolean;
+  hasActiveSplit?: boolean;
   onStartWorkout: () => void;
   onSkipToday: (() => void) | null;
   onUndoSkip: (() => void) | null;
@@ -35,6 +36,7 @@ export function HeroCard({
   newPRs,
   tomorrowWorkout,
   isRestDay = false,
+  hasActiveSplit = true,
   onStartWorkout,
   onSkipToday,
   onUndoSkip,
@@ -104,6 +106,24 @@ export function HeroCard({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
+          {!hasActiveSplit ? (
+            <div className="mx-5 bg-card rounded-[18px] border border-border p-6 relative overflow-hidden text-center shadow-lg">
+              <div className="absolute top-0 left-0 right-0 h-[3px] bg-heat" />
+              <div className="text-[40px] mb-3 mt-2">👋</div>
+              <div className="font-display text-[22px] text-white tracking-[1.5px] mb-2 uppercase">
+                Welcome to IronLog
+              </div>
+              <div className="text-[12px] text-ghost leading-relaxed mb-6 px-2">
+                Your journey starts here. Build your first workout split to begin tracking your progress.
+              </div>
+              <button
+                onClick={onStartWorkout}
+                className="block w-full py-[12px] bg-heat border-none rounded-xl text-white font-display text-[15px] tracking-[2px] cursor-pointer hover:opacity-90 transition-opacity"
+              >
+                CREATE SPLIT &nbsp;→
+              </button>
+            </div>
+          ) : (
           <div className="mx-5 bg-card rounded-[18px] border border-border p-5 relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-[3px] bg-heat" />
             <div className="absolute top-4 right-4 text-center">
@@ -184,6 +204,7 @@ export function HeroCard({
               )}
             </div>
           </div>
+          )}
         </motion.div>
       ) : (
         /* ─── POST-WORKOUT state ─── */
