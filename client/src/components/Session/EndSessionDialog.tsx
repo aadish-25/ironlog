@@ -32,10 +32,10 @@ export function EndSessionDialog({
           id="dialog-title"
           className="font-display text-[26px] tracking-[1px] m-[0_0_8px] text-white"
         >
-          End session?
+          Finish Workout?
         </p>
         <p className="text-[13px] text-[#666] m-[0_0_24px] leading-[1.55]">
-          Your progress is saved. You can resume this session later.
+          You have unlogged sets or exercises. Your session will be marked as complete anyway.
         </p>
         <div className="flex flex-col gap-2.5">
           <button
@@ -46,9 +46,9 @@ export function EndSessionDialog({
           </button>
           <button
             onClick={onConfirmEnd}
-            className="w-full p-3.5 bg-transparent border border-[#2a2a2a] rounded-[10px] text-[#555] font-display text-base tracking-[1.5px] cursor-pointer hover:bg-raised/50 transition-colors"
+            className="w-full p-3.5 bg-done border-none rounded-[10px] text-[#0f0f0f] font-display text-base tracking-[1.5px] cursor-pointer hover:opacity-90 transition-opacity"
           >
-            END SESSION
+            FINISH WORKOUT
           </button>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Zap, PlusSquare } from "lucide-react";
 import { useProfile } from "../../hooks/useProfile";
@@ -25,6 +25,10 @@ export function CompletionScreen({
   onComplete,
   onBackToWorkout,
 }: CompletionScreenProps) {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const { stats } = useProfile();
   const streak = Math.max(1, stats?.currentStreak ?? 1);
   const [motivation] = useState(() => MOTIVATIONAL_MESSAGES[Math.floor(Math.random() * MOTIVATIONAL_MESSAGES.length)]);

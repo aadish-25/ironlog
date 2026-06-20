@@ -1,4 +1,5 @@
 import { ChevronLeft } from "lucide-react";
+import { useEffect } from "react";
 import type { SessionExercise } from "../../types";
 
 interface SessionSummaryProps {
@@ -9,9 +10,13 @@ interface SessionSummaryProps {
 }
 
 export function SessionSummary({ splitDayName, exercises, onBack, onEdit }: SessionSummaryProps) {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="min-h-screen bg-bg text-ink flex flex-col font-body">
-      <header className="flex items-center justify-between px-5 pt-[52px] pb-3.5 border-b border-border shrink-0">
+      <header className="flex items-center justify-between px-5 pt-5 pb-3.5 border-b border-border shrink-0">
         <button
           onClick={onBack}
           className="w-8 h-8 rounded bg-raised border border-border flex items-center justify-center cursor-pointer hover:bg-[#222] transition-colors"
