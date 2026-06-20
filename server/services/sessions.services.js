@@ -1,19 +1,24 @@
 import pool from "../db/connection.js";
 
-const createSessionService = async (userId, splitDayId, date, isSkipped = false) => {
+const createSessionService = async (
+    userId,
+    splitDayId,
+    date,
+    isSkipped = false,
+) => {
     try {
         const splitDayResult = await pool.query(
             `SELECT sd.is_rest 
              FROM split_days sd
              JOIN splits s ON sd.split_id = s.id
              WHERE sd.id = $1 AND s.user_id = $2`,
-            [splitDayId, userId]
+            [splitDayId, userId],
         );
-        
+
         if (splitDayResult.rows.length === 0) {
             throw new Error("Split day not found or not authorized");
         }
-        
+
         if (splitDayResult.rows[0].is_rest) {
             throw new Error("Cannot create a session for a rest day");
         }
@@ -35,7 +40,7 @@ const createSessionService = async (userId, splitDayId, date, isSkipped = false)
 const getSessionsService = async (userId) => {
     try {
         const result = await pool.query(
-             `SELECT sessions.*,
+            `SELECT sessions.*,
              split_days.label as split_day_name,
              COUNT(sets.id) as sets_logged,
              SUM(CASE WHEN sets.is_pr THEN 1 ELSE 0 END) as prs_hit,
@@ -54,12 +59,12 @@ const getSessionsService = async (userId) => {
              ORDER BY sessions.date DESC`,
             [userId],
         );
-        return result.rows.map(r => ({
+        return result.rows.map((r) => ({
             ...r,
             sets_logged: Number(r.sets_logged),
             prs_hit: Number(r.prs_hit),
             total_volume: Number(r.total_volume),
-            pr_details: r.pr_details || []
+            pr_details: r.pr_details || [],
         }));
     } catch (error) {
         throw new Error("Could not fetch sessions", { cause: error });
@@ -72,7 +77,8 @@ const getSessionByIdService = async (sessionId, userId) => {
             "SELECT * FROM sessions WHERE id = $1 AND user_id = $2",
             [sessionId, userId],
         );
-        if (sessionResult.rows.length === 0) throw new Error("Session not found");
+        if (sessionResult.rows.length === 0)
+            throw new Error("Session not found");
         const session = sessionResult.rows[0];
 
         // 1. Fetch split day exercises (the plan)
@@ -89,7 +95,7 @@ const getSessionByIdService = async (sessionId, userId) => {
              JOIN exercises e ON sde.exercise_id = e.id
              WHERE sde.split_day_id = $1
              ORDER BY sde.order_index ASC`,
-             [session.split_day_id, userId]
+            [session.split_day_id, userId],
         );
 
         // 2. Fetch actually logged sets for this session
@@ -105,7 +111,8 @@ const getSessionByIdService = async (sessionId, userId) => {
         // Group sets by exercise_id
         const setsByExercise = {};
         for (const set of setsResult.rows) {
-            if (!setsByExercise[set.exercise_id]) setsByExercise[set.exercise_id] = [];
+            if (!setsByExercise[set.exercise_id])
+                setsByExercise[set.exercise_id] = [];
             setsByExercise[set.exercise_id].push({
                 id: set.id,
                 set_number: set.set_number,
@@ -121,11 +128,11 @@ const getSessionByIdService = async (sessionId, userId) => {
 
         for (const planEx of planResult.rows) {
             exerciseMap.set(planEx.exercise_id, {
-                id: planEx.id, 
+                id: planEx.id,
                 exercise_id: planEx.exercise_id,
                 name: planEx.name,
                 previous_best: planEx.previous_best || null,
-                sets: setsByExercise[planEx.exercise_id] || []
+                sets: setsByExercise[planEx.exercise_id] || [],
             });
         }
 
@@ -136,7 +143,7 @@ const getSessionByIdService = async (sessionId, userId) => {
                     exercise_id: set.exercise_id,
                     name: set.name,
                     previous_best: null, // Extra exercises added on the fly won't have previous best cached easily unless we do another query
-                    sets: setsByExercise[set.exercise_id]
+                    sets: setsByExercise[set.exercise_id],
                 });
             }
         }
@@ -251,11 +258,11 @@ const getSessionsHistoryService = async (userId, limit, offset) => {
             GROUP BY sessions.id, split_days.label, sessions.date
             ORDER BY sessions.date DESC
             LIMIT $2 OFFSET $3`,
-            [userId, limit, offset]
+            [userId, limit, offset],
         );
-        return result.rows.map(row => ({
+        return result.rows.map((row) => ({
             ...row,
-            volumeKg: Number(row.volumeKg)
+            volumeKg: Number(row.volumeKg),
         }));
     } catch (error) {
         throw new Error("Could not fetch sessions history", { cause: error });
@@ -265,14 +272,25 @@ const getSessionsHistoryService = async (userId, limit, offset) => {
 const getSessionsSummaryService = async (userId, monthStr) => {
     // monthStr format: YYYY-MM
     try {
-        const [year, month] = monthStr.split('-');
+        const [year, month] = monthStr.split("-");
         const startDate = new Date(year, month - 1, 1).toISOString();
         const endDate = new Date(year, month, 0, 23, 59, 59).toISOString(); // last day of month
-        
+
         // previous month
         const prevMonthDate = new Date(year, month - 2, 1);
-        const prevStartDate = new Date(prevMonthDate.getFullYear(), prevMonthDate.getMonth(), 1).toISOString();
-        const prevEndDate = new Date(prevMonthDate.getFullYear(), prevMonthDate.getMonth() + 1, 0, 23, 59, 59).toISOString();
+        const prevStartDate = new Date(
+            prevMonthDate.getFullYear(),
+            prevMonthDate.getMonth(),
+            1,
+        ).toISOString();
+        const prevEndDate = new Date(
+            prevMonthDate.getFullYear(),
+            prevMonthDate.getMonth() + 1,
+            0,
+            23,
+            59,
+            59,
+        ).toISOString();
 
         const currentResult = await pool.query(
             `SELECT COUNT(DISTINCT sessions.id) as sessions, 
@@ -281,7 +299,7 @@ const getSessionsSummaryService = async (userId, monthStr) => {
              LEFT JOIN sets ON sets.session_id = sessions.id
              WHERE sessions.user_id = $1 AND sessions.is_skipped = false
              AND sessions.date >= $2 AND sessions.date <= $3`,
-            [userId, startDate, endDate]
+            [userId, startDate, endDate],
         );
 
         const prevResult = await pool.query(
@@ -289,23 +307,24 @@ const getSessionsSummaryService = async (userId, monthStr) => {
              FROM sessions
              WHERE user_id = $1 AND is_skipped = false
              AND date >= $2 AND date <= $3`,
-            [userId, prevStartDate, prevEndDate]
+            [userId, prevStartDate, prevEndDate],
         );
 
         const currentCount = parseInt(currentResult.rows[0].sessions, 10);
         const prevCount = parseInt(prevResult.rows[0].sessions, 10);
-        
+
         const diff = currentCount - prevCount;
         let comparisonText = null;
         if (diff > 0) comparisonText = `${diff} more than last month`;
-        else if (diff < 0) comparisonText = `${Math.abs(diff)} less than last month`;
+        else if (diff < 0)
+            comparisonText = `${Math.abs(diff)} less than last month`;
         else comparisonText = "Same as last month";
 
         return {
             label: monthStr, // Can be formatted on client
             sessions: currentCount,
             totalVolumeKg: Number(currentResult.rows[0].totalVolumeKg),
-            comparisonText
+            comparisonText,
         };
     } catch (error) {
         throw new Error("Could not fetch sessions summary", { cause: error });
@@ -332,5 +351,5 @@ export {
     getMissedSessionsService,
     getSessionsHistoryService,
     getSessionsSummaryService,
-    completeSessionService
+    completeSessionService,
 };

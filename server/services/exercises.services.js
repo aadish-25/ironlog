@@ -7,7 +7,8 @@ const getExercisesService = async (muscleGroups, equipment, userId) => {
 
         if (userId) {
             values.push(userId);
-            query = "SELECT exercises.*, (SELECT MAX(weight_kg) FROM sets WHERE exercise_id = exercises.id AND user_id = $1) AS pr_kg FROM exercises";
+            query =
+                "SELECT exercises.*, (SELECT MAX(weight_kg) FROM sets WHERE exercise_id = exercises.id AND user_id = $1) AS pr_kg FROM exercises";
         } else {
             query = "SELECT exercises.*, NULL as pr_kg FROM exercises";
         }
@@ -29,9 +30,9 @@ const getExercisesService = async (muscleGroups, equipment, userId) => {
         }
 
         const result = await pool.query(query, values);
-        return result.rows.map(r => ({
+        return result.rows.map((r) => ({
             ...r,
-            pr_kg: r.pr_kg ? Number(r.pr_kg) : null
+            pr_kg: r.pr_kg ? Number(r.pr_kg) : null,
         }));
     } catch (error) {
         throw new Error("Could not fetch exercises", { cause: error });
@@ -65,10 +66,10 @@ const getExerciseProgressService = async (userId, exerciseId) => {
             ORDER BY sessions.date ASC;`,
             [exerciseId, userId],
         );
-        return result.rows.map(r => ({
+        return result.rows.map((r) => ({
             ...r,
             max_weight: Number(r.max_weight),
-            total_volume: Number(r.total_volume)
+            total_volume: Number(r.total_volume),
         }));
     } catch (error) {
         throw new Error("Could not fetch exercise progress", { cause: error });

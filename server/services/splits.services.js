@@ -83,22 +83,23 @@ const getSplitsByUserService = async (userId) => {
             JOIN split_days sd ON sde.split_day_id = sd.id
             WHERE sd.split_id = ANY($1)
             ORDER BY sde.split_day_id, sde.order_index`,
-            [splitIds]
+            [splitIds],
         );
 
         const exercisesByDay = {};
         for (const ex of exercisesResult.rows) {
-            if (!exercisesByDay[ex.split_day_id]) exercisesByDay[ex.split_day_id] = [];
+            if (!exercisesByDay[ex.split_day_id])
+                exercisesByDay[ex.split_day_id] = [];
             exercisesByDay[ex.split_day_id].push(ex);
         }
 
         return splits.map((split) => {
-            const days = (daysBySplit[split.id] ?? []).map(day => {
+            const days = (daysBySplit[split.id] ?? []).map((day) => {
                 const dayExercises = exercisesByDay[day.id] || [];
                 return {
                     ...day,
                     type: day.is_rest ? "rest" : "train",
-                    exercises: dayExercises
+                    exercises: dayExercises,
                 };
             });
             return { ...split, days };
@@ -139,21 +140,22 @@ const getSplitByIdService = async (splitId, userId) => {
             JOIN split_days sd ON sde.split_day_id = sd.id
             WHERE sd.split_id = $1
             ORDER BY sde.split_day_id, sde.order_index`,
-            [splitId]
+            [splitId],
         );
 
         const exercisesByDay = {};
         for (const ex of exercisesResult.rows) {
-            if (!exercisesByDay[ex.split_day_id]) exercisesByDay[ex.split_day_id] = [];
+            if (!exercisesByDay[ex.split_day_id])
+                exercisesByDay[ex.split_day_id] = [];
             exercisesByDay[ex.split_day_id].push(ex);
         }
 
-        const days = daysResult.rows.map(day => {
+        const days = daysResult.rows.map((day) => {
             const dayExercises = exercisesByDay[day.id] || [];
             return {
                 ...day,
                 type: day.is_rest ? "rest" : "train",
-                exercises: dayExercises
+                exercises: dayExercises,
             };
         });
 
@@ -178,7 +180,10 @@ const updateSplitService = async (splitId, name, userId) => {
 
 const deleteSplitService = async (splitId, userId) => {
     try {
-        await pool.query("DELETE FROM splits WHERE id = $1 AND user_id = $2", [splitId, userId]);
+        await pool.query("DELETE FROM splits WHERE id = $1 AND user_id = $2", [
+            splitId,
+            userId,
+        ]);
     } catch (error) {
         throw new Error("Could not delete split", { cause: error });
     }

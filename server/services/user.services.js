@@ -49,33 +49,36 @@ const getUserStatsService = async (userId) => {
     // Fetch all non-skipped session dates for the user, ordered descending
     const result = await pool.query(
         "SELECT date FROM sessions WHERE user_id = $1 AND is_skipped = false ORDER BY date DESC",
-        [userId]
+        [userId],
     );
 
-    const dates = result.rows.map(row => new Date(row.date));
+    const dates = result.rows.map((row) => new Date(row.date));
     const now = new Date();
-    
+
     // Normalize dates to midnight for accurate day comparison
-    const normalizeDate = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    const normalizeDate = (d) =>
+        new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
     const msPerDay = 86400000;
-    
+
     const todayStr = normalizeDate(now);
-    
+
     // Total sessions
     const totalSessions = dates.length;
-    
+
     // Monthly & Weekly
     let monthlySessions = 0;
     let weeklySessions = 0;
-    
+
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
-    
-    // JS getDay(): 0 is Sunday. We want Monday=0, Sunday=6
-    const currentDayOfWeek = (now.getDay() + 6) % 7; 
-    const startOfWeekTime = normalizeDate(new Date(now.getTime() - currentDayOfWeek * msPerDay));
 
-    dates.forEach(d => {
+    // JS getDay(): 0 is Sunday. We want Monday=0, Sunday=6
+    const currentDayOfWeek = (now.getDay() + 6) % 7;
+    const startOfWeekTime = normalizeDate(
+        new Date(now.getTime() - currentDayOfWeek * msPerDay),
+    );
+
+    dates.forEach((d) => {
         if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
             monthlySessions++;
         }
@@ -89,19 +92,24 @@ const getUserStatsService = async (userId) => {
     let bestStreak = 0;
 
     // 1. Get user's active split to determine rest days
-    const activeSplitResult = await pool.query(`
+    const activeSplitResult = await pool.query(
+        `
         SELECT sd.day_of_week, sd.is_rest
         FROM splits s
         JOIN split_days sd ON sd.split_id = s.id
         WHERE s.user_id = $1 AND s.is_active = true
-    `, [userId]);
-    
+    `,
+        [userId],
+    );
+
     const restDaysOfWeek = new Set(
-        activeSplitResult.rows.filter(r => r.is_rest).map(r => r.day_of_week)
+        activeSplitResult.rows
+            .filter((r) => r.is_rest)
+            .map((r) => r.day_of_week),
     );
 
     // Deduplicate dates in case there are multiple sessions on the same day
-    const datesSet = new Set(dates.map(d => normalizeDate(d)));
+    const datesSet = new Set(dates.map((d) => normalizeDate(d)));
     const uniqueDates = Array.from(datesSet).sort((a, b) => a - b); // Ascending
 
     if (uniqueDates.length > 0) {
@@ -146,7 +154,7 @@ const getUserStatsService = async (userId) => {
         monthlySessions,
         weeklySessions,
         currentStreak,
-        bestStreak
+        bestStreak,
     };
 };
 

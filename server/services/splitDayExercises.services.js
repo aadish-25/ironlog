@@ -1,11 +1,16 @@
 import pool from "../db/connection.js";
 
-const addExerciseService = async (splitDayId, exerciseIds, startingOrderIndex, userId) => {
+const addExerciseService = async (
+    splitDayId,
+    exerciseIds,
+    startingOrderIndex,
+    userId,
+) => {
     let client;
     try {
         // If single ID passed, convert to array
         const ids = Array.isArray(exerciseIds) ? exerciseIds : [exerciseIds];
-        
+
         client = await pool.connect();
         await client.query("BEGIN");
 
@@ -14,7 +19,7 @@ const addExerciseService = async (splitDayId, exerciseIds, startingOrderIndex, u
              FROM split_days sd
              JOIN splits s ON sd.split_id = s.id
              WHERE sd.id = $1 AND s.user_id = $2`,
-            [splitDayId, userId]
+            [splitDayId, userId],
         );
 
         if (splitDayResult.rows.length === 0) {
@@ -24,7 +29,7 @@ const addExerciseService = async (splitDayId, exerciseIds, startingOrderIndex, u
         if (splitDayResult.rows[0].is_rest) {
             throw new Error("Cannot add exercises to a rest day");
         }
-        
+
         const results = [];
         for (let i = 0; i < ids.length; i++) {
             const result = await client.query(
@@ -41,12 +46,14 @@ const addExerciseService = async (splitDayId, exerciseIds, startingOrderIndex, u
             );
             results.push(result.rows[0]);
         }
-        
+
         await client.query("COMMIT");
         return results;
     } catch (error) {
         if (client) await client.query("ROLLBACK");
-        throw new Error("Could not add exercises to split day", { cause: error });
+        throw new Error("Could not add exercises to split day", {
+            cause: error,
+        });
     } finally {
         if (client) client.release();
     }
@@ -64,11 +71,17 @@ const removeExerciseService = async (exerciseId, userId) => {
             [exerciseId, userId],
         );
     } catch (error) {
-        throw new Error("Could not remove exercise from split day", { cause: error });
+        throw new Error("Could not remove exercise from split day", {
+            cause: error,
+        });
     }
 };
 
-const reorderExerciseService = async (splitDayExerciseId, newOrderIndex, userId) => {
+const reorderExerciseService = async (
+    splitDayExerciseId,
+    newOrderIndex,
+    userId,
+) => {
     let client;
     try {
         client = await pool.connect();
@@ -97,7 +110,7 @@ const reorderExerciseService = async (splitDayExerciseId, newOrderIndex, userId)
              FROM split_days sd
              JOIN splits s ON sd.split_id = s.id
              WHERE sd.id = $1 AND s.user_id = $2`,
-            [splitDayId, userId]
+            [splitDayId, userId],
         );
         if (splitDayResult.rows.length === 0) {
             throw new Error("Split day not found or not authorized");

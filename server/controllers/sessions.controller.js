@@ -6,7 +6,7 @@ import {
     getMissedSessionsService,
     getSessionsHistoryService,
     getSessionsSummaryService,
-    completeSessionService
+    completeSessionService,
 } from "../services/sessions.services.js";
 
 async function createSession(req, res) {
@@ -16,7 +16,12 @@ async function createSession(req, res) {
     const { split_day_id, date, is_skipped } = req.body;
 
     try {
-        const result = await createSessionService(id, split_day_id, date, is_skipped);
+        const result = await createSessionService(
+            id,
+            split_day_id,
+            date,
+            is_skipped,
+        );
         res.status(200).json({
             message: "Session created successfully",
             data: result,
@@ -133,9 +138,11 @@ async function getSessionsHistory(req, res) {
 async function getSessionsSummary(req, res) {
     const userId = req.user.id;
     const { month } = req.query; // YYYY-MM
-    
+
     if (!month) {
-        return res.status(400).json({ message: "Month parameter is required (YYYY-MM)" });
+        return res
+            .status(400)
+            .json({ message: "Month parameter is required (YYYY-MM)" });
     }
 
     try {
@@ -172,13 +179,13 @@ async function completeSession(req, res) {
     }
 }
 
-export { 
-    createSession, 
-    getSessions, 
-    getSessionById, 
-    deleteSession, 
+export {
+    createSession,
+    getSessions,
+    getSessionById,
+    deleteSession,
     getMissedSessions,
     getSessionsHistory,
     getSessionsSummary,
-    completeSession
+    completeSession,
 };

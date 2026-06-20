@@ -12,7 +12,11 @@ async function getExercises(req, res) {
     const equipmentList = equipment?.split(",") || undefined;
 
     try {
-        const result = await getExercisesService(muscleGroups, equipmentList, userId);
+        const result = await getExercisesService(
+            muscleGroups,
+            equipmentList,
+            userId,
+        );
         res.status(200).json({
             message: "Exercises fetched successfully",
             data: result,

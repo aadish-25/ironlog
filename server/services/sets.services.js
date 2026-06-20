@@ -5,10 +5,13 @@ const checkIsPR = async (userId, exerciseId, weightKg) => {
         `SELECT MAX(weight_kg) AS max_weight 
          FROM sets 
          WHERE user_id = $1 AND exercise_id = $2`,
-        [userId, exerciseId]
+        [userId, exerciseId],
     );
 
-    const currentMaxWeight = result.rows[0]?.max_weight !== undefined ? result.rows[0].max_weight : null;
+    const currentMaxWeight =
+        result.rows[0]?.max_weight !== undefined
+            ? result.rows[0].max_weight
+            : null;
     if (currentMaxWeight === null) return true;
     return Number(weightKg) > Number(currentMaxWeight);
 };
@@ -19,14 +22,14 @@ const createSetService = async (
     exerciseId,
     setNumber,
     weightKg,
-    reps
+    reps,
 ) => {
     try {
         const sessionResult = await pool.query(
             "SELECT id FROM sessions WHERE id = $1 AND user_id = $2",
-            [sessionId, userId]
+            [sessionId, userId],
         );
-        
+
         if (sessionResult.rows.length === 0) {
             throw new Error("Session not found or not authorized");
         }
@@ -38,7 +41,7 @@ const createSetService = async (
             (session_id, exercise_id, user_id, set_number, weight_kg, reps, is_pr)
             VALUES ($1, $2, $3, $4, $5, $6, $7)
             RETURNING *`,
-            [sessionId, exerciseId, userId, setNumber, weightKg, reps, isPR]
+            [sessionId, exerciseId, userId, setNumber, weightKg, reps, isPR],
         );
 
         return result.rows[0];
@@ -53,7 +56,7 @@ const updateSetService = async (setId, userId, updateData) => {
         const updateKeys = Object.keys(updateData);
 
         const invalidKey = updateKeys.find(
-            (key) => !allowedFields.includes(key)
+            (key) => !allowedFields.includes(key),
         );
 
         if (invalidKey) {
@@ -80,7 +83,7 @@ const updateSetService = async (setId, userId, updateData) => {
              SET ${setClauses.join(", ")}
              WHERE id = $${values.length - 1} AND user_id = $${values.length}
              RETURNING *`,
-            values
+            values,
         );
 
         return result.rows[0];
@@ -91,7 +94,10 @@ const updateSetService = async (setId, userId, updateData) => {
 
 const deleteSetService = async (setId, userId) => {
     try {
-        await pool.query(`DELETE FROM sets WHERE id = $1 AND user_id = $2`, [setId, userId]);
+        await pool.query(`DELETE FROM sets WHERE id = $1 AND user_id = $2`, [
+            setId,
+            userId,
+        ]);
     } catch (error) {
         throw new Error("Could not delete set", { cause: error });
     }
