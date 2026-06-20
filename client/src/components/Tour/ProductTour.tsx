@@ -1,7 +1,56 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Joyride, STATUS, EVENTS } from "react-joyride";
-import type { Step, CallBackProps } from "react-joyride";
+import type { Step, CallBackProps, TooltipRenderProps } from "react-joyride";
+
+const CustomTooltip = ({
+  index,
+  step,
+  backProps,
+  closeProps,
+  primaryProps,
+  tooltipProps,
+  isLastStep,
+}: TooltipRenderProps) => {
+  return (
+    <div
+      {...tooltipProps}
+      className="bg-card border border-border rounded-2xl p-5 max-w-[320px] font-body shadow-2xl z-[1000]"
+    >
+      {step.title && (
+        <h3 className="font-display text-lg text-white mb-2 uppercase tracking-[1px]">{step.title}</h3>
+      )}
+      <div className="text-dim text-[13px] leading-relaxed mb-5">
+        {step.content}
+      </div>
+      
+      <div className="flex items-center justify-between">
+        <button
+          {...closeProps}
+          className="text-[11px] text-ghost hover:text-white uppercase tracking-[1px] transition-colors"
+        >
+          Skip
+        </button>
+        <div className="flex gap-2">
+          {index > 0 && (
+            <button
+              {...backProps}
+              className="px-3 py-1.5 rounded-lg border border-border text-dim text-[11px] font-semibold uppercase tracking-[1px] hover:bg-raised transition-colors cursor-pointer"
+            >
+              Back
+            </button>
+          )}
+          <button
+            {...primaryProps}
+            className="px-4 py-1.5 rounded-lg bg-heat text-white font-display text-[12px] uppercase tracking-[2px] hover:opacity-90 transition-opacity cursor-pointer border-none"
+          >
+            {isLastStep ? "GOT IT" : "NEXT"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export function ProductTour() {
     const location = useLocation();
@@ -78,39 +127,14 @@ export function ProductTour() {
             continuous
             showProgress
             showSkipButton
+            tooltipComponent={CustomTooltip}
             callback={handleJoyrideCallback}
             styles={{
                 options: {
-                    arrowColor: '#1a1a1a',
-                    backgroundColor: '#1a1a1a',
-                    overlayColor: 'rgba(0, 0, 0, 0.85)',
-                    primaryColor: '#FF5C00',
-                    textColor: '#ffffff',
+                    arrowColor: '#121212', // matches bg-card roughly, though custom tooltip handles box
+                    overlayColor: 'rgba(0, 0, 0, 0.7)', // Slightly lighter overlay
                     zIndex: 1000,
-                },
-                tooltipContainer: {
-                    textAlign: "left",
-                },
-                buttonNext: {
-                    backgroundColor: "#FF5C00",
-                    color: "#ffffff",
-                    fontFamily: "var(--font-display)",
-                    fontWeight: 600,
-                    letterSpacing: "1px",
-                    borderRadius: "8px",
-                    padding: "8px 16px"
-                },
-                buttonBack: {
-                    color: "#888888",
-                    marginRight: 10,
-                },
-                buttonSkip: {
-                    color: "#888888",
                 }
-            }}
-            locale={{
-                last: location.pathname === "/" ? "Got it!" : "Let's Build",
-                skip: "Skip Tour"
             }}
         />
     );
