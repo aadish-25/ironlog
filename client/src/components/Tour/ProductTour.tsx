@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import Joyride, { Step, CallBackProps, STATUS, EVENTS } from "react-joyride";
+import Joyride, { STATUS, EVENTS } from "react-joyride";
+import type { Step, CallBackProps } from "react-joyride";
 
 export function ProductTour() {
     const location = useLocation();
