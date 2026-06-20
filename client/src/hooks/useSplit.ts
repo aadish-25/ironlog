@@ -1,3 +1,4 @@
+import { useState } from "react";
 import useSWR from "swr";
 import axios from "axios";
 import { fetcher } from "../services/api";
@@ -11,6 +12,7 @@ import { type Split } from "../types";
 
 export function useSplit() {
     const { data: splits, error: swrError, isLoading: loading, mutate } = useSWR<Split[]>("/splits", fetcher);
+    const [actionLoading, setActionLoading] = useState(false);
 
     let error: string | null = null;
     if (swrError) {
@@ -22,6 +24,8 @@ export function useSplit() {
     }
 
     async function createUserSplit(name: string) {
+        if (actionLoading) return;
+        setActionLoading(true);
         try {
             const result = await createSplit(name);
             mutate((prev) => (prev ? [...prev, result] : [result]), false);
@@ -32,10 +36,14 @@ export function useSplit() {
             } else {
                 console.error((err as Error).message);
             }
+        } finally {
+            setActionLoading(false);
         }
     }
 
     async function activateUserSplit(id: string) {
+        if (actionLoading) return;
+        setActionLoading(true);
         try {
             mutate((prev) =>
                 prev
@@ -47,10 +55,14 @@ export function useSplit() {
             mutate();
         } catch (err) {
             console.error(err);
+        } finally {
+            setActionLoading(false);
         }
     }
 
     async function deleteUserSplit(id: string) {
+        if (actionLoading) return;
+        setActionLoading(true);
         try {
             mutate((prev) =>
                 prev ? prev.filter((s) => s.id !== id) : prev,
@@ -60,10 +72,14 @@ export function useSplit() {
             mutate();
         } catch (err) {
             console.error(err);
+        } finally {
+            setActionLoading(false);
         }
     }
 
     async function updateUserSplit(id: string, name: string) {
+        if (actionLoading) return;
+        setActionLoading(true);
         try {
             const result = await updateSplit(id, name);
             mutate((prev) =>
@@ -72,6 +88,8 @@ export function useSplit() {
             );
         } catch (err) {
             console.error(err);
+        } finally {
+            setActionLoading(false);
         }
     }
 

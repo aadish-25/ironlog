@@ -13,6 +13,7 @@ export function useSplitDetail(splitId: string) {
     const [split, setSplit] = useState<Split | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [actionLoading, setActionLoading] = useState(false);
 
     const fetchSplit = useCallback(async () => {
         try {
@@ -37,6 +38,8 @@ export function useSplitDetail(splitId: string) {
     }, [fetchSplit, splitId]);
 
     const updateDay = async (dayId: string, updates: { label?: string, is_rest?: boolean }) => {
+        if (actionLoading) return;
+        setActionLoading(true);
         try {
             await updateSplitDay(dayId, updates);
             // Optimistic update
@@ -50,10 +53,14 @@ export function useSplitDetail(splitId: string) {
         } catch (err) {
             console.error(err);
             fetchSplit(); // rollback on error
+        } finally {
+            setActionLoading(false);
         }
     };
 
     const addExercises = async (dayId: string, exerciseIds: string[]) => {
+        if (actionLoading) return;
+        setActionLoading(true);
         try {
             const day = split?.days.find(d => d.id === dayId);
             if (!day) return;
@@ -62,10 +69,14 @@ export function useSplitDetail(splitId: string) {
             await fetchSplit(); // Re-fetch to get all the joined exercise details (name, muscles etc)
         } catch (err) {
             console.error(err);
+        } finally {
+            setActionLoading(false);
         }
     };
 
     const removeExercise = async (dayId: string, splitDayExerciseId: string) => {
+        if (actionLoading) return;
+        setActionLoading(true);
         try {
             await removeExerciseFromDay(splitDayExerciseId);
             // Optimistic update
@@ -87,25 +98,35 @@ export function useSplitDetail(splitId: string) {
         } catch (err) {
             console.error(err);
             fetchSplit();
+        } finally {
+            setActionLoading(false);
         }
     };
 
     const reorderExercise = async (dayId: string, splitDayExerciseId: string, newIndex: number) => {
+        if (actionLoading) return;
+        setActionLoading(true);
         try {
             await reorderExerciseInDay(splitDayExerciseId, newIndex);
             await fetchSplit(); // Backend handles shifting other items, so just re-fetch
         } catch (err) {
             console.error(err);
+        } finally {
+            setActionLoading(false);
         }
     };
 
     const updateSplitName = async (newName: string) => {
+        if (actionLoading) return;
+        setActionLoading(true);
         try {
             await updateSplit(splitId, newName);
             setSplit(prev => prev ? { ...prev, name: newName } : prev);
         } catch (err) {
             console.error(err);
             fetchSplit();
+        } finally {
+            setActionLoading(false);
         }
     };
 

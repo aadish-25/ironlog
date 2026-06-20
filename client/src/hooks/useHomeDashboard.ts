@@ -1,3 +1,4 @@
+import { useState } from "react";
 import useSWR, { mutate } from "swr";
 import { fetcher } from "../services/api";
 import { useCurrentUser } from "./useCurrentUser";
@@ -10,6 +11,7 @@ export function useHomeDashboard() {
     const { user, loading: userLoading } = useCurrentUser();
     const { splits, loading: splitsLoading } = useSplit();
     const activeSplit = splits?.find(s => s.is_active) || null;
+    const [actionLoading, setActionLoading] = useState(false);
     
     const { data: sessionsData, isLoading: sessionsLoading, error: sessionsError } = useSWR<Session[]>("/sessions", fetcher);
     const { data: statsData, error: statsError } = useSWR<UserStats>("/users/me/stats", fetcher);
@@ -127,7 +129,8 @@ export function useHomeDashboard() {
     // ─── ACTIONS ───────────────────────────────────────────────────────────────
 
     const startWorkout = async () => {
-        if (!activeSplitDay) return null;
+        if (!activeSplitDay || actionLoading) return null;
+        setActionLoading(true);
         try {
             const session = await createSession(activeSplitDay.id, todayStr);
             mutate("/sessions");
@@ -136,25 +139,34 @@ export function useHomeDashboard() {
         } catch (err) {
             console.error(err);
             return null;
+        } finally {
+            setActionLoading(false);
         }
     };
 
     const skipWorkout = async () => {
-        if (!activeSplitDay) return null;
+        if (!activeSplitDay || actionLoading) return null;
+        setActionLoading(true);
         try {
             await createSession(activeSplitDay.id, todayStr, true);
             mutate("/sessions");
             mutate("/users/me/stats");
         } catch (err) {
             console.error(err);
+        } finally {
+            setActionLoading(false);
         }
     };
 
     const undoSkip = async () => {
-        if (todaySession) {
+        if (!todaySession || actionLoading) return;
+        setActionLoading(true);
+        try {
             await deleteSession(todaySession.id);
             mutate("/sessions");
             mutate("/users/me/stats");
+        } finally {
+            setActionLoading(false);
         }
     };
 
