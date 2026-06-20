@@ -6,7 +6,7 @@ const getUserByIdService = async (id) => {
 };
 
 const updateUserService = async (id, data) => {
-    const allowList = ["name", "profile_picture_url", "preferred_workout_time"];
+    const allowList = ["name", "profile_picture_url", "preferred_workout_time", "notifications_enabled"];
     const keys = Object.keys(data);
 
     const invalidKey = keys.find((key) => !allowList.includes(key));

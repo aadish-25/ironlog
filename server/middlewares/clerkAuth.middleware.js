@@ -11,7 +11,7 @@ const auth = async (req, res, next) => {
         }
 
         let result = await pool.query(
-            "SELECT id, clerk_id, name FROM users WHERE clerk_id = $1",
+            "SELECT * FROM users WHERE clerk_id = $1",
             [userId],
         );
         let user = result.rows[0];
@@ -28,7 +28,7 @@ const auth = async (req, res, next) => {
             );
 
             let new_result = await pool.query(
-                "SELECT id, clerk_id, name from users WHERE clerk_id = $1",
+                "SELECT * FROM users WHERE clerk_id = $1",
                 [userId],
             );
 
