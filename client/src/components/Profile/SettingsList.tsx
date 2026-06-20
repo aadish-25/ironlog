@@ -32,7 +32,7 @@ export function SettingsList({
             <button
               onClick={onToggleNotifications}
               className={`w-11 h-6 rounded-xl cursor-pointer transition-colors relative shrink-0 border-none ${
-                notificationsEnabled ? "bg-heat" : "bg-raised"
+                notificationsEnabled ? "bg-heat" : "bg-[#444]"
               }`}
               role="switch"
               aria-checked={notificationsEnabled ?? false}
@@ -50,6 +50,7 @@ export function SettingsList({
         {items.map((item, idx) => (
           <button
             key={item.label}
+            onClick={item.onClick}
             className={`w-full flex items-center justify-between p-4 bg-transparent border-none cursor-pointer font-body hover:bg-raised transition-colors ${
               idx < items.length - 1 ? "border-b border-border" : ""
             }`}

@@ -1,16 +1,24 @@
+import { useState } from "react";
 import { LogOut } from "lucide-react";
 import { useClerk } from "@clerk/clerk-react";
 import { ProfileHeader } from "../components/Profile/ProfileHeader";
 import { JourneyStrip } from "../components/Profile/JourneyStrip";
 import { MonthlyStats } from "../components/Profile/MonthlyStats";
 import { SettingsList } from "../components/Profile/SettingsList";
+import { EditProfileView } from "../components/Profile/EditProfileView";
+import { StaticProfileView } from "../components/Profile/StaticProfileView";
 import type { StatCard, SettingsItem } from "../components/Profile/types";
 import { useProfile } from "../hooks/useProfile";
+import { api } from "../services/api";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function ProfilePage() {
   const { signOut } = useClerk();
   const { user, stats, daysSinceJoined, memberSince, loading } = useProfile();
+  const [activeTab, setActiveTab] = useState<"edit" | "privacy" | "help" | "about" | null>(null);
+  
+  // State for notifications toggle to allow optimistic UI updates
+  const [notificationsEnabled, setNotificationsEnabled] = useState(user?.notifications_enabled ?? false);
 
   // ─── USER IDENTITY ──────────────────────────────────────────────────────────
   const userName = user?.name || "Lifter";
@@ -26,22 +34,33 @@ export function ProfilePage() {
 
   // ─── SETTINGS ───────────────────────────────────────────────────────────────
   const accountItems: SettingsItem[] = [
-    { icon: "✏️", label: "Edit profile" },
-    { icon: "⚙️", label: "Units & goals" },
-    { icon: "🔒", label: "Privacy & data" },
+    { icon: "✏️", label: "Edit profile", onClick: () => setActiveTab("edit") },
+    { icon: "🔒", label: "Privacy & data", onClick: () => setActiveTab("privacy") },
   ];
 
   const preferenceItems: SettingsItem[] = [
-    { icon: "❓", label: "Help & support" },
-    { icon: "ℹ️", label: "About" },
+    { icon: "❓", label: "Help & support", onClick: () => setActiveTab("help") },
+    { icon: "ℹ️", label: "About", onClick: () => setActiveTab("about") },
   ];
 
-  const notificationsEnabled = false; // TBD
-
-  const handleToggleNotifications = () => {};
+  const handleToggleNotifications = async () => {
+    const newValue = !notificationsEnabled;
+    setNotificationsEnabled(newValue); // Optimistic
+    try {
+      await api.patch("/users/me", { notifications_enabled: newValue });
+    } catch (e) {
+      console.error("Failed to toggle notifications", e);
+      setNotificationsEnabled(!newValue); // Revert on failure
+    }
+  };
 
   const handleLogout = () => {
     signOut();
+  };
+
+  const handleSaveName = async (newName: string) => {
+    await api.patch("/users/me", { name: newName });
+    window.location.reload();
   };
 
   if (loading && !stats) {
@@ -61,6 +80,7 @@ export function ProfilePage() {
         {/* ── Identity hero ── */}
         <ProfileHeader
           userName={userName}
+          profilePicUrl={user?.profile_picture_url}
           memberSince={memberSince}
           totalSessions={totalSessions}
           currentStreak={currentStreak}
@@ -102,6 +122,49 @@ export function ProfilePage() {
           </p>
         </div>
       </div>
+
+      {/* ── Overlays ── */}
+      {activeTab === "edit" && (
+        <EditProfileView
+          currentName={userName}
+          currentProfilePic={user?.profile_picture_url || null}
+          onBack={() => setActiveTab(null)}
+          onSave={handleSaveName}
+        />
+      )}
+      {activeTab === "privacy" && (
+        <StaticProfileView title="Privacy & Data" onBack={() => setActiveTab(null)}>
+          <p className="mb-4">
+            Your workout data is stored securely on our servers. We do not sell your personal data to third parties.
+          </p>
+          <p>
+            To request a complete export of your data or to delete your account permanently, please contact support.
+          </p>
+        </StaticProfileView>
+      )}
+      {activeTab === "help" && (
+        <StaticProfileView title="Help & Support" onBack={() => setActiveTab(null)}>
+          <p className="mb-4">
+            If you need help using IronLog or have encountered a bug, we're here to help.
+          </p>
+          <p>
+            Email us at <a href="mailto:support@ironlog.app" className="text-heat underline font-display">support@ironlog.app</a>.
+          </p>
+        </StaticProfileView>
+      )}
+      {activeTab === "about" && (
+        <StaticProfileView title="About IronLog" onBack={() => setActiveTab(null)}>
+          <p className="mb-4">
+            IronLog is a progressive overload tracker built for serious lifters. It is designed to get out of your way and let you focus on the iron.
+          </p>
+          <p className="mb-4 text-xs font-display tracking-widest text-ghost">
+            VERSION 1.0.0
+          </p>
+          <p className="text-xs text-ghost">
+            Built by Aadish.
+          </p>
+        </StaticProfileView>
+      )}
     </section>
   );
 }

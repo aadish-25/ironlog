@@ -30,12 +30,15 @@ export function useProfile() {
 
         if (user) {
             fetchStats();
+        } else if (!userLoading) {
+            if (isMounted) {
+                setLoadingStats(false);
+            }
         }
-        
         return () => {
             isMounted = false;
         };
-    }, [user]);
+    }, [user, userLoading]);
 
     // Calculate days since joined
     const daysSinceJoined = useMemo(() => {

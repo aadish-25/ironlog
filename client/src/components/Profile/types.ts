@@ -7,4 +7,5 @@ export interface StatCard {
 export interface SettingsItem {
   icon: string;
   label: string;
+  onClick?: () => void;
 }
