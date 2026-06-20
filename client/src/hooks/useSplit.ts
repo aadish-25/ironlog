@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import useSWR from "swr";
 import axios from "axios";
+import { fetcher } from "../services/api";
 import {
-    getSplits,
     createSplit,
     activateSplit,
     deleteSplit,
@@ -10,97 +10,73 @@ import {
 import { type Split } from "../types";
 
 export function useSplit() {
-    const [splits, setSplits] = useState<Split[] | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const { data: splits, error: swrError, isLoading: loading, mutate } = useSWR<Split[]>("/splits", fetcher);
 
-    const fetchUserSplits = useCallback(async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            const result = await getSplits();
-            setSplits(result);
-        } catch (err) {
-            if (axios.isAxiosError(err)) {
-                const backendMsg = err.response?.data?.message;
-                const axiosMsg = err.message;
-                setError(backendMsg ?? axiosMsg);
-            } else {
-                setError((err as Error).message);
-            }
-        } finally {
-            setLoading(false);
+    let error: string | null = null;
+    if (swrError) {
+        if (axios.isAxiosError(swrError)) {
+            error = swrError.response?.data?.message ?? swrError.message;
+        } else {
+            error = (swrError as Error).message;
         }
-    }, []);
-
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        fetchUserSplits();
-    }, [fetchUserSplits]);
+    }
 
     async function createUserSplit(name: string) {
         try {
             const result = await createSplit(name);
-            setSplits((prev) => (prev ? [...prev, result] : [result]));
+            mutate((prev) => (prev ? [...prev, result] : [result]), false);
             return result;
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                setError(err.response?.data?.message ?? err.message);
+                console.error(err.response?.data?.message ?? err.message);
             } else {
-                setError((err as Error).message);
+                console.error((err as Error).message);
             }
         }
     }
 
     async function activateUserSplit(id: string) {
         try {
-            await activateSplit(id);
-            setSplits((prev) =>
+            mutate((prev) =>
                 prev
                     ? prev.map((s) => ({ ...s, is_active: s.id === id }))
                     : prev,
+                false
             );
+            await activateSplit(id);
+            mutate();
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                setError(err.response?.data?.message ?? err.message);
-            } else {
-                setError((err as Error).message);
-            }
+            console.error(err);
         }
     }
 
     async function deleteUserSplit(id: string) {
         try {
-            await deleteSplit(id);
-            setSplits((prev) =>
+            mutate((prev) =>
                 prev ? prev.filter((s) => s.id !== id) : prev,
+                false
             );
+            await deleteSplit(id);
+            mutate();
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                setError(err.response?.data?.message ?? err.message);
-            } else {
-                setError((err as Error).message);
-            }
+            console.error(err);
         }
     }
 
     async function updateUserSplit(id: string, name: string) {
         try {
             const result = await updateSplit(id, name);
-            setSplits((prev) =>
+            mutate((prev) =>
                 prev ? prev.map((s) => (s.id === id ? result : s)) : prev,
+                false
             );
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                setError(err.response?.data?.message ?? err.message);
-            } else {
-                setError((err as Error).message);
-            }
+            console.error(err);
         }
     }
 
     return {
-        splits,
+        splits: splits || null,
         loading,
         error,
         createUserSplit,

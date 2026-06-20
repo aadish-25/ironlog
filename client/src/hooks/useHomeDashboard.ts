@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import useSWR, { mutate } from "swr";
+import { fetcher } from "../services/api";
 import { useCurrentUser } from "./useCurrentUser";
 import { useSplit } from "./useSplit";
-import { getSessions, createSession, deleteSession } from "../services/sessions";
-import { getUserStats, type UserStats } from "../services/users";
+import { createSession, deleteSession } from "../services/sessions";
+import { type UserStats } from "../services/users";
 import type { Session } from "../types";
 
 export function useHomeDashboard() {
@@ -10,30 +11,12 @@ export function useHomeDashboard() {
     const { splits, loading: splitsLoading } = useSplit();
     const activeSplit = splits?.find(s => s.is_active) || null;
     
-    const [sessions, setSessions] = useState<Session[]>([]);
-    const [stats, setStats] = useState<UserStats | null>(null);
-    const [sessionsLoading, setSessionsLoading] = useState(true);
-    const [error, setError] = useState<Error | null>(null);
+    const { data: sessionsData, isLoading: sessionsLoading, error: sessionsError } = useSWR<Session[]>("/sessions", fetcher);
+    const { data: statsData, error: statsError } = useSWR<UserStats>("/users/me/stats", fetcher);
 
-    const fetchSessions = useCallback(async () => {
-        try {
-            setSessionsLoading(true);
-            const [sessionsData, statsData] = await Promise.all([
-                getSessions(),
-                getUserStats()
-            ]);
-            setSessions(sessionsData);
-            setStats(statsData);
-        } catch (err) {
-            setError(err instanceof Error ? err : new Error("Failed to fetch sessions"));
-        } finally {
-            setSessionsLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchSessions();
-    }, [fetchSessions]);
+    const sessions = sessionsData || [];
+    const stats = statsData || null;
+    const error = sessionsError || statsError || null;
 
     // ─── DERIVED DATA ──────────────────────────────────────────────────────────
 
@@ -147,7 +130,8 @@ export function useHomeDashboard() {
         if (!activeSplitDay) return null;
         try {
             const session = await createSession(activeSplitDay.id, todayStr);
-            await fetchSessions();
+            mutate("/sessions");
+            mutate("/users/me/stats");
             return session;
         } catch (err) {
             console.error(err);
@@ -159,7 +143,8 @@ export function useHomeDashboard() {
         if (!activeSplitDay) return null;
         try {
             await createSession(activeSplitDay.id, todayStr, true);
-            await fetchSessions();
+            mutate("/sessions");
+            mutate("/users/me/stats");
         } catch (err) {
             console.error(err);
         }
@@ -168,7 +153,8 @@ export function useHomeDashboard() {
     const undoSkip = async () => {
         if (todaySession) {
             await deleteSession(todaySession.id);
-            await fetchSessions();
+            mutate("/sessions");
+            mutate("/users/me/stats");
         }
     };
 

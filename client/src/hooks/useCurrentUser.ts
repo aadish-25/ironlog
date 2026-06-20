@@ -1,48 +1,33 @@
-import { useState, useEffect } from "react";
+import useSWR from "swr";
 import axios from "axios";
-import { getUser, updateUser } from "../services/users";
+import { fetcher } from "../services/api";
+import { updateUser } from "../services/users";
 import { type User } from "../types";
 
 export function useCurrentUser() {
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const { data: user, error: swrError, isLoading: loading, mutate } = useSWR<User>("/users/me", fetcher);
 
-    useEffect(() => {
-        async function fetchCurrentUser() {
-            try {
-                const result = await getUser();
-                setUser(result);
-            } catch (err) {
-                if (axios.isAxiosError(err)) {
-                    const backendMsg = err.response?.data?.message;
-                    const axiosMsg = err.message;
-                    setError(backendMsg ?? axiosMsg);
-                } else {
-                    setError((err as Error).message);
-                }
-            } finally {
-                setLoading(false);
-            }
+    let error: string | null = null;
+    if (swrError) {
+        if (axios.isAxiosError(swrError)) {
+            error = swrError.response?.data?.message ?? swrError.message;
+        } else {
+            error = (swrError as Error).message;
         }
-
-        fetchCurrentUser();
-    }, []);
+    }
 
     async function updateCurrentUser(data: Partial<User>) {
         try {
             const result = await updateUser(data);
-            setUser(result);
+            mutate(result, false);
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                const backendMsg = err.response?.data?.message;
-                const axiosMsg = err.message;
-                setError(backendMsg ?? axiosMsg);
+                console.error(err.response?.data?.message ?? err.message);
             } else {
-                setError((err as Error).message);
+                console.error((err as Error).message);
             }
         }
     }
 
-    return { user, loading, error, updateCurrentUser };
+    return { user: user || null, loading, error, updateCurrentUser };
 }
