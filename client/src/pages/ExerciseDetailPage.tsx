@@ -6,11 +6,6 @@ import { useExercises } from "../hooks/useExercises";
 export function ExerciseDetailPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { 
-        exercise, 
-        progress, 
-        loading, 
-        error, 
     const { exercise, progress, loading, error, refetch } = useExercises(id);
 
     const [activeTab, setActiveTab] = useState<"info" | "records">("info");
