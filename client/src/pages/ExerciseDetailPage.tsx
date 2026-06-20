@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import { useExercises } from "../hooks/useExercises";
 
 export function ExerciseDetailPage() {
@@ -19,8 +20,9 @@ export function ExerciseDetailPage() {
     const [timeRange, setTimeRange] = useState<"1W" | "1M" | "3M" | "6M" | "1Y">("1M");
     const [expandedSessions, setExpandedSessions] = useState<Set<number>>(new Set());
 
+
+
     useEffect(() => {
-        window.scrollTo(0, 0);
         if (id) {
             fetchExerciseById(id);
             fetchExerciseProgress(id);
@@ -94,7 +96,7 @@ export function ExerciseDetailPage() {
                 </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1">
                 {/* Detail Hero */}
                 <div className="px-5 pb-6">
                     <div className="bg-[#141414] rounded-[16px] h-[220px] flex items-center justify-center mb-5 border border-[#1f1f1f] relative overflow-hidden">
@@ -211,71 +213,105 @@ export function ExerciseDetailPage() {
                         </div>
 
                         {/* Chart Wrap */}
-                        <div className="bg-[#1a1a1a] rounded-xl p-4 mb-4 h-[160px] relative overflow-hidden flex flex-col">
+                        <div className="bg-[#1a1a1a] rounded-xl p-4 mb-4 h-[180px] relative block overflow-hidden [&_.recharts-wrapper]:outline-none [&_.recharts-surface]:outline-none [&_svg]:outline-none" style={{ WebkitTapHighlightColor: 'transparent' }}>
                             {filteredProgress.length > 0 ? (() => {
-                                const data = filteredProgress.map(p => chartAxis === "weight" ? p.max_weight : p.total_volume);
-                                const maxVal = Math.max(...data, 1);
-                                const minVal = Math.min(...data, 0);
-                                const range = maxVal - minVal || 1;
-                                
-                                const width = 300;
-                                const height = 90;
-                                const padY = 20;
-                                const padX = 4;
-                                
-                                const points = data.map((val, i) => {
-                                    const x = data.length === 1 
-                                        ? width / 2 
-                                        : padX + (i / (data.length - 1)) * (width - 2 * padX);
-                                    const y = height + padY - ((val - minVal) / range) * height;
-                                    return `${x},${y}`;
-                                });
-                                
-                                const pathD = `M${points.join(' L')}`;
-                                const fillD = `M${points[0].split(',')[0]},130 L${points.join(' L')} L${points[points.length-1].split(',')[0]},130 Z`;
-                                
+                                let chartData = filteredProgress.map(p => ({
+                                    date: formatDate(p.session_date),
+                                    val: chartAxis === "weight" ? p.max_weight : p.total_volume,
+                                    isPr: p.pr_hit,
+                                    rawDate: p.session_date
+                                }));
+
+                                // Dynamic grouping logic (Optimized for ~20-30 points max per view)
+                                let groupDays = 1;
+                                if (timeRange === "3M") groupDays = 3;
+                                else if (timeRange === "6M") groupDays = 7;
+                                else if (timeRange === "1Y") groupDays = 14;
+
+                                if (groupDays > 1) {
+                                    const groupedData = new Map();
+                                    chartData.forEach(d => {
+                                        const date = new Date(d.rawDate);
+                                        // Calculate the epoch day index for bucketing
+                                        const dayIndex = Math.floor(date.getTime() / (1000 * 60 * 60 * 24));
+                                        const bucketStart = dayIndex - (dayIndex % groupDays);
+                                        
+                                        if (!groupedData.has(bucketStart)) {
+                                            groupedData.set(bucketStart, { ...d });
+                                        } else {
+                                            const existing = groupedData.get(bucketStart);
+                                            // Keep the highest peak in this time bucket
+                                            if (d.val > existing.val) {
+                                                existing.val = d.val;
+                                                existing.isPr = existing.isPr || d.isPr;
+                                                existing.date = d.date; // Use date of the peak
+                                            }
+                                        }
+                                    });
+                                    // Map back to array and ensure chronological order
+                                    chartData = Array.from(groupedData.entries())
+                                        .sort((a, b) => a[0] - b[0])
+                                        .map(entry => entry[1]);
+                                }
+
                                 return (
-                                    <div className="flex-1 relative w-full h-full">
-                                        {/* Y-axis Labels */}
-                                        <div className="absolute left-0 top-0 bottom-8 w-8 flex flex-col justify-between text-[9px] text-[#555] font-display z-10 pointer-events-none">
-                                            <span>{Math.round(maxVal)}</span>
-                                            <span>{Math.round(minVal + range / 2)}</span>
-                                            <span>{Math.round(minVal)}</span>
-                                        </div>
-                                        <div className="absolute right-0 top-0 text-[9px] text-heat font-medium pointer-events-none bg-[#1a1a1a] px-1 rounded-bl-md">
-                                            {chartAxis === "weight" ? "MAX KG" : "VOL KG"}
-                                        </div>
-                                        <svg width="100%" height="100%" viewBox="0 0 300 130" preserveAspectRatio="none" className="pl-[20px]">
-                                            <defs>
-                                                <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="0%" stopColor="#e8460a" stopOpacity=".25"/>
-                                                    <stop offset="100%" stopColor="#e8460a" stopOpacity="0"/>
-                                                </linearGradient>
-                                            </defs>
-                                            <line x1="0" y1={padY} x2="300" y2={padY} stroke="#1f1f1f" strokeWidth="1"/>
-                                            <line x1="0" y1={padY + height/2} x2="300" y2={padY + height/2} stroke="#1f1f1f" strokeWidth="1"/>
-                                            <line x1="0" y1={padY + height} x2="300" y2={padY + height} stroke="#1f1f1f" strokeWidth="1"/>
-                                            
-                                            <path d={fillD} fill="url(#cg)"/>
-                                            <path d={pathD} fill="none" stroke="#e8460a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                            
-                                            {points.map((p, i) => (
-                                                <circle key={i} cx={p.split(',')[0]} cy={p.split(',')[1]} r="3" fill="#e8460a"/>
-                                            ))}
-                                            
-                                            {/* X-axis labels */}
-                                            {filteredProgress.length > 1 && (
-                                                <>
-                                                    <text x={points[0].split(',')[0]} y="125" fill="#555" fontSize="9" fontFamily="system-ui" textAnchor="start">
-                                                        {formatDate(filteredProgress[0].session_date)}
-                                                    </text>
-                                                    <text x={points[points.length-1].split(',')[0]} y="125" fill="#555" fontSize="9" fontFamily="system-ui" textAnchor="end">
-                                                        {formatDate(filteredProgress[filteredProgress.length-1].session_date)}
-                                                    </text>
-                                                </>
-                                            )}
-                                        </svg>
-                                    </div>
+                                <ResponsiveContainer width="100%" height={148}>
+                                    <AreaChart
+                                        data={chartData}
+                                        margin={{ top: 5, right: 0, left: -25, bottom: 0 }}
+                                    >
+                                        <defs>
+                                            <linearGradient id="colorVal" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#e8460a" stopOpacity={0.3}/>
+                                                <stop offset="95%" stopColor="#e8460a" stopOpacity={0}/>
+                                            </linearGradient>
+                                        </defs>
+                                        <XAxis 
+                                            dataKey="date" 
+                                            stroke="#444" 
+                                            fontSize={10} 
+                                            tickLine={false} 
+                                            axisLine={false}
+                                            minTickGap={20}
+                                        />
+                                        <YAxis 
+                                            stroke="#444" 
+                                            fontSize={10} 
+                                            tickLine={false} 
+                                            axisLine={false}
+                                            domain={['dataMin', 'dataMax']}
+                                        />
+                                        <RechartsTooltip 
+                                            content={({ active, payload, label }) => {
+                                                if (active && payload && payload.length) {
+                                                    const data = payload[0].payload;
+                                                    return (
+                                                        <div className="bg-[#111] border border-[#333] rounded-md p-2 text-white shadow-xl">
+                                                            <div className="text-[10px] text-[#888] mb-1">{label}</div>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="font-display text-[16px] text-white">
+                                                                    {data.val} kg
+                                                                </span>
+                                                                {data.isPr && chartAxis === "weight" && (
+                                                                    <span className="text-[9px] bg-[#2a0f00] text-heat px-1.5 py-0.5 rounded font-bold border border-heat">PR</span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                }
+                                                return null;
+                                            }}
+                                        />
+                                        <Area 
+                                            type="monotone" 
+                                            dataKey="val" 
+                                            stroke="#e8460a" 
+                                            strokeWidth={2}
+                                            fillOpacity={1} 
+                                            fill="url(#colorVal)" 
+                                        />
+                                    </AreaChart>
+                                </ResponsiveContainer>
                                 );
                             })() : (
                                 <div className="absolute inset-0 flex items-center justify-center text-[11px] text-[#444] uppercase tracking-[2px]">
@@ -285,17 +321,28 @@ export function ExerciseDetailPage() {
                         </div>
 
                         {/* Past Sessions List */}
-                        <div className="text-[10px] tracking-[2px] text-[#333] uppercase mb-[10px]">Past Sessions</div>
+                        <div className="text-[10px] tracking-[2px] text-[#333] uppercase mb-[10px]">Past Sessions (Last 7 Days)</div>
                         
-                        {progress.length === 0 ? (
-                            <div className="flex flex-col items-center gap-3 p-[40px_20px] text-center">
-                                <div className="w-[60px] h-[60px] bg-[#1a1a1a] rounded-2xl flex items-center justify-center text-[26px] text-[#2a2a2a]">&#128170;</div>
-                                <div className="font-display text-[22px] tracking-[1px] text-[#333]">NO RECORDS YET</div>
-                                <div className="text-[12px] text-[#2a2a2a] leading-[1.6] max-w-[200px]">Log this exercise in a workout session to start building your history.</div>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col gap-2">
-                                {progress.map((p, idx) => {
+                        {(() => {
+                            const pastWeekSessions = progress.filter(p => {
+                                const d = new Date(p.session_date);
+                                const diffDays = (new Date().getTime() - d.getTime()) / (1000 * 60 * 60 * 24);
+                                return diffDays <= 7;
+                            });
+
+                            if (pastWeekSessions.length === 0) {
+                                return (
+                                    <div className="flex flex-col items-center gap-3 p-[40px_20px] text-center">
+                                        <div className="w-[60px] h-[60px] bg-[#1a1a1a] rounded-2xl flex items-center justify-center text-[26px] text-[#2a2a2a]">&#128170;</div>
+                                        <div className="font-display text-[22px] tracking-[1px] text-[#333]">NO RECENT SESSIONS</div>
+                                        <div className="text-[12px] text-[#2a2a2a] leading-[1.6] max-w-[200px]">Log this exercise in a workout session to build your history.</div>
+                                    </div>
+                                );
+                            }
+
+                            return (
+                                <div className="flex flex-col gap-2">
+                                    {pastWeekSessions.map((p, idx) => {
                                     const isOpen = expandedSessions.has(idx);
                                     return (
                                         <div key={idx} className="bg-[#1a1a1a] rounded-[10px] p-[12px_14px] border border-[#1f1f1f]">
@@ -330,7 +377,8 @@ export function ExerciseDetailPage() {
                                     );
                                 })}
                             </div>
-                        )}
+                        );
+                    })()}
                     </div>
                 )}
             </div>

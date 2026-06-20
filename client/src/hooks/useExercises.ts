@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import {
     getExercises,
@@ -15,7 +15,7 @@ export function useExercises() {
     const [error, setError] = useState<string | null>(null);
     const [progress, setProgress] = useState<ExerciseProgress[]>([]);
 
-    async function fetchAllExercises() {
+    const fetchAllExercises = useCallback(async () => {
         try {
             setLoading(true);
             setError(null);
@@ -57,9 +57,9 @@ export function useExercises() {
         } finally {
             setLoading(false);
         }
-    }
+    }, []);
 
-    async function fetchExerciseById(id: string) {
+    const fetchExerciseById = useCallback(async (id: string) => {
         try {
             setLoading(true);
             const data = await getExerciseById(id);
@@ -95,9 +95,9 @@ export function useExercises() {
         } finally {
             setLoading(false);
         }
-    }
+    }, []);
 
-    async function fetchExerciseProgress(id: string) {
+    const fetchExerciseProgress = useCallback(async (id: string) => {
         try {
             setLoading(true);
             setError(null);
@@ -122,7 +122,7 @@ export function useExercises() {
         } finally {
             setLoading(false);
         }
-    }
+    }, []);
 
     useEffect(() => {
         fetchAllExercises();
