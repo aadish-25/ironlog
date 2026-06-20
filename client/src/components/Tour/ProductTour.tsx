@@ -136,6 +136,7 @@ export function ProductTour() {
 
     return (
         <Joyride
+            key={location.pathname}
             steps={steps}
             run={run}
             continuous
