@@ -268,6 +268,7 @@ export function SplitDayDetailPage() {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 exercisesList={exercisesList || []}
+                existingExerciseIds={new Set(day.exercises?.map(ex => ex.exercise_id) || [])}
                 onAddExercises={(exerciseIds) => {
                     addExercises(day.id, exerciseIds);
                     setIsModalOpen(false);

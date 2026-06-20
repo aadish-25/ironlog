@@ -11,13 +11,15 @@ interface ExerciseSelectorModalProps {
     onClose: () => void;
     exercisesList: Exercise[];
     onAddExercises: (exerciseIds: string[]) => void;
+    existingExerciseIds?: Set<string>;
 }
 
 export function ExerciseSelectorModal({
     isOpen,
     onClose,
     exercisesList,
-    onAddExercises
+    onAddExercises,
+    existingExerciseIds = new Set()
 }: ExerciseSelectorModalProps) {
     const exercises: Exercise[] = exercisesList ?? [];
 
@@ -104,20 +106,25 @@ export function ExerciseSelectorModal({
     };
 
     const renderExercise = (ex: Exercise) => {
-        const isSelected = selectedExerciseIds.has(ex.id);
+        const isAlreadyAdded = existingExerciseIds.has(ex.id);
+        const isSelected = selectedExerciseIds.has(ex.id) || isAlreadyAdded;
         return (
             <button
                 key={ex.id}
-                onClick={() => handleToggleExercise(ex.id)}
-                className={`w-full flex items-center gap-3 px-5 py-3 border-b border-[#141414] bg-transparent border-none cursor-pointer text-left transition-colors ${isSelected ? 'bg-[#1a0800]' : 'hover:bg-raised'}`}
+                onClick={() => !isAlreadyAdded && handleToggleExercise(ex.id)}
+                disabled={isAlreadyAdded}
+                className={`w-full flex items-center gap-3 px-5 py-3 border-b border-[#141414] bg-transparent border-none text-left transition-colors ${isAlreadyAdded ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-raised'} ${isSelected && !isAlreadyAdded ? 'bg-[#1a0800]' : ''}`}
             >
                 <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-colors ${isSelected ? 'border-heat bg-heat' : 'border-[#444] bg-transparent'}`}>
                     {isSelected && <div className="w-2 h-2 bg-white rounded-full" />}
                 </div>
                 <MuscleBadge muscle={ex.muscles?.[0] || 'Unknown'} />
                 <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-medium truncate ${isSelected ? 'text-white' : 'text-zinc-200'}`}>{ex.name}</p>
+                    <p className={`text-sm font-medium truncate ${isSelected && !isAlreadyAdded ? 'text-white' : 'text-zinc-200'}`}>{ex.name}</p>
                 </div>
+                {isAlreadyAdded && (
+                    <span className="text-[10px] tracking-wider uppercase font-semibold text-ghost pr-2 shrink-0">Added</span>
+                )}
             </button>
         );
     };
