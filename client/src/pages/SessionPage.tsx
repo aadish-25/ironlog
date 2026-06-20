@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSession } from "../hooks/useSession";
 import { useSet } from "../hooks/useSet";
@@ -11,6 +11,7 @@ import { CompletionScreen } from "../components/Session/CompletionScreen";
 import { AllExercisesSheet } from "../components/Session/AllExercisesSheet";
 import { EndSessionDialog } from "../components/Session/EndSessionDialog";
 import { SessionSummary } from "../components/Session/SessionSummary";
+import { PRToast } from "../components/Session/PRToast";
 import type { SessionExercise } from "../types";
 
 export function SessionPage() {
@@ -35,6 +36,10 @@ export function SessionPage() {
     const [showEndConfirm, setShowEndConfirm] = useState(false);
     const [showCompletionOverride, setShowCompletionOverride] = useState<boolean | null>(null);
     const [showSummary, setShowSummary] = useState(false);
+
+    // ─── PR TOAST STATE ─────────────────────────────────────────────────────────
+    const [prToast, setPrToast] = useState<{ name: string; weight: number } | null>(null);
+    const dismissPrToast = useCallback(() => setPrToast(null), []);
 
     const splitDayName = session?.split_day_label ?? null;
 
@@ -63,10 +68,18 @@ export function SessionPage() {
         );
 
         if (result) {
-            // Count logged sets (using state from currentExercise, but this set will be true)
+            // Fire PR toast if backend flagged this set as a new personal record
+            const isPR = (result as any).is_pr ?? result.pr_hit;
+            if (isPR) {
+                setPrToast({ name: currentExercise.name, weight: targetSet.weight });
+            }
+
+            // Auto-advance when all sets for this exercise are logged
             const loggedCount = currentExercise.sets.filter((s) => s.is_logged).length;
             if (loggedCount + 1 >= currentExercise.sets.length) {
-                setTimeout(() => handleNextExercise(), 500);
+                if (currentExerciseIndex < exercises.length - 1) {
+                    setTimeout(() => handleNextExercise(), 500);
+                }
             }
         }
     };
@@ -74,8 +87,21 @@ export function SessionPage() {
     const handleNextExercise = () => {
         if (currentExerciseIndex < exercises.length - 1) {
             setCurrentExerciseIndex((prev) => prev + 1);
+        }
+    };
+
+    const handleFinishWorkoutClick = async () => {
+        if (session && !session.is_completed) {
+            await completeUserSession(session.id);
+        }
+        setShowCompletionOverride(true);
+    };
+
+    const handleHeaderFinishRequest = () => {
+        if (completedSets < totalSets) {
+            setShowEndConfirm(true);
         } else {
-            setShowCompletionOverride(true);
+            handleFinishWorkoutClick();
         }
     };
 
@@ -180,14 +206,17 @@ export function SessionPage() {
     const handleSwapExerciseClick = () => setPickerMode("swap");
     const handleAddExerciseClick = () => setPickerMode("add");
 
-    const handleEndSession = () => setShowEndConfirm(true);
+    const handleEndSession = () => navigate("/");
 
-    const handleConfirmEnd = async () => {
-        if (session) {
+    const handleConfirmFinishEarly = async () => {
+        if (session && !session.is_completed) {
             await completeUserSession(session.id);
         }
-        navigate("/");
+        setShowCompletionOverride(true);
+        setShowEndConfirm(false);
     };
+
+    const handleGoHome = () => navigate("/");
 
     // ─── LOADING STATE ──────────────────────────────────────────────────────────
     if (loading) {
@@ -217,7 +246,7 @@ export function SessionPage() {
             <CompletionScreen
                 splitDayName={splitDayName}
                 exercises={exercises}
-                onComplete={handleConfirmEnd}
+                onComplete={handleGoHome}
                 onBackToWorkout={() => {
                     setShowCompletionOverride(false);
                     setShowSummary(true);
@@ -249,6 +278,7 @@ export function SessionPage() {
                 totalSets={totalSets}
                 progressPercent={progressPercent}
                 onEndSession={handleEndSession}
+                onFinishWorkout={handleHeaderFinishRequest}
             />
 
             {/* ── Exercise content ── */}
@@ -268,6 +298,7 @@ export function SessionPage() {
                 />
             )}
 
+
             {/* ── Bottom navigation bar ── */}
             <BottomNav
                 currentExerciseIndex={currentExerciseIndex}
@@ -281,6 +312,7 @@ export function SessionPage() {
                 onAddExercise={handleAddExerciseClick}
                 onPrevExercise={handlePrevExercise}
                 onNextExercise={handleNextExercise}
+                onFinishWorkout={handleFinishWorkoutClick}
             />
 
             {/* ── Overlays ── */}
@@ -308,7 +340,14 @@ export function SessionPage() {
             <EndSessionDialog
                 isOpen={showEndConfirm}
                 onClose={() => setShowEndConfirm(false)}
-                onConfirmEnd={handleConfirmEnd}
+                onConfirmEnd={handleConfirmFinishEarly}
+            />
+
+            {/* ── PR Toast ── */}
+            <PRToast
+                exerciseName={prToast?.name ?? null}
+                weightKg={prToast?.weight ?? null}
+                onDismiss={dismissPrToast}
             />
         </section>
     );

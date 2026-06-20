@@ -87,7 +87,7 @@ export function SetList({
                         className="flex items-center gap-2 bg-transparent border-none cursor-pointer p-0 hover:opacity-80 transition-opacity"
                         >
                         <span className="font-display text-lg text-done tracking-[1px]">
-                            {set.weight} kg × {set.reps}
+                            {Number(set.weight).toString()} kg × {set.reps}
                         </span>
                         <div className="w-[18px] h-[18px] bg-[#1a3a1a] rounded-full flex items-center justify-center text-[11px] text-done shrink-0">
                             ✓
@@ -98,7 +98,7 @@ export function SetList({
 
                   {!set.is_logged && !isActive && (
                     <span className="font-display text-lg text-ghost/30 tracking-[1px]">
-                      {set.weight} kg × {set.reps}
+                      {Number(set.weight).toString()} kg × {set.reps}
                     </span>
                   )}
                 </div>
