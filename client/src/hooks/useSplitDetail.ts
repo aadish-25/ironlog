@@ -1,6 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
+import useSWR from "swr";
 import axios from "axios";
-import { getSplitById, updateSplit } from "../services/splits";
+import { fetcher } from "../services/api";
+import { updateSplit } from "../services/splits";
 import { 
     updateSplitDay, 
     addExercisesToDay, 
@@ -10,49 +12,32 @@ import {
 import type { Split } from "../types";
 
 export function useSplitDetail(splitId: string) {
-    const [split, setSplit] = useState<Split | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const { data: split, error: swrError, isLoading: loading, mutate: mutateSplit } = useSWR<Split>(splitId ? `/splits/${splitId}` : null, fetcher);
+    
+    let error: string | null = null;
+    if (swrError) {
+        error = axios.isAxiosError(swrError) ? swrError.response?.data?.message ?? swrError.message : (swrError as Error).message;
+    }
+
     const [actionLoading, setActionLoading] = useState(false);
-
-    const fetchSplit = useCallback(async (background = false) => {
-        try {
-            if (!background) setLoading(true);
-            setError(null);
-            const result = await getSplitById(splitId);
-            setSplit(result);
-        } catch (err) {
-            if (axios.isAxiosError(err)) {
-                setError(err.response?.data?.message ?? err.message);
-            } else {
-                setError((err as Error).message);
-            }
-        } finally {
-            setLoading(false);
-        }
-    }, [splitId]);
-
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        if (splitId) fetchSplit();
-    }, [fetchSplit, splitId]);
 
     const updateDay = async (dayId: string, updates: { label?: string, is_rest?: boolean }) => {
         if (actionLoading) return;
         setActionLoading(true);
         try {
             // Optimistic update
-            setSplit(prev => {
+            mutateSplit(prev => {
                 if (!prev) return prev;
                 return {
                     ...prev,
                     days: prev.days.map(d => d.id === dayId ? { ...d, ...updates } : d)
                 };
-            });
+            }, false);
             await updateSplitDay(dayId, updates);
+            mutateSplit();
         } catch (err) {
             console.error(err);
-            fetchSplit(); // rollback on error
+            mutateSplit(); // rollback on error
         } finally {
             setActionLoading(false);
         }
@@ -81,7 +66,7 @@ export function useSplitDetail(splitId: string) {
                     };
                 });
                 
-                setSplit(prev => {
+                mutateSplit(prev => {
                     if (!prev) return prev;
                     return {
                         ...prev,
@@ -90,14 +75,14 @@ export function useSplitDetail(splitId: string) {
                             exercises: [...(d.exercises || []), ...newExercises]
                         } : d)
                     };
-                });
+                }, false);
             }
 
             await addExercisesToDay(dayId, exerciseIds, startingIndex);
-            await fetchSplit(true); // Background re-fetch
+            mutateSplit(); // Background re-fetch
         } catch (err) {
             console.error(err);
-            fetchSplit(true); // Rollback optimistic update
+            mutateSplit(); // Rollback optimistic update
         } finally {
             setActionLoading(false);
         }
@@ -108,7 +93,7 @@ export function useSplitDetail(splitId: string) {
         setActionLoading(true);
         try {
             // Optimistic update
-            setSplit(prev => {
+            mutateSplit(prev => {
                 if (!prev) return prev;
                 return {
                     ...prev,
@@ -122,11 +107,12 @@ export function useSplitDetail(splitId: string) {
                         return d;
                     })
                 };
-            });
+            }, false);
             await removeExerciseFromDay(splitDayExerciseId);
+            mutateSplit();
         } catch (err) {
             console.error(err);
-            fetchSplit();
+            mutateSplit();
         } finally {
             setActionLoading(false);
         }
@@ -137,9 +123,10 @@ export function useSplitDetail(splitId: string) {
         setActionLoading(true);
         try {
             await reorderExerciseInDay(splitDayExerciseId, newIndex);
-            await fetchSplit(true); // Background re-fetch
+            mutateSplit(); // Backend handles shifting other items, so just re-fetch
         } catch (err) {
             console.error(err);
+            mutateSplit();
         } finally {
             setActionLoading(false);
         }
@@ -149,11 +136,12 @@ export function useSplitDetail(splitId: string) {
         if (actionLoading) return;
         setActionLoading(true);
         try {
-            setSplit(prev => prev ? { ...prev, name: newName } : prev);
+            mutateSplit(prev => prev ? { ...prev, name: newName } : prev, false);
             await updateSplit(splitId, newName);
+            mutateSplit();
         } catch (err) {
             console.error(err);
-            fetchSplit();
+            mutateSplit();
         } finally {
             setActionLoading(false);
         }
@@ -168,6 +156,6 @@ export function useSplitDetail(splitId: string) {
         addExercises,
         removeExercise,
         reorderExercise,
-        refresh: fetchSplit
+        refresh: () => mutateSplit()
     };
 }
