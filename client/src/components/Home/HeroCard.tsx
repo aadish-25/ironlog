@@ -118,7 +118,7 @@ export function HeroCard({
               </div>
               <button
                 onClick={onStartWorkout}
-                className="block w-full py-[12px] bg-heat border-none rounded-xl text-white font-display text-[15px] tracking-[2px] cursor-pointer hover:opacity-90 transition-opacity"
+                className="tour-create-split block w-full py-[12px] bg-heat border-none rounded-xl text-white font-display text-[15px] tracking-[2px] cursor-pointer hover:opacity-90 transition-opacity"
               >
                 CREATE SPLIT &nbsp;→
               </button>

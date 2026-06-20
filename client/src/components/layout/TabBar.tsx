@@ -19,7 +19,7 @@ export function TabBar() {
             key={link.to}
             to={link.to}
             className={({ isActive }) =>
-              `flex flex-col items-center gap-1 cursor-pointer transition-colors duration-200 ${
+              `flex flex-col items-center gap-1 cursor-pointer transition-colors duration-200 tour-nav-${link.label.toLowerCase()} ${
                 isActive ? "text-heat" : "text-zinc-500 hover:text-zinc-300"
               }`
             }

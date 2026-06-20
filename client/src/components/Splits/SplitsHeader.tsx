@@ -13,7 +13,7 @@ export function SplitsHeader({ onOpenCreateModal }: SplitsHeaderProps) {
       </h1>
       <button
         onClick={onOpenCreateModal}
-        className="px-4 py-2 bg-heat border-none rounded-lg text-white font-display text-sm tracking-[1.5px] cursor-pointer hover:opacity-90 transition-opacity flex items-center gap-1"
+        className="tour-new-split px-4 py-2 bg-heat border-none rounded-lg text-white font-display text-sm tracking-[1.5px] cursor-pointer hover:opacity-90 transition-opacity flex items-center gap-1"
         aria-label="Create new split"
       >
         <Plus size={14} />
