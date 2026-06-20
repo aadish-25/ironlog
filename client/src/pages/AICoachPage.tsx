@@ -21,6 +21,7 @@ export function AICoachPage() {
   // ─── TAB STATE ──────────────────────────────────────────────────────────────
   // TODO: This component needs to track which tab (insights / chat) is active.
   const [activeTab, setActiveTab] = useState<Tab>("insights");
+  const [isChatbotDisabled] = useState(true); // WIP flag
 
   // ─── INSIGHTS DATA ──────────────────────────────────────────────────────────
   // TODO: This component needs AI-generated insight cards.
@@ -75,21 +76,33 @@ export function AICoachPage() {
 
       {/* ── CHAT TAB ── */}
       {activeTab === "chat" && (
-        <>
-          <ChatTab
-            messages={messages}
-            isTyping={isTyping}
-            suggestionChips={SUGGESTION_CHIPS}
-            onChipClick={handleChipClick}
-          />
+        isChatbotDisabled ? (
+          <div className="flex-1 flex flex-col items-center justify-center text-center p-8 pb-20">
+            <div className="w-16 h-16 rounded-full bg-raised border border-[#2a2a2a] flex items-center justify-center mb-5">
+              <span className="text-2xl">🚧</span>
+            </div>
+            <h3 className="text-white font-display text-xl tracking-[1px] mb-2">Work in Progress</h3>
+            <p className="text-[#888] text-[13px] leading-relaxed max-w-[260px]">
+              The AI Coach chat feature is currently learning how to analyze your workouts. Check back soon!
+            </p>
+          </div>
+        ) : (
+          <>
+            <ChatTab
+              messages={messages}
+              isTyping={isTyping}
+              suggestionChips={SUGGESTION_CHIPS}
+              onChipClick={handleChipClick}
+            />
 
-          {/* ── Chat input bar ── */}
-          <ChatInputBar
-            chatInput={chatInput}
-            onInputChange={handleInputChange}
-            onSendMessage={handleSendMessage}
-          />
-        </>
+            {/* ── Chat input bar ── */}
+            <ChatInputBar
+              chatInput={chatInput}
+              onInputChange={handleInputChange}
+              onSendMessage={handleSendMessage}
+            />
+          </>
+        )
       )}
     </section>
   );
