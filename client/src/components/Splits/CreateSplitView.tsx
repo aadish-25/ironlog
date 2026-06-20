@@ -19,6 +19,7 @@ interface CreateSplitViewProps {
   splitName: string;
   onSplitNameChange: (name: string) => void;
   onSubmit: () => void;
+  isSubmitting?: boolean;
 }
 
 export function CreateSplitView({
@@ -26,6 +27,7 @@ export function CreateSplitView({
   splitName,
   onSplitNameChange,
   onSubmit,
+  isSubmitting = false,
 }: CreateSplitViewProps) {
   return (
     <div className="overflow-y-auto pb-[90px] no-scrollbar">
@@ -51,6 +53,7 @@ export function CreateSplitView({
             }`,
           }}
           autoFocus
+          disabled={isSubmitting}
         />
         <div className="bg-[#141414] rounded-xl px-4 py-[14px] mb-6">
           <div className="text-xs text-[#888] font-medium mb-1.5">
@@ -62,14 +65,15 @@ export function CreateSplitView({
         </div>
         <button
           onClick={onSubmit}
-          disabled={!splitName.trim()}
-          className="w-full py-4 border-none rounded-xl font-display text-[22px] tracking-[2px] cursor-pointer disabled:cursor-default transition-colors"
+          disabled={!splitName.trim() || isSubmitting}
+          className="w-full py-4 border-none rounded-xl font-display text-[22px] tracking-[2px] cursor-pointer disabled:cursor-default transition-colors flex items-center justify-center gap-2"
           style={{
             background: splitName.trim() ? "var(--color-heat)" : "#1a1a1a",
             color: splitName.trim() ? "#fff" : "#333",
+            opacity: isSubmitting ? 0.7 : 1,
           }}
         >
-          CREATE SPLIT →
+          {isSubmitting ? "CREATING..." : "CREATE SPLIT →"}
         </button>
       </div>
     </div>

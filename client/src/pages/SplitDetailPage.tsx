@@ -79,13 +79,16 @@ export function SplitDetailPage() {
                     Tap a day to view or edit exercises.
                 </p>
 
-                {split.days.map((day) => {
+                {split.days.map((day, index) => {
                     const isRestDay = day.is_rest;
                     return (
                         <div
                             key={day.id}
-                            onClick={() => navigate(`/splits/${split.id}/day/${day.id}`)}
-                            className="bg-[#1a1a1a] rounded-[14px] border border-[#1f1f1f] p-4 mb-3 flex items-center justify-between cursor-pointer hover:bg-raised transition-colors group"
+                            onClick={() => {
+                                if (index === 0) localStorage.setItem("tour_phase_3_done", "true");
+                                navigate(`/splits/${split.id}/day/${day.id}`);
+                            }}
+                            className={`${index === 0 ? "tour-day-card" : ""} bg-[#1a1a1a] rounded-[14px] border border-[#1f1f1f] p-4 mb-3 flex items-center justify-between cursor-pointer hover:bg-raised transition-colors group`}
                         >
                             <div className="flex flex-col gap-1">
                                 <div className="text-[10px] tracking-[2px] text-ghost uppercase font-semibold">

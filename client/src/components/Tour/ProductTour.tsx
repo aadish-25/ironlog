@@ -60,9 +60,11 @@ export function ProductTour() {
     useEffect(() => {
         const isHome = location.pathname === "/";
         const isSplitsList = location.pathname === "/splits";
+        const isSplitDetail = location.pathname.match(/^\/splits\/[a-zA-Z0-9-]+$/);
 
         const phase1Done = localStorage.getItem("tour_phase_1_done");
         const phase2Done = localStorage.getItem("tour_phase_2_done");
+        const phase3Done = localStorage.getItem("tour_phase_3_done");
 
         const startTourWhenReady = (selector: string, stepsToRun: Step[]) => {
             const checkAndRun = () => {
@@ -121,6 +123,21 @@ export function ProductTour() {
                     disableBeacon: true,
                 }
             ]);
+        } else if (isSplitDetail && phase3Done !== "true") {
+            return startTourWhenReady(".tour-day-card", [
+                {
+                    target: "body",
+                    content: "Awesome! Your 7-day split has been generated.",
+                    placement: "center",
+                    disableBeacon: true,
+                },
+                {
+                    target: ".tour-day-card",
+                    content: "Tap on a day to assign muscles, add exercises, or mark it as a Rest Day.",
+                    placement: "bottom",
+                    disableBeacon: true,
+                }
+            ]);
         } else {
             setRun(false);
         }
@@ -136,6 +153,8 @@ export function ProductTour() {
                 localStorage.setItem("tour_phase_1_done", "true");
             } else if (location.pathname === "/splits") {
                 localStorage.setItem("tour_phase_2_done", "true");
+            } else if (location.pathname.match(/^\/splits\/[a-zA-Z0-9-]+$/)) {
+                localStorage.setItem("tour_phase_3_done", "true");
             }
         }
     };

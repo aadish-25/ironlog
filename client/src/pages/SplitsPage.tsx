@@ -21,16 +21,21 @@ export function SplitsPage() {
     // ─── NAVIGATION STATE ───────────────────────────────────────────────────────
     const [view, setView] = useState<"list" | "create">("list");
     const [newSplitName, setNewSplitName] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
 
     // ─── EVENT HANDLERS ─────────────────────────────────────────────────────────
     const handleCreateSplitSubmit = async () => {
-        if (!newSplitName.trim()) return;
+        if (!newSplitName.trim() || isSubmitting) return;
 
+        setIsSubmitting(true);
         const newSplit = await createUserSplit(newSplitName.trim());
-        setView("list");
-        setNewSplitName("");
+        setIsSubmitting(false);
+
         if (newSplit) {
+            setView("list");
+            setNewSplitName("");
+            localStorage.setItem("tour_phase_3_done", "false"); // Ensure phase 3 runs
             navigate(`/splits/${newSplit.id}`);
         }
     };
@@ -90,6 +95,7 @@ export function SplitsPage() {
                     splitName={newSplitName}
                     onSplitNameChange={setNewSplitName}
                     onSubmit={handleCreateSplitSubmit}
+                    isSubmitting={isSubmitting}
                 />
             ) : null}
         </section>
