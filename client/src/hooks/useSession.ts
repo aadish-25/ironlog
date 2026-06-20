@@ -30,7 +30,7 @@ export function useSession(sessionId: string | null) {
     async function completeUserSession(id: string) {
         try {
             const result = await completeSession(id);
-            mutate(result, false);
+            mutate((currentData) => currentData ? { ...currentData, ...result } : undefined, false);
             return result;
         } catch (err) {
             console.error(err);
