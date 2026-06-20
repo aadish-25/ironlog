@@ -27,7 +27,7 @@ export function HistoryPage() {
     >
       <div className="overflow-y-auto pb-[120px]">
         {/* ── Page header ── */}
-        <header className="px-5 pt-[54px] pb-4">
+        <header className="px-5 pt-5 pb-4">
           <h1 className="text-[22px] font-extrabold tracking-tight mb-4">
             History
           </h1>

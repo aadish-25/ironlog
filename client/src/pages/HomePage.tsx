@@ -100,9 +100,13 @@ export function HomePage() {
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => navigate("/profile")}
-                            className="w-[34px] h-[34px] rounded-full bg-raised border-[1.5px] border-border flex items-center justify-center text-[13px] font-semibold text-dim cursor-pointer"
+                            className="w-[34px] h-[34px] rounded-full bg-raised border-[1.5px] border-border flex items-center justify-center text-[13px] font-semibold text-dim cursor-pointer overflow-hidden"
                         >
-                            {userName ? String(userName)[0].toUpperCase() : "U"}
+                            {user?.profile_picture_url ? (
+                                <img src={user.profile_picture_url} alt="Profile" className="w-full h-full object-cover" />
+                            ) : (
+                                userName ? String(userName)[0].toUpperCase() : "U"
+                            )}
                         </button>
                     </div>
                 </div>
