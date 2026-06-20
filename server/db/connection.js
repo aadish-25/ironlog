@@ -10,8 +10,12 @@ dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const { Pool } = pg;
 
+const connectionString = process.env.DATABASE_URL
+    ? process.env.DATABASE_URL.replace("sslmode=require", "uselibpqcompat=true&sslmode=require")
+    : undefined;
+
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString,
 });
 
 export default pool;
