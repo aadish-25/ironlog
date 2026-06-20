@@ -15,9 +15,9 @@ export function useSplitDetail(splitId: string) {
     const [error, setError] = useState<string | null>(null);
     const [actionLoading, setActionLoading] = useState(false);
 
-    const fetchSplit = useCallback(async () => {
+    const fetchSplit = useCallback(async (background = false) => {
         try {
-            setLoading(true);
+            if (!background) setLoading(true);
             setError(null);
             const result = await getSplitById(splitId);
             setSplit(result);
@@ -58,17 +58,46 @@ export function useSplitDetail(splitId: string) {
         }
     };
 
-    const addExercises = async (dayId: string, exerciseIds: string[]) => {
+    const addExercises = async (dayId: string, exerciseIds: string[], exercisesList?: any[]) => {
         if (actionLoading) return;
         setActionLoading(true);
         try {
             const day = split?.days.find(d => d.id === dayId);
             if (!day) return;
             const startingIndex = day.exercises?.length || 0;
+            
+            // Optimistic Update
+            if (exercisesList) {
+                const newExercises = exerciseIds.map((exId, i) => {
+                    const exDetails = exercisesList.find(e => e.id === exId);
+                    return {
+                        id: `temp-${Date.now()}-${i}`,
+                        exercise_id: exId,
+                        name: exDetails?.name || "Loading...",
+                        sets: 3, // Default sets
+                        reps: 10, // Default reps
+                        order_index: startingIndex + i,
+                        muscle_groups: exDetails?.muscles || []
+                    };
+                });
+                
+                setSplit(prev => {
+                    if (!prev) return prev;
+                    return {
+                        ...prev,
+                        days: prev.days.map(d => d.id === dayId ? {
+                            ...d,
+                            exercises: [...(d.exercises || []), ...newExercises]
+                        } : d)
+                    };
+                });
+            }
+
             await addExercisesToDay(dayId, exerciseIds, startingIndex);
-            await fetchSplit(); // Re-fetch to get all the joined exercise details (name, muscles etc)
+            await fetchSplit(true); // Background re-fetch
         } catch (err) {
             console.error(err);
+            fetchSplit(true); // Rollback optimistic update
         } finally {
             setActionLoading(false);
         }
@@ -108,7 +137,7 @@ export function useSplitDetail(splitId: string) {
         setActionLoading(true);
         try {
             await reorderExerciseInDay(splitDayExerciseId, newIndex);
-            await fetchSplit(); // Backend handles shifting other items, so just re-fetch
+            await fetchSplit(true); // Background re-fetch
         } catch (err) {
             console.error(err);
         } finally {

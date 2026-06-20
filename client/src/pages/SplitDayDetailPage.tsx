@@ -270,7 +270,7 @@ export function SplitDayDetailPage() {
                 exercisesList={exercisesList || []}
                 existingExerciseIds={new Set(day.exercises?.map(ex => ex.exercise_id) || [])}
                 onAddExercises={(exerciseIds) => {
-                    addExercises(day.id, exerciseIds);
+                    addExercises(day.id, exerciseIds, exercisesList);
                     setIsModalOpen(false);
                 }}
             />
