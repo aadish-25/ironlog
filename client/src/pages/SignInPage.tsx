@@ -1,4 +1,5 @@
 import { SignIn } from "@clerk/clerk-react";
+import logo from "../assets/logo.png";
 import { dark } from "@clerk/themes";
 import { motion } from "motion/react";
 
@@ -15,7 +16,8 @@ export function SignInPage() {
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className="z-10 w-full max-w-[400px]"
       >
-        <div className="mb-8 text-center">
+        <div className="text-center mb-8 flex flex-col items-center">
+          <img src={logo} alt="IronLog Logo" className="w-[60px] h-[60px] object-contain mb-4" />
           <h1 className="font-display text-5xl tracking-wider text-ink mb-2">IRON<span className="text-heat">LOG</span></h1>
           <p className="font-body text-dim text-sm uppercase tracking-[0.2em]">Forge Your Legacy</p>
         </div>

@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { HeroCard } from "../components/Home/HeroCard";
 import { CoachNudge } from "../components/Home/CoachNudge";
+import logo from "../assets/logo.png";
 import { QuickStats } from "../components/Home/QuickStats";
 import { RecentActivity } from "../components/Home/RecentActivity";
 import { useHomeDashboard } from "../hooks/useHomeDashboard";
@@ -92,9 +93,7 @@ export function HomePage() {
                 {/* ── Top bar ── */}
                 <div className="flex items-center justify-between px-5 py-[14px] pb-2.5 relative">
                     <div className="flex items-center gap-2">
-                        <div className="w-[30px] h-[30px] bg-heat rounded-lg flex items-center justify-center font-display text-[13px] text-white tracking-[0.5px]">
-                            IL
-                        </div>
+                        <img src={logo} alt="IronLog Logo" className="w-[30px] h-[30px] object-contain" />
                         <span className="font-display text-xl tracking-[3px] text-white">
                             IRONLOG
                         </span>
