@@ -58,52 +58,66 @@ export function ProductTour() {
     const [steps, setSteps] = useState<Step[]>([]);
     
     useEffect(() => {
-        // We delay slightly to ensure DOM elements are painted
-        const timer = setTimeout(() => {
-            const isHome = location.pathname === "/";
-            const isSplitsList = location.pathname === "/splits";
-            const isSplitDetail = location.pathname.match(/^\/splits\/[a-zA-Z0-9-]+$/);
+        const isHome = location.pathname === "/";
+        const isSplitsList = location.pathname === "/splits";
 
-            const phase1Done = localStorage.getItem("tour_phase_1_done");
-            const phase2Done = localStorage.getItem("tour_phase_2_done");
+        const phase1Done = localStorage.getItem("tour_phase_1_done");
+        const phase2Done = localStorage.getItem("tour_phase_2_done");
 
-            if (isHome && !phase1Done) {
-                setSteps([
-                    {
-                        target: "body",
-                        content: "Welcome to IronLog! Let's get you set up with your first workout plan.",
-                        placement: "center",
-                        disableBeacon: true,
-                    },
-                    {
-                        target: ".tour-profile",
-                        content: "This is your profile. You can check your stats and adjust settings here.",
-                        placement: "bottom",
-                    },
-                    {
-                        target: ".tour-create-split",
-                        content: "Start your journey right here. Tap this to build your first split!",
-                        placement: "top",
+        const startTourWhenReady = (selector: string, stepsToRun: Step[]) => {
+            const checkAndRun = () => {
+                if (document.querySelector(selector)) {
+                    setSteps(stepsToRun);
+                    setRun(true);
+                    return true;
+                }
+                return false;
+            };
+
+            if (!checkAndRun()) {
+                const observer = new MutationObserver((mutations, obs) => {
+                    if (checkAndRun()) {
+                        obs.disconnect();
                     }
-                ]);
-                setRun(true);
-            } else if (isSplitsList && !phase2Done && phase1Done) {
-                // If they have no splits yet, we point them to the NEW button
-                setSteps([
-                    {
-                        target: ".tour-new-split",
-                        content: "Tap 'NEW' to create and name your first split.",
-                        placement: "bottom",
-                        disableBeacon: true,
-                    }
-                ]);
-                setRun(true);
-            } else {
-                setRun(false);
+                });
+                observer.observe(document.body, { childList: true, subtree: true });
+                
+                // Cleanup observer on unmount or path change
+                return () => observer.disconnect();
             }
-        }, 500);
+        };
 
-        return () => clearTimeout(timer);
+        if (isHome && !phase1Done) {
+            return startTourWhenReady(".tour-profile", [
+                {
+                    target: "body",
+                    content: "Welcome to IronLog! Let's get you set up with your first workout plan.",
+                    placement: "center",
+                    disableBeacon: true,
+                },
+                {
+                    target: ".tour-profile",
+                    content: "This is your profile. You can check your stats and adjust settings here.",
+                    placement: "bottom",
+                },
+                {
+                    target: ".tour-create-split",
+                    content: "Start your journey right here. Tap this to build your first split!",
+                    placement: "top",
+                }
+            ]);
+        } else if (isSplitsList && !phase2Done && phase1Done) {
+            return startTourWhenReady(".tour-new-split", [
+                {
+                    target: ".tour-new-split",
+                    content: "Tap 'NEW' to create and name your first split.",
+                    placement: "bottom",
+                    disableBeacon: true,
+                }
+            ]);
+        } else {
+            setRun(false);
+        }
     }, [location.pathname]);
 
     const handleJoyrideCallback = (data: CallBackProps) => {
