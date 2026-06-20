@@ -63,6 +63,7 @@ export function HomePage() {
                 navigate("/");
             }
         } else {
+            localStorage.setItem("tour_phase_1_done", "true");
             navigate("/splits");
         }
     };

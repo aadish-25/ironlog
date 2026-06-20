@@ -59,7 +59,10 @@ export function SplitsPage() {
             ) : view === "list" ? (
                 <div className="overflow-y-auto pb-[90px] no-scrollbar">
                     {/* ── Header ── */}
-                    <SplitsHeader onOpenCreateModal={() => setView("create")} />
+                    <SplitsHeader onOpenCreateModal={() => {
+                        localStorage.setItem("tour_phase_2_done", "true");
+                        setView("create");
+                    }} />
 
                     <p className="px-5 pb-4 text-xs text-ghost">
                         Manage your training programmes
