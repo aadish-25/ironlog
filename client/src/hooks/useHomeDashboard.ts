@@ -112,7 +112,7 @@ export function useHomeDashboard() {
     const volumeKg = todaySession?.total_volume || 0;
     
     // Group newPRs by name and take the max kg
-    const rawPRs = todaySession?.pr_details || [];
+    const rawPRs = (todaySession as any)?.pr_details || [];
     const uniquePRsMap = rawPRs.reduce((acc: any, pr: any) => {
         if (!acc[pr.name] || pr.kg > acc[pr.name].kg) {
             acc[pr.name] = pr;

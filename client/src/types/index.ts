@@ -1,4 +1,3 @@
-// ─── User ─────────────────────────────────────────────────────────────────────
 export type User = {
   id: string;
   clerk_id: string;
@@ -6,6 +5,8 @@ export type User = {
   email: string;
   unit: "kg" | "lbs";
   accent_color: string;
+  profile_picture_url?: string;
+  notifications_enabled?: boolean;
   created_at: string;
 };
 

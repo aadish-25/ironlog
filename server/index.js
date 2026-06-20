@@ -23,6 +23,10 @@ const allowedOrigins = [
     "https://192.168.1.5:5173" 
 ];
 
+if (process.env.CLIENT_URL) {
+    allowedOrigins.push(process.env.CLIENT_URL);
+}
+
 app.use(
     cors({
         origin: allowedOrigins,
@@ -66,3 +70,6 @@ app.use("/api/exercise", exerciseRoutes);
 app.use("/api/split-day-exercises", splitDayExercisesRoutes);
 app.use("/api/sessions", sessionsRouter);
 app.use("/api/sets", setsRoutes);
+
+// Export for Vercel Serverless
+export default app;
