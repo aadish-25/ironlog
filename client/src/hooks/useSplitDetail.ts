@@ -41,7 +41,6 @@ export function useSplitDetail(splitId: string) {
         if (actionLoading) return;
         setActionLoading(true);
         try {
-            await updateSplitDay(dayId, updates);
             // Optimistic update
             setSplit(prev => {
                 if (!prev) return prev;
@@ -50,6 +49,7 @@ export function useSplitDetail(splitId: string) {
                     days: prev.days.map(d => d.id === dayId ? { ...d, ...updates } : d)
                 };
             });
+            await updateSplitDay(dayId, updates);
         } catch (err) {
             console.error(err);
             fetchSplit(); // rollback on error
@@ -107,7 +107,6 @@ export function useSplitDetail(splitId: string) {
         if (actionLoading) return;
         setActionLoading(true);
         try {
-            await removeExerciseFromDay(splitDayExerciseId);
             // Optimistic update
             setSplit(prev => {
                 if (!prev) return prev;
@@ -124,6 +123,7 @@ export function useSplitDetail(splitId: string) {
                     })
                 };
             });
+            await removeExerciseFromDay(splitDayExerciseId);
         } catch (err) {
             console.error(err);
             fetchSplit();
@@ -149,8 +149,8 @@ export function useSplitDetail(splitId: string) {
         if (actionLoading) return;
         setActionLoading(true);
         try {
-            await updateSplit(splitId, newName);
             setSplit(prev => prev ? { ...prev, name: newName } : prev);
+            await updateSplit(splitId, newName);
         } catch (err) {
             console.error(err);
             fetchSplit();
