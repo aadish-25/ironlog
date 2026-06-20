@@ -1,4 +1,5 @@
 export interface SessionSummary {
+  id: string;
   date: string;
   name: string;
   volumeKg: number;

@@ -6,7 +6,7 @@ import { completeSession } from "../services/sessions";
 import type { Session, SessionExercise } from "../types";
 
 export function useSession(sessionId: string | null) {
-    const { data: sessionData, error: swrError, isLoading, mutate } = useSWR<Session>(
+    const { data: sessionData, error: swrError, isLoading, mutate } = useSWR<Session & { exercises: SessionExercise[] }>(
         sessionId ? `/sessions/${sessionId}` : null,
         fetcher
     );

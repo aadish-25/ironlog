@@ -249,7 +249,7 @@ const getMissedSessionsService = async (userId) => {
 const getSessionsHistoryService = async (userId, limit, offset) => {
     try {
         const result = await pool.query(
-            `SELECT sessions.date, split_days.label as name, 
+            `SELECT sessions.id, sessions.date, split_days.label as name, 
             COALESCE(SUM(sets.weight_kg * sets.reps), 0) as "volumeKg"
             FROM sessions
             LEFT JOIN split_days ON sessions.split_day_id = split_days.id
