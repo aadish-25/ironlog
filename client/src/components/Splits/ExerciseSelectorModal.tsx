@@ -133,7 +133,7 @@ export function ExerciseSelectorModal({
                 <button 
                     onClick={handleAdd} 
                     disabled={selectedExerciseIds.size === 0}
-                    className={`text-sm font-semibold tracking-wide ${selectedExerciseIds.size > 0 ? 'text-heat' : 'text-[#444]'}`}
+                    className={`text-sm font-semibold tracking-wide cursor-pointer disabled:cursor-default transition-opacity hover:opacity-80 disabled:hover:opacity-100 ${selectedExerciseIds.size > 0 ? 'text-heat' : 'text-[#444]'}`}
                 >
                     ADD ({selectedExerciseIds.size})
                 </button>
