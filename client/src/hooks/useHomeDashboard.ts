@@ -132,12 +132,26 @@ export function useHomeDashboard() {
         if (!activeSplitDay || actionLoading) return null;
         setActionLoading(true);
         try {
+            // Optimistic Update
+            const fakeSession = {
+                id: `temp-${Date.now()}`,
+                split_day_id: activeSplitDay.id,
+                split_day_label: activeSplitDay.label,
+                started_at: new Date().toISOString(),
+                is_skipped: false,
+                total_volume: 0,
+                sets_logged: 0,
+                is_completed: false
+            };
+            mutate("/sessions", (current: any) => [...(current || []), fakeSession], false);
+
             const session = await createSession(activeSplitDay.id, todayStr);
             mutate("/sessions");
             mutate("/users/me/stats");
             return session;
         } catch (err) {
             console.error(err);
+            mutate("/sessions"); // rollback
             return null;
         } finally {
             setActionLoading(false);
@@ -148,11 +162,26 @@ export function useHomeDashboard() {
         if (!activeSplitDay || actionLoading) return null;
         setActionLoading(true);
         try {
+            // Optimistic update
+            const fakeSession = {
+                id: `temp-${Date.now()}`,
+                split_day_id: activeSplitDay.id,
+                split_day_label: activeSplitDay.label,
+                started_at: new Date().toISOString(),
+                ended_at: new Date().toISOString(),
+                is_skipped: true,
+                total_volume: 0,
+                sets_logged: 0,
+                is_completed: true
+            };
+            mutate("/sessions", (current: any) => [...(current || []), fakeSession], false);
+
             await createSession(activeSplitDay.id, todayStr, true);
             mutate("/sessions");
             mutate("/users/me/stats");
         } catch (err) {
             console.error(err);
+            mutate("/sessions"); // rollback
         } finally {
             setActionLoading(false);
         }
@@ -162,9 +191,15 @@ export function useHomeDashboard() {
         if (!todaySession || actionLoading) return;
         setActionLoading(true);
         try {
+            // Optimistic Update
+            mutate("/sessions", (current: any) => current?.filter((s: any) => s.id !== todaySession.id), false);
+            
             await deleteSession(todaySession.id);
             mutate("/sessions");
             mutate("/users/me/stats");
+        } catch (err) {
+            console.error(err);
+            mutate("/sessions"); // rollback
         } finally {
             setActionLoading(false);
         }
