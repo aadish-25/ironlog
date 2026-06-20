@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import Joyride, { STATUS, EVENTS } from "react-joyride";
+import { Joyride, STATUS, EVENTS } from "react-joyride";
 import type { Step, CallBackProps } from "react-joyride";
 
 export function ProductTour() {
