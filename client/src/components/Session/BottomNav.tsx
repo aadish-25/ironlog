@@ -26,6 +26,7 @@ export function BottomNav({
 }: BottomNavProps) {
   return (
     <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-card border-t border-border p-[12px_20px_34px] flex flex-col gap-2 z-50">
+      
       {/* Swap / Add buttons */}
       <div className="flex gap-2">
         <button
@@ -65,28 +66,16 @@ export function BottomNav({
           </span>
         </div>
 
-        {currentExerciseIndex >= totalExercises - 1 ? (
-          <button
-            onClick={onNextExercise}
-            disabled={sessionSetsLogged === 0}
-            className={`w-[44px] h-[44px] rounded-[10px] border-none flex items-center justify-center shrink-0 transition-opacity ${
-              sessionSetsLogged === 0 
-                ? "bg-[#333] cursor-not-allowed opacity-50" 
-                : "bg-done cursor-pointer hover:opacity-90"
-            }`}
-            aria-label="Finish session"
-          >
-            <Check size={22} className={sessionSetsLogged === 0 ? "text-ghost" : "text-[#0f0f0f]"} strokeWidth={3} />
-          </button>
-        ) : (
-          <button
-            onClick={onNextExercise}
-            className="w-[44px] h-[44px] rounded-[10px] bg-heat border-none flex items-center justify-center shrink-0 transition-opacity cursor-pointer hover:opacity-90"
-            aria-label="Next exercise"
-          >
-            <ChevronRight size={22} className="text-white" strokeWidth={2.5} />
-          </button>
-        )}
+        <button
+          onClick={onNextExercise}
+          disabled={currentExerciseIndex >= totalExercises - 1}
+          className={`w-[44px] h-[44px] rounded-[10px] bg-heat border-none flex items-center justify-center shrink-0 transition-opacity ${
+            currentExerciseIndex >= totalExercises - 1 ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:opacity-90"
+          }`}
+          aria-label="Next exercise"
+        >
+          <ChevronRight size={22} className="text-white" strokeWidth={2.5} />
+        </button>
       </div>
     </div>
   );

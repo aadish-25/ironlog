@@ -7,6 +7,7 @@ interface SessionHeaderProps {
   totalSets: number;
   progressPercent: number;
   onEndSession: () => void;
+  onFinishWorkout: () => void;
 }
 
 export function SessionHeader({
@@ -15,31 +16,34 @@ export function SessionHeader({
   totalSets,
   progressPercent,
   onEndSession,
+  onFinishWorkout,
 }: SessionHeaderProps) {
   return (
     <>
-      <header className="flex items-center justify-between px-5 pt-[52px] pb-3.5 border-b border-border shrink-0">
+      <header className="flex items-center justify-between px-5 pt-5 pb-3.5 border-b border-border shrink-0">
         <button
           onClick={onEndSession}
-          className="w-8 h-8 rounded bg-raised border border-border flex items-center justify-center cursor-pointer"
-          aria-label="End session"
+          className="w-8 h-8 rounded bg-raised border border-border flex items-center justify-center cursor-pointer hover:bg-raised/80"
+          aria-label="Exit session"
         >
           <ChevronLeft size={16} className="text-dim" strokeWidth={2} />
         </button>
 
-        <h1 className="font-display text-base font-bold tracking-widest">
-          {splitDayName ?? "SESSION"}
-        </h1>
-
-        {/* Sets counter */}
-        <div className="text-right leading-none" aria-label="Sets progress">
-          <span className="font-display text-[22px] text-white tracking-[1px]">
-            {completedSets}
+        <div className="flex flex-col items-center">
+          <h1 className="font-display text-base font-bold tracking-widest leading-none">
+            {splitDayName ?? "SESSION"}
+          </h1>
+          <span className="font-body text-[10px] text-ghost mt-1.5 tracking-wider uppercase">
+            {completedSets} / {totalSets} SETS
           </span>
-          <small className="font-body text-[10px] text-ghost/50 tracking-[1px] uppercase ml-0.5">
-            / {totalSets} SETS
-          </small>
         </div>
+
+        <button
+          onClick={onFinishWorkout}
+          className="h-8 px-3 rounded bg-done text-[#0f0f0f] font-display text-xs tracking-[1.5px] font-bold cursor-pointer hover:opacity-90 flex items-center justify-center shadow-md shadow-done/20"
+        >
+          FINISH
+        </button>
       </header>
 
       {/* ── Progress bar ── */}

@@ -78,7 +78,6 @@ export function ExercisePicker({
             strokeWidth={1.5}
           />
           <input
-            autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search exercises…"
