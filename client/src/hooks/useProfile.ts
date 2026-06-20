@@ -1,44 +1,22 @@
-import { useState, useEffect, useMemo } from "react";
-import { getUserStats, type UserStats } from "../services/users";
+import { useMemo } from "react";
+import useSWR from "swr";
+import axios from "axios";
+import { fetcher } from "../services/api";
+import { type UserStats } from "../services/users";
 import { useCurrentUser } from "./useCurrentUser";
 
 export function useProfile() {
     const { user, loading: userLoading } = useCurrentUser();
-    const [stats, setStats] = useState<UserStats | null>(null);
-    const [loadingStats, setLoadingStats] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    
+    const { data: stats, error: swrError, isLoading: loadingStats } = useSWR<UserStats>(
+        user ? "/users/me/stats" : null,
+        fetcher
+    );
 
-    useEffect(() => {
-        let isMounted = true;
-        const fetchStats = async () => {
-            try {
-                setLoadingStats(true);
-                const data = await getUserStats();
-                if (isMounted) {
-                    setStats(data);
-                }
-            } catch (err: any) {
-                if (isMounted) {
-                    setError(err.message || "Failed to load profile stats");
-                }
-            } finally {
-                if (isMounted) {
-                    setLoadingStats(false);
-                }
-            }
-        };
-
-        if (user) {
-            fetchStats();
-        } else if (!userLoading) {
-            if (isMounted) {
-                setLoadingStats(false);
-            }
-        }
-        return () => {
-            isMounted = false;
-        };
-    }, [user, userLoading]);
+    let error: string | null = null;
+    if (swrError) {
+        error = axios.isAxiosError(swrError) ? swrError.response?.data?.message ?? swrError.message : (swrError as Error).message;
+    }
 
     // Calculate days since joined
     const daysSinceJoined = useMemo(() => {
@@ -53,7 +31,7 @@ export function useProfile() {
 
     return {
         user,
-        stats,
+        stats: stats || null,
         daysSinceJoined,
         memberSince,
         loading: userLoading || loadingStats,

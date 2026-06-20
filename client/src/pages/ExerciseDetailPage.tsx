@@ -11,9 +11,7 @@ export function ExerciseDetailPage() {
         progress, 
         loading, 
         error, 
-        fetchExerciseById, 
-        fetchExerciseProgress 
-    } = useExercises();
+    const { exercise, progress, loading, error, refetch } = useExercises(id);
 
     const [activeTab, setActiveTab] = useState<"info" | "records">("info");
     const [chartAxis, setChartAxis] = useState<"weight" | "volume">("weight");
@@ -22,12 +20,7 @@ export function ExerciseDetailPage() {
 
 
 
-    useEffect(() => {
-        if (id) {
-            fetchExerciseById(id);
-            fetchExerciseProgress(id);
-        }
-    }, [id, fetchExerciseById, fetchExerciseProgress]);
+
 
     if (loading && !exercise) {
         return (

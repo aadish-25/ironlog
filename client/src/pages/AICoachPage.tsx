@@ -81,9 +81,9 @@ export function AICoachPage() {
             <div className="w-16 h-16 rounded-full bg-raised border border-[#2a2a2a] flex items-center justify-center mb-5">
               <span className="text-2xl">🚧</span>
             </div>
-            <h3 className="text-white font-display text-xl tracking-[1px] mb-2">Work in Progress</h3>
+            <h3 className="text-white font-display text-xl tracking-[1px] mb-2">Coming Soon</h3>
             <p className="text-[#888] text-[13px] leading-relaxed max-w-[260px]">
-              The AI Coach chat feature is currently learning how to analyze your workouts. Check back soon!
+              We're hard at work building the AI Coach chat feature. It'll be ready for you soon!
             </p>
           </div>
         ) : (
