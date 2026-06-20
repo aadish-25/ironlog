@@ -165,14 +165,14 @@ export function ProductTour() {
             steps={steps}
             run={run}
             continuous
-            showProgress
-            showSkipButton
             tooltipComponent={CustomTooltip}
             onEvent={handleJoyrideCallback}
             options={{
                 arrowColor: '#121212', // matches bg-card roughly, though custom tooltip handles box
                 overlayColor: 'rgba(0, 0, 0, 0.7)', // Slightly lighter overlay
                 zIndex: 1000,
+                showProgress: true,
+                buttons: ['back', 'close', 'primary', 'skip'],
             }}
         />
     );
