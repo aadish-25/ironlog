@@ -1,15 +1,24 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Pencil } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
 import { useSplitDetail } from "../hooks/useSplitDetail";
+import { useSplit } from "../hooks/useSplit";
 import { ChevronRight } from "lucide-react";
 
 export function SplitDetailPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { split, loading, error, updateSplitName } = useSplitDetail(id!);
+    const { deleteUserSplit } = useSplit();
     const [isEditing, setIsEditing] = useState(false);
     const [editName, setEditName] = useState("");
+
+    const handleDeleteSplit = async () => {
+        if (window.confirm("Are you sure you want to delete this split? This cannot be undone.")) {
+            await deleteUserSplit(id!);
+            navigate("/splits");
+        }
+    };
 
     const handleSaveName = async () => {
         if (editName.trim() && editName.trim() !== split?.name) {
@@ -46,7 +55,7 @@ export function SplitDetailPage() {
             <div className="flex items-center gap-4 px-5 py-[14px] bg-bg sticky top-0 z-20 shrink-0 border-b border-[#1f1f1f]">
                 <button 
                     onClick={() => navigate("/splits")}
-                    className="w-10 h-10 bg-[#161616] rounded-[10px] flex items-center justify-center text-[#888] cursor-pointer hover:bg-[#1f1f1f] transition-colors"
+                    className="w-10 h-10 bg-[#161616] rounded-[10px] flex items-center justify-center text-[#888] cursor-pointer hover:bg-[#1f1f1f] transition-colors shrink-0"
                 >
                     <ArrowLeft size={20} />
                 </button>
@@ -71,6 +80,13 @@ export function SplitDetailPage() {
                         </div>
                     )}
                 </div>
+                <button 
+                    onClick={handleDeleteSplit}
+                    className="w-10 h-10 bg-[#1a0f0f] rounded-[10px] flex items-center justify-center text-[#e05252] cursor-pointer hover:bg-[#2a1616] transition-colors shrink-0"
+                    aria-label="Delete split"
+                >
+                    <Trash2 size={18} />
+                </button>
             </div>
 
             {/* Content */}
