@@ -37,7 +37,7 @@ app.use(
 app.use(clerkMiddleware());
 
 app.get("/", (req, res) => {
-    res.send("<h1>Hello World</h1>");
+    res.send("<h1>Phase 1 complete!!</h1>");
 });
 
 app.get("/protected", auth, (req, res) => {
