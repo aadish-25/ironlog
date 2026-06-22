@@ -1,8 +1,13 @@
 [
     {
         "name": "Barbell Bench Press",
-        "muscle_groups": ["chest"],
-        "equipment": ["barbell", "bench"],
+        "muscle_groups": [
+            "chest"
+        ],
+        "equipment": [
+            "barbell",
+            "bench"
+        ],
         "description": "A foundational pressing movement for building overall chest strength and size. Keep your shoulder blades retracted to protect the shoulders.",
         "form_guide": [
             {
@@ -25,8 +30,13 @@
     },
     {
         "name": "Incline Bench Press",
-        "muscle_groups": ["chest"],
-        "equipment": ["barbell", "incline bench"],
+        "muscle_groups": [
+            "chest"
+        ],
+        "equipment": [
+            "barbell",
+            "incline bench"
+        ],
         "description": "Targets the upper chest and front delts with a steeper pressing angle. Use controlled reps to keep tension on the pecs.",
         "form_guide": [
             {
@@ -49,8 +59,13 @@
     },
     {
         "name": "Dumbbell Bench Press",
-        "muscle_groups": ["chest"],
-        "equipment": ["dumbbells", "bench"],
+        "muscle_groups": [
+            "chest"
+        ],
+        "equipment": [
+            "dumbbells",
+            "bench"
+        ],
         "description": "Allows greater range of motion and independent arm control for chest development. Keep the dumbbells balanced through the full press.",
         "form_guide": [
             {
@@ -73,8 +88,12 @@
     },
     {
         "name": "Machine Chest Press",
-        "muscle_groups": ["chest"],
-        "equipment": ["chest press machine"],
+        "muscle_groups": [
+            "chest"
+        ],
+        "equipment": [
+            "chest press machine"
+        ],
         "description": "A stable pressing variation that helps isolate the chest with less balance demand. Great for controlled hypertrophy work.",
         "form_guide": [
             {
@@ -97,8 +116,12 @@
     },
     {
         "name": "Cable Fly",
-        "muscle_groups": ["chest"],
-        "equipment": ["cable machine"],
+        "muscle_groups": [
+            "chest"
+        ],
+        "equipment": [
+            "cable machine"
+        ],
         "description": "Emphasizes chest contraction through an arcing motion and constant cable tension. Keep a soft bend in the elbows throughout.",
         "form_guide": [
             {
@@ -121,8 +144,12 @@
     },
     {
         "name": "Pec Deck Fly",
-        "muscle_groups": ["chest"],
-        "equipment": ["pec deck machine"],
+        "muscle_groups": [
+            "chest"
+        ],
+        "equipment": [
+            "pec deck machine"
+        ],
         "description": "A machine fly that isolates the chest with a fixed movement path. Focus on squeezing your pecs rather than moving heavy weight.",
         "form_guide": [
             {
@@ -145,8 +172,12 @@
     },
     {
         "name": "Push Up",
-        "muscle_groups": ["chest"],
-        "equipment": ["bodyweight"],
+        "muscle_groups": [
+            "chest"
+        ],
+        "equipment": [
+            "bodyweight"
+        ],
         "description": "A classic bodyweight press that builds chest, triceps, and core stability. Keep your body in a straight line from head to heels.",
         "form_guide": [
             {
@@ -169,8 +200,13 @@
     },
     {
         "name": "Chest Dip",
-        "muscle_groups": ["chest"],
-        "equipment": ["dip bars", "bodyweight"],
+        "muscle_groups": [
+            "chest"
+        ],
+        "equipment": [
+            "dip bars",
+            "bodyweight"
+        ],
         "description": "A dip variation biased toward chest by leaning the torso forward. Use a controlled descent to avoid shoulder irritation.",
         "form_guide": [
             {
@@ -193,8 +229,12 @@
     },
     {
         "name": "Deadlift",
-        "muscle_groups": ["back"],
-        "equipment": ["barbell"],
+        "muscle_groups": [
+            "back"
+        ],
+        "equipment": [
+            "barbell"
+        ],
         "description": "A full posterior-chain lift that strongly develops back strength and total-body power. Prioritize a neutral spine and tight setup.",
         "form_guide": [
             {
@@ -217,8 +257,13 @@
     },
     {
         "name": "Pull Up",
-        "muscle_groups": ["back"],
-        "equipment": ["pull-up bar", "bodyweight"],
+        "muscle_groups": [
+            "back"
+        ],
+        "equipment": [
+            "pull-up bar",
+            "bodyweight"
+        ],
         "description": "A bodyweight vertical pull that builds lats and upper-back strength. Use full range and avoid swinging for best results.",
         "form_guide": [
             {
@@ -233,13 +278,20 @@
                 "step": 3,
                 "instruction": "Pull chest toward the bar by driving elbows down."
             },
-            { "step": 4, "instruction": "Lower to a dead hang with control." }
+            {
+                "step": 4,
+                "instruction": "Lower to a dead hang with control."
+            }
         ]
     },
     {
-        "name": "Lat Pulldown",
-        "muscle_groups": ["back"],
-        "equipment": ["lat pulldown machine"],
+        "name": "Lat Pulldown Wide",
+        "muscle_groups": [
+            "back"
+        ],
+        "equipment": [
+            "machine"
+        ],
         "description": "A scalable vertical pulling movement targeting the lats and upper back. Keep torso stable and pull with your elbows.",
         "form_guide": [
             {
@@ -262,8 +314,12 @@
     },
     {
         "name": "Barbell Row",
-        "muscle_groups": ["back"],
-        "equipment": ["barbell"],
+        "muscle_groups": [
+            "back"
+        ],
+        "equipment": [
+            "barbell"
+        ],
         "description": "A horizontal pull that builds thickness in the mid and upper back. Maintain a strong hinge and minimize torso momentum.",
         "form_guide": [
             {
@@ -286,8 +342,12 @@
     },
     {
         "name": "Seated Cable Row",
-        "muscle_groups": ["back"],
-        "equipment": ["cable row machine"],
+        "muscle_groups": [
+            "back"
+        ],
+        "equipment": [
+            "cable row machine"
+        ],
         "description": "A controlled row variation for mid-back and lats using constant cable tension. Avoid leaning excessively to keep the back doing the work.",
         "form_guide": [
             {
@@ -310,8 +370,12 @@
     },
     {
         "name": "T-Bar Row",
-        "muscle_groups": ["back"],
-        "equipment": ["t-bar row machine"],
+        "muscle_groups": [
+            "back"
+        ],
+        "equipment": [
+            "t-bar row machine"
+        ],
         "description": "Targets the mid-back with a stable row path and heavy loading potential. Keep your chest supported or torso fixed for strict reps.",
         "form_guide": [
             {
@@ -334,8 +398,12 @@
     },
     {
         "name": "Machine Row",
-        "muscle_groups": ["back"],
-        "equipment": ["row machine"],
+        "muscle_groups": [
+            "back"
+        ],
+        "equipment": [
+            "row machine"
+        ],
         "description": "A guided rowing movement useful for isolating upper and mid-back muscles. Focus on scapular retraction at peak contraction.",
         "form_guide": [
             {
@@ -358,8 +426,14 @@
     },
     {
         "name": "Face Pull",
-        "muscle_groups": ["back", "shoulders"],
-        "equipment": ["cable machine", "rope attachment"],
+        "muscle_groups": [
+            "back",
+            "shoulders"
+        ],
+        "equipment": [
+            "cable machine",
+            "rope attachment"
+        ],
         "description": "Strengthens rear delts and upper back while supporting shoulder health. Keep elbows high and externally rotate at the end range.",
         "form_guide": [
             {
@@ -382,8 +456,12 @@
     },
     {
         "name": "Overhead Press",
-        "muscle_groups": ["shoulders"],
-        "equipment": ["barbell"],
+        "muscle_groups": [
+            "shoulders"
+        ],
+        "equipment": [
+            "barbell"
+        ],
         "description": "A primary compound movement for shoulder and triceps strength. Keep ribs down and press in a vertical bar path.",
         "form_guide": [
             {
@@ -405,9 +483,13 @@
         ]
     },
     {
-        "name": "Dumbbell Press",
-        "muscle_groups": ["shoulders"],
-        "equipment": ["dumbbells", "bench"],
+        "name": "Seated Dumbbell Shoulder Press",
+        "muscle_groups": [
+            "shoulders"
+        ],
+        "equipment": [
+            "dumbbell"
+        ],
         "description": "Develops the shoulders with independent arm motion and improved stability demand. Use full control to avoid lower-back compensation.",
         "form_guide": [
             {
@@ -422,13 +504,21 @@
                 "step": 3,
                 "instruction": "Press dumbbells overhead until arms are extended."
             },
-            { "step": 4, "instruction": "Lower back to shoulder level slowly." }
+            {
+                "step": 4,
+                "instruction": "Lower back to shoulder level slowly."
+            }
         ]
     },
     {
         "name": "Arnold Press",
-        "muscle_groups": ["shoulders"],
-        "equipment": ["dumbbells", "bench"],
+        "muscle_groups": [
+            "shoulders"
+        ],
+        "equipment": [
+            "dumbbells",
+            "bench"
+        ],
         "description": "A rotational shoulder press that increases anterior and medial delt involvement. Perform smoothly to keep constant tension.",
         "form_guide": [
             {
@@ -451,8 +541,12 @@
     },
     {
         "name": "Lateral Raise",
-        "muscle_groups": ["shoulders"],
-        "equipment": ["dumbbells"],
+        "muscle_groups": [
+            "shoulders"
+        ],
+        "equipment": [
+            "dumbbells"
+        ],
         "description": "Isolates the side delts to build shoulder width and shape. Keep the lift strict and avoid swinging.",
         "form_guide": [
             {
@@ -475,8 +569,12 @@
     },
     {
         "name": "Cable Lateral Raise",
-        "muscle_groups": ["shoulders"],
-        "equipment": ["cable machine"],
+        "muscle_groups": [
+            "shoulders"
+        ],
+        "equipment": [
+            "cable machine"
+        ],
         "description": "Provides continuous tension on the side delts through the full range. Great for controlled hypertrophy work with lighter loads.",
         "form_guide": [
             {
@@ -499,8 +597,13 @@
     },
     {
         "name": "Rear Delt Fly",
-        "muscle_groups": ["shoulders"],
-        "equipment": ["dumbbells", "bench"],
+        "muscle_groups": [
+            "shoulders"
+        ],
+        "equipment": [
+            "dumbbells",
+            "bench"
+        ],
         "description": "Targets the rear delts and upper back for balanced shoulder development. Keep motion wide and controlled.",
         "form_guide": [
             {
@@ -523,15 +626,22 @@
     },
     {
         "name": "Reverse Pec Deck",
-        "muscle_groups": ["shoulders"],
-        "equipment": ["pec deck machine"],
+        "muscle_groups": [
+            "shoulders"
+        ],
+        "equipment": [
+            "pec deck machine"
+        ],
         "description": "A machine-based rear delt movement that limits cheating. Focus on driving through elbows and squeezing upper back.",
         "form_guide": [
             {
                 "step": 1,
                 "instruction": "Sit facing the machine pad and grip handles at shoulder height."
             },
-            { "step": 2, "instruction": "Keep chest tall and shoulders down." },
+            {
+                "step": 2,
+                "instruction": "Keep chest tall and shoulders down."
+            },
             {
                 "step": 3,
                 "instruction": "Pull arms outward and back until shoulder blades contract."
@@ -544,8 +654,13 @@
     },
     {
         "name": "Shrug",
-        "muscle_groups": ["shoulders", "back"],
-        "equipment": ["dumbbells"],
+        "muscle_groups": [
+            "shoulders",
+            "back"
+        ],
+        "equipment": [
+            "dumbbells"
+        ],
         "description": "Builds upper traps and neck support strength through scapular elevation. Use controlled range and avoid rolling the shoulders.",
         "form_guide": [
             {
@@ -556,7 +671,10 @@
                 "step": 2,
                 "instruction": "Elevate shoulders straight up toward your ears."
             },
-            { "step": 3, "instruction": "Pause briefly at peak contraction." },
+            {
+                "step": 3,
+                "instruction": "Pause briefly at peak contraction."
+            },
             {
                 "step": 4,
                 "instruction": "Lower shoulders back to neutral under control."
@@ -565,8 +683,12 @@
     },
     {
         "name": "Barbell Curl",
-        "muscle_groups": ["biceps"],
-        "equipment": ["barbell"],
+        "muscle_groups": [
+            "biceps"
+        ],
+        "equipment": [
+            "barbell"
+        ],
         "description": "A staple arm exercise for building overall biceps mass. Keep elbows fixed by your sides throughout the rep.",
         "form_guide": [
             {
@@ -589,8 +711,12 @@
     },
     {
         "name": "EZ Bar Curl",
-        "muscle_groups": ["biceps"],
-        "equipment": ["ez bar"],
+        "muscle_groups": [
+            "biceps"
+        ],
+        "equipment": [
+            "ez bar"
+        ],
         "description": "A curl variation with wrist-friendly grip angles that still heavily targets the biceps. Control both lift and lowering phases.",
         "form_guide": [
             {
@@ -601,7 +727,10 @@
                 "step": 2,
                 "instruction": "Stand tall and set elbows close to your sides."
             },
-            { "step": 3, "instruction": "Curl bar up toward upper chest." },
+            {
+                "step": 3,
+                "instruction": "Curl bar up toward upper chest."
+            },
             {
                 "step": 4,
                 "instruction": "Lower to full extension without shoulder sway."
@@ -610,8 +739,12 @@
     },
     {
         "name": "Dumbbell Curl",
-        "muscle_groups": ["biceps"],
-        "equipment": ["dumbbells"],
+        "muscle_groups": [
+            "biceps"
+        ],
+        "equipment": [
+            "dumbbells"
+        ],
         "description": "Allows unilateral control and supination for strong biceps contraction. Keep upper arm position stable to reduce cheating.",
         "form_guide": [
             {
@@ -622,7 +755,10 @@
                 "step": 2,
                 "instruction": "Curl up while rotating palms to face upward."
             },
-            { "step": 3, "instruction": "Squeeze biceps at the top." },
+            {
+                "step": 3,
+                "instruction": "Squeeze biceps at the top."
+            },
             {
                 "step": 4,
                 "instruction": "Lower slowly and rotate back to neutral."
@@ -631,15 +767,23 @@
     },
     {
         "name": "Hammer Curl",
-        "muscle_groups": ["biceps", "forearms"],
-        "equipment": ["dumbbells"],
+        "muscle_groups": [
+            "biceps",
+            "forearms"
+        ],
+        "equipment": [
+            "dumbbells"
+        ],
         "description": "Targets brachialis and brachioradialis for fuller arm development. Neutral grip helps reduce wrist strain.",
         "form_guide": [
             {
                 "step": 1,
                 "instruction": "Hold dumbbells with palms facing each other."
             },
-            { "step": 2, "instruction": "Keep elbows close and torso still." },
+            {
+                "step": 2,
+                "instruction": "Keep elbows close and torso still."
+            },
             {
                 "step": 3,
                 "instruction": "Curl weights up while maintaining neutral grip."
@@ -652,8 +796,13 @@
     },
     {
         "name": "Incline Dumbbell Curl",
-        "muscle_groups": ["biceps"],
-        "equipment": ["dumbbells", "incline bench"],
+        "muscle_groups": [
+            "biceps"
+        ],
+        "equipment": [
+            "dumbbells",
+            "incline bench"
+        ],
         "description": "Stretches the biceps at the bottom for strong hypertrophy stimulus. Keep shoulders pinned back on the bench.",
         "form_guide": [
             {
@@ -668,13 +817,21 @@
                 "step": 3,
                 "instruction": "Curl dumbbells upward without moving shoulders."
             },
-            { "step": 4, "instruction": "Lower slowly to a full stretch." }
+            {
+                "step": 4,
+                "instruction": "Lower slowly to a full stretch."
+            }
         ]
     },
     {
         "name": "Preacher Curl",
-        "muscle_groups": ["biceps"],
-        "equipment": ["preacher bench", "ez bar"],
+        "muscle_groups": [
+            "biceps"
+        ],
+        "equipment": [
+            "preacher bench",
+            "ez bar"
+        ],
         "description": "An isolation curl that limits momentum and emphasizes biceps peak tension. Move deliberately to protect the elbows.",
         "form_guide": [
             {
@@ -689,13 +846,21 @@
                 "step": 3,
                 "instruction": "Curl bar upward until forearms are nearly vertical."
             },
-            { "step": 4, "instruction": "Lower slowly to near full extension." }
+            {
+                "step": 4,
+                "instruction": "Lower slowly to near full extension."
+            }
         ]
     },
     {
         "name": "Cable Curl",
-        "muscle_groups": ["biceps"],
-        "equipment": ["cable machine", "straight bar attachment"],
+        "muscle_groups": [
+            "biceps"
+        ],
+        "equipment": [
+            "cable machine",
+            "straight bar attachment"
+        ],
         "description": "Maintains continuous tension on the biceps through the full motion. Keep elbows fixed to maximize isolation.",
         "form_guide": [
             {
@@ -718,8 +883,13 @@
     },
     {
         "name": "Concentration Curl",
-        "muscle_groups": ["biceps"],
-        "equipment": ["dumbbell", "bench"],
+        "muscle_groups": [
+            "biceps"
+        ],
+        "equipment": [
+            "dumbbell",
+            "bench"
+        ],
         "description": "A strict single-arm curl that enhances mind-muscle connection in the biceps. Great for finishing sets with high control.",
         "form_guide": [
             {
@@ -734,20 +904,31 @@
                 "step": 3,
                 "instruction": "Curl dumbbell up toward shoulder without moving upper arm."
             },
-            { "step": 4, "instruction": "Lower slowly to full extension." }
+            {
+                "step": 4,
+                "instruction": "Lower slowly to full extension."
+            }
         ]
     },
     {
         "name": "Rope Pushdown",
-        "muscle_groups": ["triceps"],
-        "equipment": ["cable machine", "rope attachment"],
+        "muscle_groups": [
+            "triceps"
+        ],
+        "equipment": [
+            "cable machine",
+            "rope attachment"
+        ],
         "description": "A triceps isolation movement that emphasizes full elbow extension. Spread the rope at the bottom for stronger contraction.",
         "form_guide": [
             {
                 "step": 1,
                 "instruction": "Attach rope to high pulley and stand with slight forward lean."
             },
-            { "step": 2, "instruction": "Keep elbows pinned near your sides." },
+            {
+                "step": 2,
+                "instruction": "Keep elbows pinned near your sides."
+            },
             {
                 "step": 3,
                 "instruction": "Push rope down until arms are straight and hands separate."
@@ -760,8 +941,13 @@
     },
     {
         "name": "Overhead Cable Extension",
-        "muscle_groups": ["triceps"],
-        "equipment": ["cable machine", "rope attachment"],
+        "muscle_groups": [
+            "triceps"
+        ],
+        "equipment": [
+            "cable machine",
+            "rope attachment"
+        ],
         "description": "Targets the long head of the triceps in a stretched overhead position. Keep upper arms stable and avoid flaring too much.",
         "form_guide": [
             {
@@ -784,15 +970,23 @@
     },
     {
         "name": "Skull Crusher",
-        "muscle_groups": ["triceps"],
-        "equipment": ["ez bar", "bench"],
+        "muscle_groups": [
+            "triceps"
+        ],
+        "equipment": [
+            "ez bar",
+            "bench"
+        ],
         "description": "A lying triceps extension that strongly loads the elbow extensors. Use controlled tempo to protect elbows.",
         "form_guide": [
             {
                 "step": 1,
                 "instruction": "Lie on a bench holding EZ bar above chest with arms straight."
             },
-            { "step": 2, "instruction": "Keep upper arms mostly vertical." },
+            {
+                "step": 2,
+                "instruction": "Keep upper arms mostly vertical."
+            },
             {
                 "step": 3,
                 "instruction": "Lower bar toward forehead by bending elbows."
@@ -805,8 +999,14 @@
     },
     {
         "name": "Close Grip Bench Press",
-        "muscle_groups": ["triceps", "chest"],
-        "equipment": ["barbell", "bench"],
+        "muscle_groups": [
+            "triceps",
+            "chest"
+        ],
+        "equipment": [
+            "barbell",
+            "bench"
+        ],
         "description": "A compound press that shifts emphasis to triceps using a narrower grip. Keep wrists stacked and elbows controlled.",
         "form_guide": [
             {
@@ -829,8 +1029,13 @@
     },
     {
         "name": "Bench Dip",
-        "muscle_groups": ["triceps"],
-        "equipment": ["bench", "bodyweight"],
+        "muscle_groups": [
+            "triceps"
+        ],
+        "equipment": [
+            "bench",
+            "bodyweight"
+        ],
         "description": "A bodyweight triceps movement using a bench for support. Keep shoulders down and range controlled.",
         "form_guide": [
             {
@@ -845,13 +1050,22 @@
                 "step": 3,
                 "instruction": "Lower body by bending elbows to roughly 90 degrees."
             },
-            { "step": 4, "instruction": "Press back up by extending elbows." }
+            {
+                "step": 4,
+                "instruction": "Press back up by extending elbows."
+            }
         ]
     },
     {
         "name": "Parallel Bar Dip",
-        "muscle_groups": ["triceps", "chest"],
-        "equipment": ["dip bars", "bodyweight"],
+        "muscle_groups": [
+            "triceps",
+            "chest"
+        ],
+        "equipment": [
+            "dip bars",
+            "bodyweight"
+        ],
         "description": "A compound upper-body movement with strong triceps involvement when kept upright. Control depth to match shoulder comfort.",
         "form_guide": [
             {
@@ -874,8 +1088,13 @@
     },
     {
         "name": "Tricep Kickback",
-        "muscle_groups": ["triceps"],
-        "equipment": ["dumbbell", "bench"],
+        "muscle_groups": [
+            "triceps"
+        ],
+        "equipment": [
+            "dumbbell",
+            "bench"
+        ],
         "description": "An isolation move that trains triceps lockout and control. Keep upper arm fixed parallel to the torso.",
         "form_guide": [
             {
@@ -898,8 +1117,13 @@
     },
     {
         "name": "Wrist Curl",
-        "muscle_groups": ["forearms"],
-        "equipment": ["barbell", "bench"],
+        "muscle_groups": [
+            "forearms"
+        ],
+        "equipment": [
+            "barbell",
+            "bench"
+        ],
         "description": "Isolates forearm flexors to improve grip endurance and arm development. Use a slow tempo through full wrist range.",
         "form_guide": [
             {
@@ -914,13 +1138,21 @@
                 "step": 3,
                 "instruction": "Curl wrists upward as high as possible."
             },
-            { "step": 4, "instruction": "Lower wrists slowly to a stretch." }
+            {
+                "step": 4,
+                "instruction": "Lower wrists slowly to a stretch."
+            }
         ]
     },
     {
         "name": "Reverse Wrist Curl",
-        "muscle_groups": ["forearms"],
-        "equipment": ["barbell", "bench"],
+        "muscle_groups": [
+            "forearms"
+        ],
+        "equipment": [
+            "barbell",
+            "bench"
+        ],
         "description": "Strengthens forearm extensors for balanced wrist development. Keep movement small and controlled.",
         "form_guide": [
             {
@@ -935,13 +1167,21 @@
                 "step": 3,
                 "instruction": "Extend wrists to lift knuckles upward."
             },
-            { "step": 4, "instruction": "Lower back down under control." }
+            {
+                "step": 4,
+                "instruction": "Lower back down under control."
+            }
         ]
     },
     {
         "name": "Reverse Curl",
-        "muscle_groups": ["forearms", "biceps"],
-        "equipment": ["ez bar"],
+        "muscle_groups": [
+            "forearms",
+            "biceps"
+        ],
+        "equipment": [
+            "ez bar"
+        ],
         "description": "A pronated curl variation emphasizing brachioradialis and forearms. Keep elbows tucked and avoid torso swing.",
         "form_guide": [
             {
@@ -956,13 +1196,22 @@
                 "step": 3,
                 "instruction": "Curl bar upward while maintaining overhand grip."
             },
-            { "step": 4, "instruction": "Lower slowly to full extension." }
+            {
+                "step": 4,
+                "instruction": "Lower slowly to full extension."
+            }
         ]
     },
     {
         "name": "Farmer's Carry",
-        "muscle_groups": ["forearms", "legs", "back"],
-        "equipment": ["dumbbells"],
+        "muscle_groups": [
+            "forearms",
+            "legs",
+            "back"
+        ],
+        "equipment": [
+            "dumbbells"
+        ],
         "description": "A loaded carry that builds grip strength, trunk stability, and work capacity. Walk with posture tall and controlled steps.",
         "form_guide": [
             {
@@ -985,15 +1234,23 @@
     },
     {
         "name": "Back Squat",
-        "muscle_groups": ["legs"],
-        "equipment": ["barbell", "squat rack"],
+        "muscle_groups": [
+            "legs"
+        ],
+        "equipment": [
+            "barbell",
+            "squat rack"
+        ],
         "description": "A fundamental lower-body lift for quads, glutes, and overall strength. Maintain a stable brace and consistent depth.",
         "form_guide": [
             {
                 "step": 1,
                 "instruction": "Position bar on upper back and step out with feet shoulder-width."
             },
-            { "step": 2, "instruction": "Brace core and keep chest up." },
+            {
+                "step": 2,
+                "instruction": "Brace core and keep chest up."
+            },
             {
                 "step": 3,
                 "instruction": "Sit down and back until hips reach desired depth."
@@ -1006,8 +1263,13 @@
     },
     {
         "name": "Front Squat",
-        "muscle_groups": ["legs"],
-        "equipment": ["barbell", "squat rack"],
+        "muscle_groups": [
+            "legs"
+        ],
+        "equipment": [
+            "barbell",
+            "squat rack"
+        ],
         "description": "A quad-focused squat variation requiring strong torso uprightness. Keep elbows high to maintain rack position.",
         "form_guide": [
             {
@@ -1030,8 +1292,12 @@
     },
     {
         "name": "Leg Press",
-        "muscle_groups": ["legs"],
-        "equipment": ["leg press machine"],
+        "muscle_groups": [
+            "legs"
+        ],
+        "equipment": [
+            "leg press machine"
+        ],
         "description": "A machine compound for quads and glutes with high loading potential. Control depth and avoid locking knees hard.",
         "form_guide": [
             {
@@ -1054,8 +1320,12 @@
     },
     {
         "name": "Hack Squat",
-        "muscle_groups": ["legs"],
-        "equipment": ["hack squat machine"],
+        "muscle_groups": [
+            "legs"
+        ],
+        "equipment": [
+            "hack squat machine"
+        ],
         "description": "A guided squat pattern that emphasizes quads and allows stable heavy training. Keep your back fully against the pad.",
         "form_guide": [
             {
@@ -1078,8 +1348,13 @@
     },
     {
         "name": "Bulgarian Split Squat",
-        "muscle_groups": ["legs"],
-        "equipment": ["dumbbells", "bench"],
+        "muscle_groups": [
+            "legs"
+        ],
+        "equipment": [
+            "dumbbells",
+            "bench"
+        ],
         "description": "A unilateral leg exercise that develops quads, glutes, and balance. Keep front foot planted and torso controlled.",
         "form_guide": [
             {
@@ -1102,8 +1377,12 @@
     },
     {
         "name": "Walking Lunge",
-        "muscle_groups": ["legs"],
-        "equipment": ["dumbbells"],
+        "muscle_groups": [
+            "legs"
+        ],
+        "equipment": [
+            "dumbbells"
+        ],
         "description": "A dynamic lower-body movement that builds leg strength and coordination. Take controlled steps and keep trunk upright.",
         "form_guide": [
             {
@@ -1126,8 +1405,12 @@
     },
     {
         "name": "Leg Extension",
-        "muscle_groups": ["legs"],
-        "equipment": ["leg extension machine"],
+        "muscle_groups": [
+            "legs"
+        ],
+        "equipment": [
+            "leg extension machine"
+        ],
         "description": "An isolation exercise for quads useful for focused hypertrophy and pre-fatigue. Control the top and bottom positions.",
         "form_guide": [
             {
@@ -1142,13 +1425,21 @@
                 "step": 3,
                 "instruction": "Extend knees to lift pad until legs are nearly straight."
             },
-            { "step": 4, "instruction": "Lower slowly to starting bend." }
+            {
+                "step": 4,
+                "instruction": "Lower slowly to starting bend."
+            }
         ]
     },
     {
         "name": "Romanian Deadlift",
-        "muscle_groups": ["legs", "back"],
-        "equipment": ["barbell"],
+        "muscle_groups": [
+            "legs",
+            "back"
+        ],
+        "equipment": [
+            "barbell"
+        ],
         "description": "A hip-hinge movement emphasizing hamstrings and glutes. Maintain a neutral spine and slight knee bend.",
         "form_guide": [
             {
@@ -1171,8 +1462,12 @@
     },
     {
         "name": "Leg Curl",
-        "muscle_groups": ["legs"],
-        "equipment": ["leg curl machine"],
+        "muscle_groups": [
+            "legs"
+        ],
+        "equipment": [
+            "leg curl machine"
+        ],
         "description": "Isolates hamstrings for knee-flexion strength and muscle growth. Use strict reps and avoid hip lifting.",
         "form_guide": [
             {
@@ -1195,8 +1490,13 @@
     },
     {
         "name": "Hip Thrust",
-        "muscle_groups": ["legs"],
-        "equipment": ["barbell", "bench"],
+        "muscle_groups": [
+            "legs"
+        ],
+        "equipment": [
+            "barbell",
+            "bench"
+        ],
         "description": "A glute-dominant lift that builds powerful hip extension. Keep chin tucked and avoid overextending the lower back.",
         "form_guide": [
             {
@@ -1219,26 +1519,40 @@
     },
     {
         "name": "Standing Calf Raise",
-        "muscle_groups": ["calves"],
-        "equipment": ["calf raise machine"],
+        "muscle_groups": [
+            "calves"
+        ],
+        "equipment": [
+            "calf raise machine"
+        ],
         "description": "Targets the gastrocnemius with body upright and knees extended. Use full range from deep stretch to high contraction.",
         "form_guide": [
             {
                 "step": 1,
                 "instruction": "Position shoulders under pads with balls of feet on platform edge."
             },
-            { "step": 2, "instruction": "Lower heels to feel a calf stretch." },
+            {
+                "step": 2,
+                "instruction": "Lower heels to feel a calf stretch."
+            },
             {
                 "step": 3,
                 "instruction": "Press through toes to raise heels as high as possible."
             },
-            { "step": 4, "instruction": "Lower slowly back into stretch." }
+            {
+                "step": 4,
+                "instruction": "Lower slowly back into stretch."
+            }
         ]
     },
     {
         "name": "Seated Calf Raise",
-        "muscle_groups": ["calves"],
-        "equipment": ["seated calf raise machine"],
+        "muscle_groups": [
+            "calves"
+        ],
+        "equipment": [
+            "seated calf raise machine"
+        ],
         "description": "Emphasizes the soleus by training calves with bent knees. Keep movement smooth and pause at both ends.",
         "form_guide": [
             {
@@ -1253,13 +1567,20 @@
                 "step": 3,
                 "instruction": "Push through forefoot to lift heels upward."
             },
-            { "step": 4, "instruction": "Return to bottom under control." }
+            {
+                "step": 4,
+                "instruction": "Return to bottom under control."
+            }
         ]
     },
     {
         "name": "Leg Press Calf Raise",
-        "muscle_groups": ["calves"],
-        "equipment": ["leg press machine"],
+        "muscle_groups": [
+            "calves"
+        ],
+        "equipment": [
+            "leg press machine"
+        ],
         "description": "A calf-focused movement on the leg press platform with stable support. Keep knees nearly fixed and move through ankles only.",
         "form_guide": [
             {
@@ -1270,7 +1591,10 @@
                 "step": 2,
                 "instruction": "Extend legs with a slight knee bend and brace torso."
             },
-            { "step": 3, "instruction": "Lower heels to stretch calves." },
+            {
+                "step": 3,
+                "instruction": "Lower heels to stretch calves."
+            },
             {
                 "step": 4,
                 "instruction": "Press through toes to raise heels back up."
@@ -1279,15 +1603,23 @@
     },
     {
         "name": "Single Leg Calf Raise",
-        "muscle_groups": ["calves"],
-        "equipment": ["bodyweight", "step"],
+        "muscle_groups": [
+            "calves"
+        ],
+        "equipment": [
+            "bodyweight",
+            "step"
+        ],
         "description": "Builds unilateral calf strength and improves ankle stability. Keep balance support light and movement controlled.",
         "form_guide": [
             {
                 "step": 1,
                 "instruction": "Stand on one foot on a step with heel hanging off edge."
             },
-            { "step": 2, "instruction": "Hold support lightly for balance." },
+            {
+                "step": 2,
+                "instruction": "Hold support lightly for balance."
+            },
             {
                 "step": 3,
                 "instruction": "Lower heel below step for stretch, then rise onto toes."
@@ -1300,8 +1632,13 @@
     },
     {
         "name": "Crunch",
-        "muscle_groups": ["abs"],
-        "equipment": ["bodyweight", "mat"],
+        "muscle_groups": [
+            "abs"
+        ],
+        "equipment": [
+            "bodyweight",
+            "mat"
+        ],
         "description": "A simple trunk-flexion move for upper abdominal activation. Keep the motion short and focused on rib-to-pelvis curl.",
         "form_guide": [
             {
@@ -1324,8 +1661,13 @@
     },
     {
         "name": "Cable Crunch",
-        "muscle_groups": ["abs"],
-        "equipment": ["cable machine", "rope attachment"],
+        "muscle_groups": [
+            "abs"
+        ],
+        "equipment": [
+            "cable machine",
+            "rope attachment"
+        ],
         "description": "Adds resistance to abdominal flexion for progressive overload. Focus on spinal flexion rather than hip movement.",
         "form_guide": [
             {
@@ -1348,15 +1690,23 @@
     },
     {
         "name": "Hanging Leg Raise",
-        "muscle_groups": ["abs"],
-        "equipment": ["pull-up bar", "bodyweight"],
+        "muscle_groups": [
+            "abs"
+        ],
+        "equipment": [
+            "pull-up bar",
+            "bodyweight"
+        ],
         "description": "A challenging core movement that trains lower abs and hip flexors. Avoid swinging by controlling the start and finish.",
         "form_guide": [
             {
                 "step": 1,
                 "instruction": "Hang from a bar with arms straight and shoulders engaged."
             },
-            { "step": 2, "instruction": "Brace core and keep legs together." },
+            {
+                "step": 2,
+                "instruction": "Brace core and keep legs together."
+            },
             {
                 "step": 3,
                 "instruction": "Raise legs until thighs are near parallel or higher."
@@ -1369,8 +1719,13 @@
     },
     {
         "name": "Reverse Crunch",
-        "muscle_groups": ["abs"],
-        "equipment": ["bodyweight", "mat"],
+        "muscle_groups": [
+            "abs"
+        ],
+        "equipment": [
+            "bodyweight",
+            "mat"
+        ],
         "description": "Targets lower abdominal fibers by lifting the pelvis rather than upper torso. Keep movement controlled and compact.",
         "form_guide": [
             {
@@ -1393,8 +1748,13 @@
     },
     {
         "name": "Ab Wheel Rollout",
-        "muscle_groups": ["abs"],
-        "equipment": ["ab wheel", "mat"],
+        "muscle_groups": [
+            "abs"
+        ],
+        "equipment": [
+            "ab wheel",
+            "mat"
+        ],
         "description": "An anti-extension core exercise that challenges deep abdominal control. Move only as far as you can keep the spine neutral.",
         "form_guide": [
             {
@@ -1417,8 +1777,13 @@
     },
     {
         "name": "Sit Up",
-        "muscle_groups": ["abs"],
-        "equipment": ["bodyweight", "mat"],
+        "muscle_groups": [
+            "abs"
+        ],
+        "equipment": [
+            "bodyweight",
+            "mat"
+        ],
         "description": "A full-range trunk flexion exercise for abdominal endurance. Avoid jerking with the neck and keep movement controlled.",
         "form_guide": [
             {
@@ -1433,13 +1798,21 @@
                 "step": 3,
                 "instruction": "Curl torso up until sitting upright."
             },
-            { "step": 4, "instruction": "Lower back down slowly to the floor." }
+            {
+                "step": 4,
+                "instruction": "Lower back down slowly to the floor."
+            }
         ]
     },
     {
         "name": "Plank",
-        "muscle_groups": ["abs"],
-        "equipment": ["bodyweight", "mat"],
+        "muscle_groups": [
+            "abs"
+        ],
+        "equipment": [
+            "bodyweight",
+            "mat"
+        ],
         "description": "An isometric core exercise for trunk stiffness and posture control. Keep hips level and breathe steadily.",
         "form_guide": [
             {
@@ -1462,8 +1835,13 @@
     },
     {
         "name": "Side Plank",
-        "muscle_groups": ["abs"],
-        "equipment": ["bodyweight", "mat"],
+        "muscle_groups": [
+            "abs"
+        ],
+        "equipment": [
+            "bodyweight",
+            "mat"
+        ],
         "description": "Strengthens obliques and lateral core stability in an anti-side-bend position. Keep shoulders and hips stacked.",
         "form_guide": [
             {
@@ -1483,5 +1861,148 @@
                 "instruction": "Breathe steadily, then repeat on the other side."
             }
         ]
+    },
+    {
+        "name": "Lat Pulldown Narrow",
+        "muscle_groups": [
+            "back"
+        ],
+        "equipment": [
+            "machine"
+        ],
+        "description": "Targets the lats with a closer grip for increased stretch and range of motion.",
+        "form_guide": []
+    },
+    {
+        "name": "One Arm DB Row",
+        "muscle_groups": [
+            "back"
+        ],
+        "equipment": [
+            "dumbbell"
+        ],
+        "description": "Unilateral pulling movement that builds thickness in the mid-back and lats.",
+        "form_guide": []
+    },
+    {
+        "name": "One Arm DB Machine",
+        "muscle_groups": [
+            "back"
+        ],
+        "equipment": [
+            "machine"
+        ],
+        "description": "Machine variation of the one-arm row for added stability and focus on the lats.",
+        "form_guide": []
+    },
+    {
+        "name": "Incline DB Press",
+        "muscle_groups": [
+            "chest"
+        ],
+        "equipment": [
+            "dumbbell"
+        ],
+        "description": "Targets the upper chest and shoulders using dumbbells for a greater range of motion.",
+        "form_guide": []
+    },
+    {
+        "name": "Decline DB Press",
+        "muscle_groups": [
+            "chest"
+        ],
+        "equipment": [
+            "dumbbell"
+        ],
+        "description": "Focuses on the lower chest using a decline angle.",
+        "form_guide": []
+    },
+    {
+        "name": "Incline Pec Dec Fly",
+        "muscle_groups": [
+            "chest"
+        ],
+        "equipment": [
+            "machine"
+        ],
+        "description": "Machine fly variation that emphasizes the upper chest fibers.",
+        "form_guide": []
+    },
+    {
+        "name": "Machine Shoulder Press",
+        "muscle_groups": [
+            "shoulders"
+        ],
+        "equipment": [
+            "machine"
+        ],
+        "description": "Stable pressing movement to build front and side deltoids.",
+        "form_guide": []
+    },
+    {
+        "name": "Cable Push Down",
+        "muscle_groups": [
+            "triceps"
+        ],
+        "equipment": [
+            "cable"
+        ],
+        "description": "Isolates the triceps using constant tension from the cable machine.",
+        "form_guide": []
+    },
+    {
+        "name": "Cable Extension Bar/Rope",
+        "muscle_groups": [
+            "triceps"
+        ],
+        "equipment": [
+            "cable"
+        ],
+        "description": "Triceps extension utilizing a bar or rope attachment.",
+        "form_guide": []
+    },
+    {
+        "name": "Cable Reverse Curl",
+        "muscle_groups": [
+            "biceps"
+        ],
+        "equipment": [
+            "cable"
+        ],
+        "description": "Builds the brachialis and forearm muscles using an overhand grip.",
+        "form_guide": []
+    },
+    {
+        "name": "Squats",
+        "muscle_groups": [
+            "legs"
+        ],
+        "equipment": [
+            "bodyweight"
+        ],
+        "description": "Fundamental lower body movement using only body weight for resistance.",
+        "form_guide": []
+    },
+    {
+        "name": "Hip Abduction",
+        "muscle_groups": [
+            "legs"
+        ],
+        "equipment": [
+            "machine"
+        ],
+        "description": "Isolates the outer glutes and abductor muscles.",
+        "form_guide": []
+    },
+    {
+        "name": "Hip Adductor",
+        "muscle_groups": [
+            "legs"
+        ],
+        "equipment": [
+            "machine"
+        ],
+        "description": "Isolates the inner thigh muscles.",
+        "form_guide": []
     }
 ]
