@@ -70,7 +70,7 @@ export function Stepper({
         <input
           type="text"
           inputMode="decimal"
-          value={disabled && localValue === "0" ? "BW" : localValue}
+          value={disabled ? "BW" : localValue}
           onChange={handleChange}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}

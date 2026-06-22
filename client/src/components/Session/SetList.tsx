@@ -108,6 +108,12 @@ export function SetList({
                 {/* Active set: weight/rep editors */}
                 {isActive && (
                   <div className="px-3.5 py-3">
+                    {isBodyweight && (
+                      <div className="text-[11px] text-[#aaa] bg-[#1a1a1a] rounded p-2 mb-2 mt-2 flex items-center gap-2 border border-[#333]">
+                        <span className="text-heat opacity-80 text-sm leading-none">ℹ</span>
+                        This is a bodyweight exercise. Weight is locked.
+                      </div>
+                    )}
                     <div className="flex gap-3 mt-4">
                       <div className="flex-1">
                         <Stepper
