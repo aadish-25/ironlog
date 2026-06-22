@@ -65,6 +65,7 @@ export function ExerciseView({
 
           <SetList
             sets={exercise.sets}
+            isBodyweight={exercise.is_bodyweight ?? false}
             onRemoveSet={onRemoveSet}
             onLogSet={onLogSet}
             onAddSet={onAddSet}

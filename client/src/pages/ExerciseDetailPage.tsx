@@ -157,7 +157,7 @@ export function ExerciseDetailPage() {
                             <div className="bg-[#1a1a1a] rounded-[14px] p-4 mb-4 flex items-center justify-between">
                                 <div>
                                     <div className="text-[10px] tracking-[2px] text-[#444] uppercase mb-1">All-time PR</div>
-                                    <div className="font-display text-[42px] text-white tracking-[1px] leading-none">{maxPr.max_weight} kg</div>
+                                    <div className="font-display text-[42px] text-white tracking-[1px] leading-none">{exercise?.is_bodyweight && maxPr.max_weight === 0 ? "BW" : `${maxPr.max_weight} kg`}</div>
                                     <div className="text-[11px] text-[#555] mt-[3px]">Set on {formatDate(maxPr.session_date)}</div>
                                 </div>
                                 <div className="bg-[#2a0f00] border border-heat rounded-lg px-3 py-1.5 font-display text-[14px] text-heat tracking-[1px]">ALL-TIME PR</div>
@@ -278,7 +278,7 @@ export function ExerciseDetailPage() {
                                                             <div className="text-[10px] text-[#888] mb-1">{label}</div>
                                                             <div className="flex items-center gap-2">
                                                                 <span className="font-display text-[16px] text-white">
-                                                                    {data.val} kg
+                                                                    {exercise?.is_bodyweight && chartAxis === "weight" && data.val === 0 ? "BW" : `${data.val} kg`}
                                                                 </span>
                                                                 {data.isPr && chartAxis === "weight" && (
                                                                     <span className="text-[9px] bg-[#2a0f00] text-heat px-1.5 py-0.5 rounded font-bold border border-heat">PR</span>
@@ -342,7 +342,7 @@ export function ExerciseDetailPage() {
                                                     {formatDate(p.session_date)}
                                                 </div>
                                                 <div className="flex items-center gap-[8px]">
-                                                    <div className="font-display text-[18px] text-white tracking-[1px]">{p.max_weight} kg</div>
+                                                    <div className="font-display text-[18px] text-white tracking-[1px]">{exercise?.is_bodyweight && p.max_weight === 0 ? "BW" : `${p.max_weight} kg`}</div>
                                                     <div className={`text-[14px] text-[#333] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>▾</div>
                                                 </div>
                                             </div>

@@ -9,8 +9,8 @@ interface ExercisePickerProps {
   currentName: string | null;
   existingExercises: string[];
   onClose: () => void;
-  onAdd: (id: string, name: string) => void;
-  onSwap: (id: string, name: string) => void;
+  onAdd: (id: string, name: string, is_bodyweight: boolean) => void;
+  onSwap: (id: string, name: string, is_bodyweight: boolean) => void;
 }
 
 export function ExercisePicker({
@@ -54,9 +54,9 @@ export function ExercisePicker({
     });
   }
 
-  function pick(id: string, name: string) {
-    if (mode === "add") onAdd(id, name);
-    else onSwap(id, name);
+  function pick(id: string, name: string, is_bodyweight: boolean) {
+    if (mode === "add") onAdd(id, name, is_bodyweight);
+    else onSwap(id, name, is_bodyweight);
     
     // Reset state for next time
     setQuery("");
@@ -92,7 +92,7 @@ export function ExercisePicker({
             flat.map((ex, i) => (
               <button
                 key={ex.id}
-                onClick={() => pick(ex.id, ex.name)}
+                onClick={() => pick(ex.id, ex.name, ex.is_bodyweight ?? false)}
                 className={`w-full text-left flex items-center justify-between p-[12px_0] bg-transparent border-b ${
                   i < flat.length - 1 ? "border-border" : "border-transparent"
                 } cursor-pointer hover:bg-raised/50 transition-colors`}
@@ -133,7 +133,7 @@ export function ExercisePicker({
                     visible.map((ex, i) => (
                       <button
                         key={ex.id}
-                        onClick={() => pick(ex.id, ex.name)}
+                        onClick={() => pick(ex.id, ex.name, ex.is_bodyweight ?? false)}
                         className={`w-full text-left flex items-center justify-between py-3 pl-2 pr-0 bg-transparent border-b ${
                           i < visible.length - 1
                             ? "border-border"

@@ -38,6 +38,7 @@ export function useExercises(exerciseId?: string) {
             muscles,
             equipments,
             prKg: ex.pr_kg ?? null,
+            is_bodyweight: ex.is_bodyweight ?? false,
         };
     }) : [];
 
@@ -59,6 +60,7 @@ export function useExercises(exerciseId?: string) {
             equipments,
             prKg: null,
             formGuide: Array.isArray(exerciseData.form_guide) ? exerciseData.form_guide : [],
+            is_bodyweight: exerciseData.is_bodyweight ?? false,
         };
     })() : null;
 
