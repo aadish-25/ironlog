@@ -5,7 +5,6 @@ export interface Exercise {
   equipments: string[];
   prKg: number | null;
   formGuide?: { step: number; instruction: string }[];
-  is_bodyweight?: boolean;
 }
 
 export interface MuscleGroup {

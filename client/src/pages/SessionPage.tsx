@@ -38,7 +38,7 @@ export function SessionPage() {
     const [showSummary, setShowSummary] = useState(false);
 
     // ─── PR TOAST STATE ─────────────────────────────────────────────────────────
-    const [prToast, setPrToast] = useState<{ name: string; weight: number; isBodyweight: boolean } | null>(null);
+    const [prToast, setPrToast] = useState<{ name: string; weight: number } | null>(null);
     const dismissPrToast = useCallback(() => setPrToast(null), []);
 
     const splitDayName = session?.split_day_label ?? null;
@@ -71,7 +71,7 @@ export function SessionPage() {
             // Fire PR toast if backend flagged this set as a new personal record
             const isPR = (result as any).is_pr ?? result.pr_hit;
             if (isPR) {
-                setPrToast({ name: currentExercise.name, weight: targetSet.weight, isBodyweight: currentExercise.is_bodyweight ?? false });
+                setPrToast({ name: currentExercise.name, weight: targetSet.weight });
             }
 
             // Auto-advance when all sets for this exercise are logged
@@ -180,14 +180,13 @@ export function SessionPage() {
         );
     };
 
-    const handleAddExerciseToSession = (id: string, name: string, is_bodyweight: boolean) => {
+    const handleAddExerciseToSession = (id: string, name: string) => {
         const newEx: SessionExercise = {
             id: `temp-ex-${Date.now()}`,
             exercise_id: id,
             name,
             sets: [],
-            muscles: [],
-            is_bodyweight
+            muscles: []
         };
         setExercises((prev) => [...prev, newEx]);
         setPickerMode(null);
@@ -195,10 +194,10 @@ export function SessionPage() {
         setCurrentExerciseIndex(exercises.length);
     };
 
-    const handleSwapExerciseInSession = (id: string, name: string, is_bodyweight: boolean) => {
+    const handleSwapExerciseInSession = (id: string, name: string) => {
         setExercises((prev) =>
             prev.map((ex, i) =>
-                i === currentExerciseIndex ? { ...ex, exercise_id: id, name, sets: [], is_bodyweight } : ex
+                i === currentExerciseIndex ? { ...ex, exercise_id: id, name, sets: [] } : ex
             )
         );
         setPickerMode(null);
@@ -348,7 +347,6 @@ export function SessionPage() {
             <PRToast
                 exerciseName={prToast?.name ?? null}
                 weightKg={prToast?.weight ?? null}
-                isBodyweight={prToast?.isBodyweight ?? false}
                 onDismiss={dismissPrToast}
             />
         </section>

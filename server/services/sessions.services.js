@@ -83,7 +83,7 @@ const getSessionByIdService = async (sessionId, userId) => {
 
         // 1. Fetch split day exercises (the plan)
         const planResult = await pool.query(
-            `SELECT sde.id, sde.exercise_id, e.name, e.is_bodyweight,
+            `SELECT sde.id, sde.exercise_id, e.name,
              (
                  SELECT CONCAT(weight_kg, ' kg × ', reps)
                  FROM sets
@@ -100,7 +100,7 @@ const getSessionByIdService = async (sessionId, userId) => {
 
         // 2. Fetch actually logged sets for this session
         const setsResult = await pool.query(
-            `SELECT sets.*, exercises.name, exercises.is_bodyweight
+            `SELECT sets.*, exercises.name
             FROM sets 
             JOIN exercises ON sets.exercise_id = exercises.id
             WHERE sets.session_id = $1 AND sets.user_id = $2
@@ -132,7 +132,6 @@ const getSessionByIdService = async (sessionId, userId) => {
                 exercise_id: planEx.exercise_id,
                 name: planEx.name,
                 previous_best: planEx.previous_best || null,
-                is_bodyweight: planEx.is_bodyweight || false,
                 sets: setsByExercise[planEx.exercise_id] || [],
             });
         }
@@ -144,7 +143,6 @@ const getSessionByIdService = async (sessionId, userId) => {
                     exercise_id: set.exercise_id,
                     name: set.name,
                     previous_best: null, // Extra exercises added on the fly won't have previous best cached easily unless we do another query
-                    is_bodyweight: set.is_bodyweight || false,
                     sets: setsByExercise[set.exercise_id],
                 });
             }

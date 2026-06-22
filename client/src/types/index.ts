@@ -49,7 +49,6 @@ export type Exercise = {
   formGuide?: { step: number; instruction: string }[];
   demo_url: string | null;
   demo_type: "youtube" | "gif" | null;
-  is_bodyweight?: boolean;
 };
 
 export type ExerciseProgress = {
@@ -79,7 +78,6 @@ export interface SessionExercise {
   sets: SetRecord[];
   muscles?: string[];
   previous_best?: string | null;
-  is_bodyweight?: boolean;
 }
 
 export type SetRecord = {

@@ -4,11 +4,10 @@ import { motion, AnimatePresence } from "motion/react";
 interface PRToastProps {
     exerciseName: string | null;
     weightKg: number | null;
-    isBodyweight: boolean;
     onDismiss: () => void;
 }
 
-export function PRToast({ exerciseName, weightKg, isBodyweight, onDismiss }: PRToastProps) {
+export function PRToast({ exerciseName, weightKg, onDismiss }: PRToastProps) {
     const visible = exerciseName !== null && weightKg !== null;
 
     // Auto-dismiss after 3 seconds
@@ -42,7 +41,7 @@ export function PRToast({ exerciseName, weightKg, isBodyweight, onDismiss }: PRT
                             </span>
                             <span className="text-white font-display text-[16px] tracking-[0.5px] leading-snug">
                                 {exerciseName}{" "}
-                                <span className="text-heat">{isBodyweight && weightKg === 0 ? "BW" : `${weightKg} kg`}</span>
+                                <span className="text-heat">{weightKg} kg</span>
                             </span>
                         </div>
 

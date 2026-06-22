@@ -53,7 +53,7 @@ export function SessionSummary({ splitDayName, exercises, onBack, onEdit }: Sess
                                 )}
                             </div>
                             <div className="flex gap-6 font-display text-lg tracking-[1.5px] text-[#eee]">
-                                <span>{ex.is_bodyweight && set.weight === 0 ? "BW" : <>{set.weight} <span className="text-ghost text-xs">KG</span></>}</span>
+                                <span>{set.weight} <span className="text-ghost text-xs">KG</span></span>
                                 <span>{set.reps} <span className="text-ghost text-xs">REPS</span></span>
                             </div>
                         </div>

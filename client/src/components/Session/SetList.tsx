@@ -6,7 +6,6 @@ import type { SetRecord } from "../../types";
 
 interface SetListProps {
   sets: SetRecord[];
-  isBodyweight: boolean;
   onRemoveSet: (index: number) => void;
   onLogSet: (index: number) => void;
   onAddSet: () => void;
@@ -18,7 +17,6 @@ interface SetListProps {
 
 export function SetList({
   sets,
-  isBodyweight,
   onRemoveSet,
   onLogSet,
   onAddSet,
@@ -30,8 +28,8 @@ export function SetList({
 
   const handleLogClick = (index: number) => {
     const targetSet = sets[index];
-    if (targetSet.weight < 0) {
-      setErrorMsg("Weight cannot be negative");
+    if (targetSet.weight <= 0) {
+      setErrorMsg("Weight must be greater than 0");
       return;
     }
     if (targetSet.reps <= 0) {
@@ -89,7 +87,7 @@ export function SetList({
                         className="flex items-center gap-2 bg-transparent border-none cursor-pointer p-0 hover:opacity-80 transition-opacity"
                         >
                         <span className="font-display text-lg text-done tracking-[1px]">
-                            {isBodyweight && set.weight === 0 ? "BW" : `${Number(set.weight)} kg`} × {set.reps}
+                            {Number(set.weight).toString()} kg × {set.reps}
                         </span>
                         <div className="w-[18px] h-[18px] bg-[#1a3a1a] rounded-full flex items-center justify-center text-[11px] text-done shrink-0">
                             ✓
@@ -100,7 +98,7 @@ export function SetList({
 
                   {!set.is_logged && !isActive && (
                     <span className="font-display text-lg text-ghost/30 tracking-[1px]">
-                      {isBodyweight && set.weight === 0 ? "BW" : `${Number(set.weight)} kg`} × {set.reps}
+                      {Number(set.weight).toString()} kg × {set.reps}
                     </span>
                   )}
                 </div>
@@ -108,12 +106,6 @@ export function SetList({
                 {/* Active set: weight/rep editors */}
                 {isActive && (
                   <div className="px-3.5 py-3">
-                    {isBodyweight && (
-                      <div className="text-[11px] text-[#aaa] bg-[#1a1a1a] rounded p-2 mb-2 mt-2 flex items-center gap-2 border border-[#333]">
-                        <span className="text-heat opacity-80 text-sm leading-none">ℹ</span>
-                        This is a bodyweight exercise. Weight is locked.
-                      </div>
-                    )}
                     <div className="flex gap-3 mt-4">
                       <div className="flex-1">
                         <Stepper
@@ -123,8 +115,7 @@ export function SetList({
                             onWeightChange?.(setIdx, v);
                           }}
                           step={0.5}
-                          label={isBodyweight && set.weight === 0 ? "Bodyweight" : "Weight (kg)"}
-                          disabled={isBodyweight}
+                          label="Weight (kg)"
                         />
                       </div>
                       <div className="flex-1">

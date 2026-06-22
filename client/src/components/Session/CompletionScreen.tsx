@@ -48,15 +48,15 @@ export function CompletionScreen({
   );
 
   // Compute PRs dynamically
-  const prMap: Record<string, { kg: number, isBodyweight: boolean }> = {};
+  const prMap: Record<string, number> = {};
   for (const ex of exercises) {
     const prSets = ex.sets.filter((s) => s.is_logged && s.pr_hit);
     if (prSets.length > 0) {
       const maxLogged = Math.max(...prSets.map((s) => s.weight));
-      prMap[ex.name] = { kg: maxLogged, isBodyweight: ex.is_bodyweight ?? false };
+      prMap[ex.name] = maxLogged;
     }
   }
-  const prs = Object.entries(prMap).map(([name, { kg, isBodyweight }]) => ({ name, kg, isBodyweight }));
+  const prs = Object.entries(prMap).map(([name, kg]) => ({ name, kg }));
 
   return (
     <div className="min-h-screen bg-bg text-ink font-body p-[40px_20px_40px] flex flex-col overflow-y-auto no-scrollbar">
@@ -152,7 +152,7 @@ export function CompletionScreen({
                     PR
                   </span>
                   <span className="font-display text-[26px] text-heat tracking-[1px]">
-                    {pr.isBodyweight && pr.kg === 0 ? "BW" : `${pr.kg} KG`}
+                    {pr.kg} KG
                   </span>
                 </div>
               </div>
