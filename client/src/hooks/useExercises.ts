@@ -7,17 +7,17 @@ import { type ExerciseProgress } from "../types";
 
 export function useExercises(exerciseId?: string) {
     const { data: exercisesData, error: exercisesError, isLoading: loadingExercises, mutate: mutateExercises } = useSWR<any[]>(
-        "/exercises",
+        "/exercise",
         fetcher
     );
 
     const { data: exerciseData, error: exerciseError, isLoading: loadingExercise, mutate: mutateExercise } = useSWR<any>(
-        exerciseId ? `/exercises/${exerciseId}` : null,
+        exerciseId ? `/exercise/${exerciseId}` : null,
         fetcher
     );
 
     const { data: progressData, error: progressError, isLoading: loadingProgress, mutate: mutateProgress } = useSWR<any[]>(
-        exerciseId ? `/exercises/${exerciseId}/progress` : null,
+        exerciseId ? `/exercise/${exerciseId}/progress` : null,
         fetcher
     );
 
