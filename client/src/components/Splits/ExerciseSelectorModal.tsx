@@ -3,7 +3,7 @@ import { SearchBar } from "../Exercises/SearchBar";
 import { MUSCLE_ORDER, EQUIPMENT_OPTIONS } from "../Exercises/types";
 import type { Exercise, MuscleGroup } from "../Exercises/types";
 import { MuscleBadge } from "../ui/MuscleBadge";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, SlidersHorizontal } from "lucide-react";
 import { BottomSheet } from "../ui/BottomSheet";
 
 interface ExerciseSelectorModalProps {
@@ -150,13 +150,13 @@ export function ExerciseSelectorModal({
             <div className="shrink-0 bg-bg border-b border-[#1f1f1f] pb-3">
                 <div className="flex items-center gap-2 px-5 py-3">
                     <div className="flex-1">
-                        <SearchBar searchQuery={searchQuery} onSearchChange={(e) => setSearchQuery(e.target.value)} />
+                        <SearchBar searchQuery={searchQuery} onSearchChange={(e) => setSearchQuery(e.target.value)} className="relative w-full" />
                     </div>
                     <button 
                         onClick={() => setIsFilterSheetOpen(true)}
                         className={`shrink-0 w-10 h-10 flex items-center justify-center rounded-xl border transition-colors ${activeFilterCount > 0 ? 'bg-[#1a0800] border-heat text-heat' : 'bg-[#161616] border-[#1f1f1f] text-[#666]'}`}
                     >
-                        F
+                        <SlidersHorizontal size={16} />
                     </button>
                 </div>
                 <p className="px-5 text-[11px] text-ghost/50 shrink-0">
@@ -208,7 +208,7 @@ export function ExerciseSelectorModal({
                             ))}
                         </div>
                     </div>
-                    <button onClick={() => setIsFilterSheetOpen(false)} className="w-full py-[15px] rounded-xl bg-heat text-white font-display text-xl tracking-[2px] border-none cursor-pointer hover:opacity-90 transition-opacity">
+                    <button onClick={() => setIsFilterSheetOpen(false)} className="w-full mt-2 mb-4 py-[15px] rounded-xl bg-heat text-white font-display text-xl tracking-[2px] border-none cursor-pointer hover:opacity-90 transition-opacity">
                         APPLY FILTERS
                     </button>
                 </div>

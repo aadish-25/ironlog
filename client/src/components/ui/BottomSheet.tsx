@@ -60,7 +60,7 @@ export function BottomSheet({ isOpen, onClose, title, children, fixedHeight }: B
             ✕
           </button>
         </div>
-        <div className="overflow-y-auto pb-4 flex-1 no-scrollbar">
+        <div className="overflow-y-auto pb-4 flex-1">
           {children}
         </div>
       </div>
