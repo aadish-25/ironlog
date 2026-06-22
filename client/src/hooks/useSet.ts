@@ -74,6 +74,7 @@ export function useSet(
                                     weight:
                                         (savedRecord as any).weight_kg ??
                                         weightKg,
+                                    pr_hit: (savedRecord as any).is_pr ?? false,
                                     is_logged: true,
                                 };
                                 return mappedRecord;
