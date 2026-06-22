@@ -5,6 +5,7 @@ interface StepperProps {
   onChange: (v: number) => void;
   step?: number;
   label: string;
+  disabled?: boolean;
 }
 
 export function Stepper({
@@ -12,6 +13,7 @@ export function Stepper({
   onChange,
   step = 2.5,
   label,
+  disabled = false,
 }: StepperProps) {
   const [localValue, setLocalValue] = React.useState(value.toString());
 
@@ -20,6 +22,7 @@ export function Stepper({
   }, [value]);
 
   const handleBlur = () => {
+    if (disabled) return;
     const parsed = parseFloat(localValue);
     if (!isNaN(parsed) && parsed >= 0) {
       onChange(parsed);
@@ -30,6 +33,7 @@ export function Stepper({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) return;
     const newValue = e.target.value;
     
     if (newValue === "") {
@@ -56,8 +60,9 @@ export function Stepper({
       </label>
       <div className="bg-[#141414] rounded-[10px] p-[12px_8px] flex items-center justify-between">
         <button
-          onClick={() => onChange(Math.max(0, +(value - step).toFixed(1)))}
-          className="w-[30px] h-[30px] bg-raised rounded-md border-none text-lg text-ghost cursor-pointer flex items-center justify-center shrink-0 select-none hover:bg-border transition-colors"
+          onClick={() => !disabled && onChange(Math.max(0, +(value - step).toFixed(1)))}
+          disabled={disabled}
+          className={`w-[30px] h-[30px] rounded-md border-none text-lg flex items-center justify-center shrink-0 select-none transition-colors ${disabled ? 'bg-transparent text-ghost/30 cursor-not-allowed' : 'bg-raised text-ghost cursor-pointer hover:bg-border'}`}
           aria-label={`Decrease ${label}`}
         >
           −
@@ -65,15 +70,17 @@ export function Stepper({
         <input
           type="text"
           inputMode="decimal"
-          value={localValue}
+          value={disabled && localValue === "0" ? "BW" : localValue}
           onChange={handleChange}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
-          className="font-display text-[34px] text-white tracking-[1px] leading-none bg-transparent border-none text-center outline-none w-16 m-0 p-0"
+          disabled={disabled}
+          className={`font-display text-[34px] tracking-[1px] leading-none bg-transparent border-none text-center outline-none w-16 m-0 p-0 ${disabled ? 'text-ghost/50 cursor-not-allowed' : 'text-white'}`}
         />
         <button
-          onClick={() => onChange(+(value + step).toFixed(1))}
-          className="w-[30px] h-[30px] bg-raised rounded-md border-none text-lg text-ghost cursor-pointer flex items-center justify-center shrink-0 select-none hover:bg-border transition-colors"
+          onClick={() => !disabled && onChange(+(value + step).toFixed(1))}
+          disabled={disabled}
+          className={`w-[30px] h-[30px] rounded-md border-none text-lg flex items-center justify-center shrink-0 select-none transition-colors ${disabled ? 'bg-transparent text-ghost/30 cursor-not-allowed' : 'bg-raised text-ghost cursor-pointer hover:bg-border'}`}
           aria-label={`Increase ${label}`}
         >
           +

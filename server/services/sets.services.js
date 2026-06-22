@@ -34,6 +34,15 @@ const createSetService = async (
             throw new Error("Session not found or not authorized");
         }
 
+        const exerciseResult = await pool.query(
+            "SELECT is_bodyweight FROM exercises WHERE id = $1",
+            [exerciseId]
+        );
+        if (exerciseResult.rows.length === 0) throw new Error("Exercise not found");
+        if (exerciseResult.rows[0].is_bodyweight) {
+            weightKg = 0;
+        }
+
         const isPR = await checkIsPR(userId, exerciseId, weightKg);
 
         const result = await pool.query(
@@ -65,6 +74,14 @@ const updateSetService = async (setId, userId, updateData) => {
 
         if (updateKeys.length === 0) {
             throw new Error("No valid fields provided");
+        }
+
+        const setResult = await pool.query(
+            "SELECT e.is_bodyweight FROM sets s JOIN exercises e ON s.exercise_id = e.id WHERE s.id = $1",
+            [setId]
+        );
+        if (setResult.rows.length > 0 && setResult.rows[0].is_bodyweight && updateData.weight_kg !== undefined) {
+            updateData.weight_kg = 0;
         }
 
         const setClauses = [];

@@ -118,6 +118,7 @@ export function SetList({
                           }}
                           step={0.5}
                           label={isBodyweight && set.weight === 0 ? "Bodyweight" : "Weight (kg)"}
+                          disabled={isBodyweight}
                         />
                       </div>
                       <div className="flex-1">
