@@ -267,12 +267,7 @@ export function HeroCard({
                   No PRs logged in today's session.
                 </div>
               )}
-              <button
-                onClick={onUndoSkip || undefined}
-                className="w-full mt-1 mb-2 py-2 border border-heat/30 text-heat rounded-[10px] text-[11px] font-semibold tracking-wide uppercase hover:bg-heat/10 transition-colors"
-              >
-                TEMP: Reset Session
-              </button>
+
               <div className="mt-3 pt-3 border-t border-raised">
                 <div className="text-[9px] tracking-[2px] text-ghost uppercase mb-0.5">
                   Tomorrow
