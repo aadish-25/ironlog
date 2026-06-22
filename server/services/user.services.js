@@ -48,7 +48,7 @@ const updateUserService = async (id, data) => {
 const getUserStatsService = async (userId) => {
     // Fetch all non-skipped session dates for the user, ordered descending
     const result = await pool.query(
-        "SELECT date FROM sessions WHERE user_id = $1 AND is_skipped = false ORDER BY date DESC",
+        "SELECT date FROM sessions WHERE user_id = $1 AND is_skipped = false AND is_completed = true ORDER BY date DESC",
         [userId],
     );
 

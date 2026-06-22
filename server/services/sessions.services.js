@@ -54,7 +54,7 @@ const getSessionsService = async (userId) => {
              FROM sessions
              LEFT JOIN split_days ON sessions.split_day_id = split_days.id
              LEFT JOIN sets ON sets.session_id = sessions.id
-             WHERE sessions.user_id = $1 
+             WHERE sessions.user_id = $1 AND sessions.is_completed = true
              GROUP BY sessions.id, split_days.label
              ORDER BY sessions.date DESC`,
             [userId],
@@ -254,7 +254,7 @@ const getSessionsHistoryService = async (userId, limit, offset) => {
             FROM sessions
             LEFT JOIN split_days ON sessions.split_day_id = split_days.id
             LEFT JOIN sets ON sets.session_id = sessions.id
-            WHERE sessions.user_id = $1 AND sessions.is_skipped = false
+            WHERE sessions.user_id = $1 AND sessions.is_skipped = false AND sessions.is_completed = true
             GROUP BY sessions.id, split_days.label, sessions.date
             ORDER BY sessions.date DESC
             LIMIT $2 OFFSET $3`,
@@ -297,7 +297,7 @@ const getSessionsSummaryService = async (userId, monthStr) => {
              COALESCE(SUM(sets.weight_kg * sets.reps), 0) as "totalVolumeKg"
              FROM sessions
              LEFT JOIN sets ON sets.session_id = sessions.id
-             WHERE sessions.user_id = $1 AND sessions.is_skipped = false
+             WHERE sessions.user_id = $1 AND sessions.is_skipped = false AND sessions.is_completed = true
              AND sessions.date >= $2 AND sessions.date <= $3`,
             [userId, startDate, endDate],
         );
@@ -305,7 +305,7 @@ const getSessionsSummaryService = async (userId, monthStr) => {
         const prevResult = await pool.query(
             `SELECT COUNT(DISTINCT sessions.id) as sessions
              FROM sessions
-             WHERE user_id = $1 AND is_skipped = false
+             WHERE user_id = $1 AND is_skipped = false AND is_completed = true
              AND date >= $2 AND date <= $3`,
             [userId, prevStartDate, prevEndDate],
         );
