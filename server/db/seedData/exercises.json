@@ -455,7 +455,7 @@
         ]
     },
     {
-        "name": "Overhead Press",
+        "name": "Overhead Barbell Press",
         "muscle_groups": [
             "shoulders"
         ],
@@ -2004,5 +2004,61 @@
         ],
         "description": "Isolates the inner thigh muscles.",
         "form_guide": []
+    },
+    {
+        "name": "Front Raise",
+        "muscle_groups": [
+            "shoulders"
+        ],
+        "equipment": [
+            "dumbbell"
+        ],
+        "description": "Isolates the front delts by lifting the arms directly in front of the body. Keep the movement strict and avoid swinging.",
+        "form_guide": [
+            {
+                "step": 1,
+                "instruction": "Stand tall holding dumbbells in front of your thighs with palms facing down."
+            },
+            {
+                "step": 2,
+                "instruction": "Raise both arms straight in front of you to shoulder height."
+            },
+            {
+                "step": 3,
+                "instruction": "Pause briefly at the top without shrugging."
+            },
+            {
+                "step": 4,
+                "instruction": "Lower dumbbells slowly back to the starting position."
+            }
+        ]
+    },
+    {
+        "name": "Overhead Dumbbell Press",
+        "muscle_groups": [
+            "shoulders"
+        ],
+        "equipment": [
+            "dumbbell"
+        ],
+        "description": "A compound shoulder movement using dumbbells for independent arm control and greater range of motion. Keep core braced throughout.",
+        "form_guide": [
+            {
+                "step": 1,
+                "instruction": "Hold dumbbells at shoulder height with palms facing forward."
+            },
+            {
+                "step": 2,
+                "instruction": "Brace your core and keep your back upright."
+            },
+            {
+                "step": 3,
+                "instruction": "Press dumbbells overhead until arms are fully extended."
+            },
+            {
+                "step": 4,
+                "instruction": "Lower back to shoulder height under control."
+            }
+        ]
     }
 ]
