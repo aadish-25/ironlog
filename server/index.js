@@ -10,7 +10,10 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// This middleware parses requests with a JSON body.
 app.use(express.json());
+
+// This middleware parses URL-encoded form data, which is commonly sent from HTML forms.
 app.use(express.urlencoded({ extended: true }));
 
 const allowedOrigins = [
@@ -23,6 +26,11 @@ const allowedOrigins = [
     "https://192.168.1.5:5173" 
 ];
 
+// Dynamically add the frontend URL from environment variables if it exists.
+// This is useful for production/staging deployments where the URL isn't localhost.
+// Frontend application's URL (set via environment variables on the hosting platform).
+// If provided, add it to the list of allowed CORS origins so the deployed frontend
+// can communicate with this backend.
 if (process.env.CLIENT_URL) {
     allowedOrigins.push(process.env.CLIENT_URL);
 }
