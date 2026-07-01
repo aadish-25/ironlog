@@ -3,6 +3,7 @@ import pool from "../db/connection.js";
 
 const auth = async (req, res, next) => {
     try {
+        // Clerk attaches this "userId" automatically from the token to the request headers
         const { userId } = getAuth(req);
         if (!userId) {
             return res.status(401).json({

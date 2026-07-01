@@ -6,13 +6,23 @@ const getUserByIdService = async (id) => {
 };
 
 const updateUserService = async (id, data) => {
-    const allowList = ["name", "profile_picture_url", "preferred_workout_time", "notifications_enabled"];
+    // columnMap maps allowed incoming field names to their exact, hardcoded
+    // SQL column names. The value written into the query string always comes
+    // from this map — never from the request — making column-name injection
+    // structurally impossible even if validation logic changes in the future.
+    const columnMap = {
+        name: "name",
+        profile_picture_url: "profile_picture_url",
+        preferred_workout_time: "preferred_workout_time",
+        notifications_enabled: "notifications_enabled",
+    };
+
     const keys = Object.keys(data);
 
-    const invalidKey = keys.find((key) => !allowList.includes(key));
+    const invalidKey = keys.find((key) => !(key in columnMap));
 
     if (invalidKey) {
-        console.log("Invalid update parameter: ${invalidKey}");
+        console.log(`Invalid update parameter: ${invalidKey}`);
         throw new Error(`Invalid update parameter: ${invalidKey}`);
     }
 
@@ -21,17 +31,17 @@ const updateUserService = async (id, data) => {
         throw new Error("No valid fields provided for update");
     }
 
-    // building sql query
+    // Build parameterised SET clauses using the safe column names from columnMap,
+    // never the raw key strings from the request.
     const setClauses = [];
     const values = [];
 
     keys.forEach((key, index) => {
-        setClauses.push(`${key} = $${index + 1}`);
+        const safeColumn = columnMap[key]; // always a source-code literal
+        setClauses.push(`${safeColumn} = $${index + 1}`);
         values.push(data[key]);
     });
     values.push(id);
-
-    // Keys are valid, extract and query
 
     const query = `
         UPDATE users
@@ -74,6 +84,8 @@ const getUserStatsService = async (userId) => {
 
     // JS getDay(): 0 is Sunday. We want Monday=0, Sunday=6
     const currentDayOfWeek = (now.getDay() + 6) % 7;
+
+    // This calculates this Monday's midnight timestamp
     const startOfWeekTime = normalizeDate(
         new Date(now.getTime() - currentDayOfWeek * msPerDay),
     );
