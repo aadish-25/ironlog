@@ -23,10 +23,7 @@ export function useHomeDashboard() {
     // ─── DERIVED DATA ──────────────────────────────────────────────────────────
 
     // 1. Date calculation
-    // ── PORTFOLIO_MOCK START ── override date to Wednesday July 15 for screenshot
-    const today = new Date(2026, 6, 15); // July 15, 2026 (Wednesday)
-    // const today = new Date(); // <-- real line, uncomment to revert
-    // ── PORTFOLIO_MOCK END ──
+    const today = new Date();
     today.setHours(0, 0, 0, 0);
     const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().split('T')[0];
 
@@ -53,7 +50,6 @@ export function useHomeDashboard() {
     const inProgress = !!todaySession && !skipped && !todaySession.is_completed;
 
     // 4. Week History (Current week Mon-Sun)
-    // ── PORTFOLIO_MOCK START ── force Mon + Tue as "done" for screenshot
     const weekHistory = [0, 1, 2, 3, 4, 5, 6].map((dbDay) => {
         const labels = ["M", "T", "W", "T", "F", "S", "S"];
         let type: "done" | "rest" | "today" | "future" = "future";
@@ -62,14 +58,12 @@ export function useHomeDashboard() {
             type = "today";
         } else if (dbDay > dbDayOfWeek) {
             type = "future";
-        } else if (dbDay === 0 || dbDay === 1) {
-            // PORTFOLIO_MOCK: Mon (0) and Tue (1) hardcoded as done
-            type = "done";
         } else {
-            // Past day — real logic
+            // Past day
             const daysAgo = dbDayOfWeek - dbDay;
             const pastDate = new Date(today);
             pastDate.setDate(today.getDate() - daysAgo);
+            const pastDateStr = new Date(pastDate.getTime() - pastDate.getTimezoneOffset() * 60000).toISOString().split('T')[0];
             
             const sessionOnDay = sessions.find(s => {
                 const sDate = (s as any).date || s.started_at;
@@ -83,10 +77,13 @@ export function useHomeDashboard() {
             if (sessionOnDay && !sessionOnDay.is_skipped) {
                 type = "done";
             } else {
+                // Was it a rest day?
                 const splitDayForPast = activeSplit?.days?.find((d: any) => d.day_of_week === dbDay);
                 if (splitDayForPast?.type === "rest") {
                     type = "rest";
                 } else {
+                    // It was a training day, but no session found (missed)
+                    // The UI 'rest' dot represents a missed day or rest day based on design.
                     type = "rest";
                 }
             }
@@ -94,7 +91,6 @@ export function useHomeDashboard() {
 
         return { label: labels[dbDay], type };
     });
-    // ── PORTFOLIO_MOCK END ──
 
     // 5. Stats
     const setsLogged = todaySession?.sets_logged || 0;
