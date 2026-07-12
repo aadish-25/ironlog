@@ -39,7 +39,10 @@ export function HomePage() {
     const greeting = hour < 12 ? "Morning" : hour < 17 ? "Afternoon" : "Evening";
 
     const userName = user?.name;
-    const formattedDate = new Date().toLocaleDateString("en-US", {
+    // ── PORTFOLIO_MOCK START ── show Wednesday July 15 for screenshot
+    const formattedDate = new Date(2026, 6, 15).toLocaleDateString("en-US", {
+    // const formattedDate = new Date().toLocaleDateString("en-US", { // <-- real line, uncomment to revert
+    // ── PORTFOLIO_MOCK END ──
         weekday: "long",
         month: "short",
         day: "numeric",
