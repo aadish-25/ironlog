@@ -20,6 +20,7 @@ export function useCurrentUser() {
         try {
             const result = await updateUser(data);
             mutate(result, false);
+            mutate();
         } catch (err) {
             if (axios.isAxiosError(err)) {
                 console.error(err.response?.data?.message ?? err.message);

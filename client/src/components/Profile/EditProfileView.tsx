@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { ChevronLeft, Camera, Pencil } from "lucide-react";
+import { mutate } from "swr";
 import { api } from "../../services/api";
 
 interface EditProfileViewProps {
@@ -45,6 +46,7 @@ export function EditProfileView({ currentName, currentProfilePic, onBack, onSave
 
       // Save immediately so it feels snappy
       await api.patch("/users/me", { profile_picture_url: newUrl });
+      mutate("/users/me");
       setProfilePic(newUrl);
     } catch (err) {
       console.error("Failed to upload or save profile picture", err);
@@ -60,6 +62,7 @@ export function EditProfileView({ currentName, currentProfilePic, onBack, onSave
     setUploading(true);
     try {
       await api.patch("/users/me", { profile_picture_url: null });
+      mutate("/users/me");
       setProfilePic(null);
     } catch (err) {
       console.error("Failed to remove profile picture", err);

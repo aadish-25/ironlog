@@ -29,6 +29,7 @@ export function useSplit() {
         try {
             const result = await createSplit(name);
             mutate((prev) => (prev ? [...prev, result] : [result]), false);
+            mutate();
             return result;
         } catch (err) {
             if (axios.isAxiosError(err)) {
@@ -86,6 +87,7 @@ export function useSplit() {
                 prev ? prev.map((s) => (s.id === id ? result : s)) : prev,
                 false
             );
+            mutate();
         } catch (err) {
             console.error(err);
         } finally {

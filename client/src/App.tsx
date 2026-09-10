@@ -17,6 +17,8 @@ import { ExerciseDetailPage } from "./pages/ExerciseDetailPage";
 import { SplitDetailPage } from "./pages/SplitDetailPage";
 import { SplitDayDetailPage } from "./pages/SplitDayDetailPage";
 
+import { usePrefetchOnLogin } from "./hooks/usePrefetch";
+
 function AuthGate({ children }: { children: React.ReactNode }) {
   const { isLoaded, isSignedIn } = useAuth();
 
@@ -53,6 +55,8 @@ function ScrollToTop() {
 }
 
 export default function App() {
+  usePrefetchOnLogin();
+
   return (
     <BrowserRouter>
       <ScrollToTop />

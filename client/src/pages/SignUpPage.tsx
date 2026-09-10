@@ -1,9 +1,14 @@
+import { useEffect } from "react";
 import { SignUp } from "@clerk/clerk-react";
 import logo from "../assets/logo.png";
 import { dark } from "@clerk/themes";
 import { motion } from "motion/react";
 
 export function SignUpPage() {
+  useEffect(() => {
+    localStorage.removeItem("ironlog_swr_cache");
+    localStorage.removeItem("ironlog_prefetch_timestamp");
+  }, []);
   return (
     <div className="min-h-[100dvh] w-full flex items-center justify-center bg-bg relative overflow-hidden px-4">
       {/* Background glowing effects */}

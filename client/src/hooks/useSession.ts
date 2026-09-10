@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import useSWR from "swr";
+import useSWR, { mutate as globalMutate } from "swr";
 import axios from "axios";
 import { fetcher } from "../services/api";
 import { completeSession } from "../services/sessions";
@@ -31,6 +31,28 @@ export function useSession(sessionId: string | null) {
         try {
             const result = await completeSession(id);
             mutate((currentData) => currentData ? { ...currentData, ...result } : undefined, false);
+
+            const now = new Date();
+            const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+            // Invalidate all affected caches in parallel to guarantee real-time data freshness
+            const invalidationPromises: Promise<unknown>[] = [
+                globalMutate("/sessions"),
+                globalMutate("/users/me/stats"),
+                globalMutate("/exercise"),
+                globalMutate(`/sessions/summary?month=${currentMonthStr}`),
+                globalMutate("/sessions/history?limit=10&offset=0"),
+            ];
+
+            exercises.forEach((ex) => {
+                if (ex.exercise_id) {
+                    invalidationPromises.push(globalMutate(`/exercise/${ex.exercise_id}/progress`));
+                    invalidationPromises.push(globalMutate(`/exercise/${ex.exercise_id}`));
+                }
+            });
+
+            await Promise.allSettled(invalidationPromises);
+
             return result;
         } catch (err) {
             console.error(err);

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import useSWR from "swr";
+import useSWR, { mutate as globalMutate } from "swr";
 import axios from "axios";
 import { fetcher } from "../services/api";
 import { updateSplit } from "../services/splits";
@@ -35,6 +35,7 @@ export function useSplitDetail(splitId: string) {
             }, false);
             await updateSplitDay(dayId, updates);
             mutateSplit();
+            globalMutate("/splits");
         } catch (err) {
             console.error(err);
             mutateSplit(); // rollback on error
@@ -80,6 +81,7 @@ export function useSplitDetail(splitId: string) {
 
             await addExercisesToDay(dayId, exerciseIds, startingIndex);
             mutateSplit(); // Background re-fetch
+            globalMutate("/splits");
         } catch (err) {
             console.error(err);
             mutateSplit(); // Rollback optimistic update
@@ -110,6 +112,7 @@ export function useSplitDetail(splitId: string) {
             }, false);
             await removeExerciseFromDay(splitDayExerciseId);
             mutateSplit();
+            globalMutate("/splits");
         } catch (err) {
             console.error(err);
             mutateSplit();
@@ -124,6 +127,7 @@ export function useSplitDetail(splitId: string) {
         try {
             await reorderExerciseInDay(splitDayExerciseId, newIndex);
             mutateSplit(); // Backend handles shifting other items, so just re-fetch
+            globalMutate("/splits");
         } catch (err) {
             console.error(err);
             mutateSplit();
@@ -139,6 +143,7 @@ export function useSplitDetail(splitId: string) {
             mutateSplit(prev => prev ? { ...prev, name: newName } : prev, false);
             await updateSplit(splitId, newName);
             mutateSplit();
+            globalMutate("/splits");
         } catch (err) {
             console.error(err);
             mutateSplit();
