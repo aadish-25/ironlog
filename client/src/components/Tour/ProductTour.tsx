@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Joyride, STATUS, EVENTS } from "react-joyride";
 import type { Step, EventData, TooltipRenderProps } from "react-joyride";
+import { useSplit } from "../../hooks/useSplit";
 
 const CustomTooltip = ({
   index,
@@ -54,13 +55,25 @@ const CustomTooltip = ({
 
 export function ProductTour() {
     const location = useLocation();
+    const { splits, loading: splitsLoading } = useSplit();
     const [run, setRun] = useState(false);
     const [steps, setSteps] = useState<Step[]>([]);
     
     useEffect(() => {
+        if (splitsLoading) return;
+
         const isHome = location.pathname === "/";
         const isSplitsList = location.pathname === "/splits";
         const isSplitDetail = location.pathname.match(/^\/splits\/[a-zA-Z0-9-]+$/);
+
+        const isManuallyTriggered = sessionStorage.getItem("tour_manually_triggered") === "true";
+        const hasExistingSplits = splits && splits.length > 0;
+
+        // If user is an existing lifter (already has splits) and didn't manually request the tour, do not run
+        if (hasExistingSplits && !isManuallyTriggered) {
+            setRun(false);
+            return;
+        }
 
         const phase1Done = localStorage.getItem("tour_phase_1_done");
         const phase2Done = localStorage.getItem("tour_phase_2_done");
@@ -77,19 +90,17 @@ export function ProductTour() {
             };
 
             if (!checkAndRun()) {
-                const observer = new MutationObserver((mutations, obs) => {
+                const observer = new MutationObserver(() => {
                     if (checkAndRun()) {
-                        obs.disconnect();
+                        observer.disconnect();
                     }
                 });
                 observer.observe(document.body, { childList: true, subtree: true });
-                
-                // Cleanup observer on unmount or path change
                 return () => observer.disconnect();
             }
         };
 
-        if (isHome && !phase1Done) {
+        if (isHome && (!phase1Done || isManuallyTriggered)) {
             return startTourWhenReady(".tour-profile", [
                 {
                     target: "body",
@@ -108,7 +119,7 @@ export function ProductTour() {
                     placement: "top",
                 }
             ]);
-        } else if (isSplitsList && !phase2Done && phase1Done) {
+        } else if (isSplitsList && (!phase2Done || isManuallyTriggered)) {
             return startTourWhenReady(".tour-new-split", [
                 {
                     target: "body",
@@ -123,7 +134,7 @@ export function ProductTour() {
                     skipBeacon: true,
                 }
             ]);
-        } else if (isSplitDetail && phase3Done !== "true") {
+        } else if (isSplitDetail && (!phase3Done || isManuallyTriggered)) {
             return startTourWhenReady(".tour-day-card", [
                 {
                     target: "body",
@@ -141,7 +152,7 @@ export function ProductTour() {
         } else {
             setRun(false);
         }
-    }, [location.pathname]);
+    }, [location.pathname, splits, splitsLoading]);
 
     const handleJoyrideCallback = (data: EventData) => {
         const { status, type } = data;
@@ -155,6 +166,7 @@ export function ProductTour() {
                 localStorage.setItem("tour_phase_2_done", "true");
             } else if (location.pathname.match(/^\/splits\/[a-zA-Z0-9-]+$/)) {
                 localStorage.setItem("tour_phase_3_done", "true");
+                sessionStorage.removeItem("tour_manually_triggered");
             }
         }
     };
@@ -168,8 +180,8 @@ export function ProductTour() {
             tooltipComponent={CustomTooltip}
             onEvent={handleJoyrideCallback}
             options={{
-                arrowColor: '#121212', // matches bg-card roughly, though custom tooltip handles box
-                overlayColor: 'rgba(0, 0, 0, 0.7)', // Slightly lighter overlay
+                arrowColor: '#121212',
+                overlayColor: 'rgba(0, 0, 0, 0.7)',
                 zIndex: 1000,
                 showProgress: true,
                 buttons: ['back', 'close', 'primary', 'skip'],
@@ -177,3 +189,4 @@ export function ProductTour() {
         />
     );
 }
+

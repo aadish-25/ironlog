@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import { useClerk } from "@clerk/clerk-react";
+import { mutate } from "swr";
 import { ProfileHeader } from "../components/Profile/ProfileHeader";
 import { JourneyStrip } from "../components/Profile/JourneyStrip";
 import { MonthlyStats } from "../components/Profile/MonthlyStats";
@@ -13,6 +15,7 @@ import { api } from "../services/api";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function ProfilePage() {
+  const navigate = useNavigate();
   const { signOut } = useClerk();
   const { user, stats, daysSinceJoined, memberSince, loading } = useProfile();
   const [activeTab, setActiveTab] = useState<"edit" | "privacy" | "help" | "about" | null>(null);
@@ -33,12 +36,21 @@ export function ProfilePage() {
   ];
 
   // ─── SETTINGS ───────────────────────────────────────────────────────────────
+  const handleStartTour = () => {
+    localStorage.removeItem("tour_phase_1_done");
+    localStorage.removeItem("tour_phase_2_done");
+    localStorage.removeItem("tour_phase_3_done");
+    sessionStorage.setItem("tour_manually_triggered", "true");
+    navigate("/");
+  };
+
   const accountItems: SettingsItem[] = [
     { icon: "✏️", label: "Edit profile", onClick: () => setActiveTab("edit") },
     { icon: "🔒", label: "Privacy & data", onClick: () => setActiveTab("privacy") },
   ];
 
   const preferenceItems: SettingsItem[] = [
+    { icon: "🧭", label: "App Tutorial", onClick: handleStartTour },
     { icon: "❓", label: "Help & support", onClick: () => setActiveTab("help") },
     { icon: "ℹ️", label: "About", onClick: () => setActiveTab("about") },
   ];
@@ -48,6 +60,7 @@ export function ProfilePage() {
     setNotificationsEnabled(newValue); // Optimistic
     try {
       await api.patch("/users/me", { notifications_enabled: newValue });
+      mutate("/users/me");
     } catch (e) {
       console.error("Failed to toggle notifications", e);
       setNotificationsEnabled(!newValue); // Revert on failure
@@ -60,7 +73,8 @@ export function ProfilePage() {
 
   const handleSaveName = async (newName: string) => {
     await api.patch("/users/me", { name: newName });
-    window.location.reload();
+    await mutate("/users/me");
+    setActiveTab(null);
   };
 
   if (loading && !stats) {
