@@ -1,3 +1,4 @@
+import React from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { MuscleBadge } from "../../components/ui/MuscleBadge";
 import type { Exercise, MuscleGroup } from "./types";
@@ -11,6 +12,38 @@ interface ExerciseListProps {
   onSelectExercise: (ex: Exercise) => void;
   onToggleSection: (muscle: string) => void;
 }
+
+const ExerciseRow = React.memo(function ExerciseRow({
+  ex,
+  onSelectExercise,
+}: {
+  ex: Exercise;
+  onSelectExercise: (ex: Exercise) => void;
+}) {
+  return (
+    <button
+      onClick={() => onSelectExercise(ex)}
+      className="w-full flex items-center gap-3 px-5 py-3 border-b border-[#141414] bg-transparent border-none cursor-pointer text-left hover:bg-raised transition-colors [content-visibility:auto] [contain-intrinsic-size:0_53px]"
+      aria-label={`${ex.name} — ${ex.muscles?.[0] || "Unknown"}`}
+    >
+      <MuscleBadge muscle={ex.muscles?.[0] || "Unknown"} />
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-zinc-200 font-medium truncate">{ex.name}</p>
+      </div>
+      {ex.prKg !== null ? (
+        <div className="flex items-center gap-[5px] shrink-0">
+          <span className="text-xs text-zinc-400">🏆</span>
+          <span className="font-display text-lg text-white tracking-[1px]">
+            {ex.prKg} kg
+          </span>
+        </div>
+      ) : (
+        <span className="text-[13px] text-zinc-500">No data</span>
+      )}
+      <ChevronRight size={16} className="text-zinc-600 ml-1 shrink-0" />
+    </button>
+  );
+});
 
 export function ExerciseList({
   exercises,
@@ -34,28 +67,11 @@ export function ExerciseList({
       ) : isSearching ? (
         /* Flat search results */
         exercises.map((ex) => (
-          <button
+          <ExerciseRow
             key={ex.id}
-            onClick={() => onSelectExercise(ex)}
-            className="w-full flex items-center gap-3 px-5 py-3 border-b border-[#141414] bg-transparent border-none cursor-pointer text-left hover:bg-raised transition-colors"
-            aria-label={`${ex.name} — ${ex.muscles?.[0] || 'Unknown'}`}
-          >
-            <MuscleBadge muscle={ex.muscles?.[0] || 'Unknown'} />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm text-zinc-200 font-medium truncate">{ex.name}</p>
-            </div>
-            {ex.prKg !== null ? (
-              <div className="flex items-center gap-[5px] shrink-0">
-                <span className="text-xs text-zinc-400">🏆</span>
-                <span className="font-display text-lg text-white tracking-[1px]">
-                  {ex.prKg} kg
-                </span>
-              </div>
-            ) : (
-              <span className="text-[13px] text-zinc-500">No data</span>
-            )}
-            <ChevronRight size={16} className="text-zinc-600 ml-1 shrink-0" />
-          </button>
+            ex={ex}
+            onSelectExercise={onSelectExercise}
+          />
         ))
       ) : (
         /* Grouped by muscle */
@@ -82,33 +98,11 @@ export function ExerciseList({
 
               {!isCollapsed &&
                 items.map((ex) => (
-                  <button
+                  <ExerciseRow
                     key={ex.id}
-                    onClick={() => onSelectExercise(ex)}
-                    className="w-full flex items-center gap-3 px-5 py-3 border-b border-[#141414] bg-transparent border-none cursor-pointer text-left hover:bg-raised transition-colors"
-                    aria-label={`${ex.name} — ${ex.muscles?.[0] || 'Unknown'}`}
-                  >
-                    <MuscleBadge muscle={ex.muscles?.[0] || 'Unknown'} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-zinc-200 font-medium truncate">
-                        {ex.name}
-                      </p>
-                    </div>
-                    {ex.prKg !== null ? (
-                      <div className="flex items-center gap-[5px] shrink-0">
-                        <span className="text-xs text-zinc-400">🏆</span>
-                        <span className="font-display text-lg text-white tracking-[1px]">
-                          {ex.prKg} kg
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="text-[13px] text-zinc-500">No data</span>
-                    )}
-                    <ChevronRight
-                      size={16}
-                      className="text-zinc-600 ml-1 shrink-0"
-                    />
-                  </button>
+                    ex={ex}
+                    onSelectExercise={onSelectExercise}
+                  />
                 ))}
             </div>
           );

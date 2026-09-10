@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import useSWR from "swr";
 import axios from "axios";
 import { fetcher } from "../services/api";
@@ -21,53 +21,69 @@ export function useExercises(exerciseId?: string) {
         fetcher
     );
 
-    const exercisesList: Exercise[] = exercisesData ? exercisesData.map((ex: any) => {
-        const rawMuscles = Array.isArray(ex.muscle_groups)
-            ? ex.muscle_groups
-            : (ex.muscle_group ? [ex.muscle_group] : []);
-        const muscles = rawMuscles.map((m: string) => m.charAt(0).toUpperCase() + m.slice(1));
-        
-        const rawEquipments = Array.isArray(ex.equipment)
-            ? ex.equipment
-            : (ex.equipment ? [ex.equipment] : []);
-        const equipments = rawEquipments.map((e: string) => e.charAt(0).toUpperCase() + e.slice(1));
+    const exercisesList: Exercise[] = useMemo(() => {
+        return exercisesData ? exercisesData.map((ex: any) => {
+            const rawMuscles = Array.isArray(ex.muscle_groups)
+                ? ex.muscle_groups
+                : (ex.muscle_group ? [ex.muscle_group] : []);
+            const muscles = rawMuscles.map((m: string) => m.charAt(0).toUpperCase() + m.slice(1));
+            
+            const rawEquipments = Array.isArray(ex.equipment)
+                ? ex.equipment
+                : (ex.equipment ? [ex.equipment] : []);
+            const equipments = rawEquipments.map((e: string) => e.charAt(0).toUpperCase() + e.slice(1));
 
-        return {
-            id: ex.id,
-            name: ex.name,
-            muscles,
-            equipments,
-            prKg: ex.pr_kg ?? null,
-        };
-    }) : [];
+            return {
+                id: ex.id,
+                name: ex.name,
+                muscles,
+                equipments,
+                prKg: ex.pr_kg ?? null,
+            };
+        }) : [];
+    }, [exercisesData]);
 
-    const exercise: Exercise | null = exerciseData ? (() => {
-        const rawMuscles = Array.isArray(exerciseData.muscle_groups) 
-            ? exerciseData.muscle_groups 
-            : (exerciseData.muscle_group ? [exerciseData.muscle_group] : []);
-        const muscles = rawMuscles.map((m: string) => m.charAt(0).toUpperCase() + m.slice(1));
-        
-        const rawEquipments = Array.isArray(exerciseData.equipment)
-            ? exerciseData.equipment
-            : (exerciseData.equipment ? [exerciseData.equipment] : []);
-        const equipments = rawEquipments.map((e: string) => e.charAt(0).toUpperCase() + e.slice(1));
+    const exercise: Exercise | null = useMemo(() => {
+        if (exerciseData) {
+            const rawMuscles = Array.isArray(exerciseData.muscle_groups) 
+                ? exerciseData.muscle_groups 
+                : (exerciseData.muscle_group ? [exerciseData.muscle_group] : []);
+            const muscles = rawMuscles.map((m: string) => m.charAt(0).toUpperCase() + m.slice(1));
+            
+            const rawEquipments = Array.isArray(exerciseData.equipment)
+                ? exerciseData.equipment
+                : (exerciseData.equipment ? [exerciseData.equipment] : []);
+            const equipments = rawEquipments.map((e: string) => e.charAt(0).toUpperCase() + e.slice(1));
 
-        return {
-            id: exerciseData.id,
-            name: exerciseData.name,
-            muscles,
-            equipments,
-            prKg: null,
-            formGuide: Array.isArray(exerciseData.form_guide) ? exerciseData.form_guide : [],
-        };
-    })() : null;
+            return {
+                id: exerciseData.id,
+                name: exerciseData.name,
+                muscles,
+                equipments,
+                prKg: exerciseData.pr_kg ?? null,
+                formGuide: Array.isArray(exerciseData.form_guide) ? exerciseData.form_guide : [],
+            };
+        }
+        if (exerciseId && exercisesList.length > 0) {
+            const found = exercisesList.find((e) => e.id === exerciseId);
+            if (found) {
+                return {
+                    ...found,
+                    formGuide: [],
+                };
+            }
+        }
+        return null;
+    }, [exerciseData, exerciseId, exercisesList]);
 
-    const progress: ExerciseProgress[] = progressData ? progressData.map((item: any) => ({
-        session_date: item.date || item.session_date,
-        max_weight: Number(item.max_weight) || 0,
-        total_volume: Number(item.volume || item.total_volume) || 0,
-        pr_hit: item.pr_hit ?? false,
-    })) : [];
+    const progress: ExerciseProgress[] = useMemo(() => {
+        return progressData ? progressData.map((item: any) => ({
+            session_date: item.date || item.session_date,
+            max_weight: Number(item.max_weight) || 0,
+            total_volume: Number(item.volume || item.total_volume) || 0,
+            pr_hit: item.pr_hit ?? false,
+        })) : [];
+    }, [progressData]);
 
     const loading = loadingExercises || loadingExercise || loadingProgress;
     const combinedError = exercisesError || exerciseError || progressError;

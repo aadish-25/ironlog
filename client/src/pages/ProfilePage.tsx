@@ -40,6 +40,7 @@ export function ProfilePage() {
     localStorage.removeItem("tour_phase_1_done");
     localStorage.removeItem("tour_phase_2_done");
     localStorage.removeItem("tour_phase_3_done");
+    localStorage.removeItem("tour_completed");
     sessionStorage.setItem("tour_manually_triggered", "true");
     navigate("/");
   };
@@ -68,6 +69,9 @@ export function ProfilePage() {
   };
 
   const handleLogout = () => {
+    localStorage.removeItem("ironlog_swr_cache");
+    localStorage.removeItem("ironlog_prefetch_timestamp");
+    localStorage.removeItem("tour_completed");
     signOut();
   };
 

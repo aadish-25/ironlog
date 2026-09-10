@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { BottomSheet } from "../components/ui/BottomSheet";
 import { ExercisesHeader } from "../components/Exercises/ExercisesHeader";
@@ -12,12 +12,11 @@ import { useExercises } from "../hooks/useExercises";
 export function ExercisesPage() {
     const { exercisesList } = useExercises();
     const navigate = useNavigate();
+
     // ─── EXERCISE DATA ──────────────────────────────────────────────────────────
-    // TODO: This component needs the full list of exercises the user has added.
     const exercises: Exercise[] = exercisesList ?? [];
 
     // ─── SEARCH & FILTER STATE ──────────────────────────────────────────────────
-
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedMuscles, setSelectedMuscles] = useState<Set<string>>(
         new Set(),
@@ -26,24 +25,26 @@ export function ExercisesPage() {
         new Set(["All"]),
     );
 
-    const filteredExercises = exercises.filter((ex) => {
-        if (
-            searchQuery &&
-            !ex.name.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-            return false;
-        if (selectedMuscles.size > 0 && !ex.muscles.some(m => selectedMuscles.has(m)))
-            return false;
-        if (
-            !selectedEquipment.has("All") &&
-            !ex.equipments.some(e => selectedEquipment.has(e))
-        ) {
-            return false;
-        }
-        return true;
-    });
+    const filteredExercises = useMemo(() => {
+        return exercises.filter((ex) => {
+            if (
+                searchQuery &&
+                !ex.name.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+                return false;
+            if (selectedMuscles.size > 0 && !ex.muscles.some(m => selectedMuscles.has(m)))
+                return false;
+            if (
+                !selectedEquipment.has("All") &&
+                !ex.equipments.some(e => selectedEquipment.has(e))
+            ) {
+                return false;
+            }
+            return true;
+        });
+    }, [exercises, searchQuery, selectedMuscles, selectedEquipment]);
 
-    // TODO: This component needs collapsible sections by muscle group.
+    // ─── COLLAPSIBLE SECTIONS ───────────────────────────────────────────────────
     const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
         new Set(),
     );
@@ -57,10 +58,12 @@ export function ExercisesPage() {
         (selectedEquipment.has("All") ? 0 : selectedEquipment.size);
 
     // Group exercises by muscle (preserving display order)
-    const grouped: MuscleGroup[] = MUSCLE_ORDER.map((muscle) => ({
-        muscle,
-        exercises: filteredExercises.filter((ex) => ex.muscles.includes(muscle)),
-    })).filter((group) => group.exercises.length > 0);
+    const grouped: MuscleGroup[] = useMemo(() => {
+        return MUSCLE_ORDER.map((muscle) => ({
+            muscle,
+            exercises: filteredExercises.filter((ex) => ex.muscles.includes(muscle)),
+        })).filter((group) => group.exercises.length > 0);
+    }, [filteredExercises]);
 
     // ─── EVENT HANDLERS ─────────────────────────────────────────────────────────
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,13 +99,13 @@ export function ExercisesPage() {
         });
     };
 
-    // TODO: Implement viewing exercise details (bottom sheet or new page)
-    const handleSelectExercise = (ex: Exercise) => {
+    // Handle viewing exercise details
+    const handleSelectExercise = useCallback((ex: Exercise) => {
         navigate(`/exercises/${ex.id}`);
-    };
+    }, [navigate]);
 
-    // TODO: Implement toggling collapsed state of a muscle group section.
-    const handleToggleSection = (muscle: string) => {
+    // Handle toggling collapsed state of a muscle group section
+    const handleToggleSection = useCallback((muscle: string) => {
         setCollapsedSections((prev) => {
             const next = new Set(prev);
             if (next.has(muscle)) {
@@ -112,7 +115,7 @@ export function ExercisesPage() {
             }
             return next;
         });
-    };
+    }, []);
 
     return (
         <section

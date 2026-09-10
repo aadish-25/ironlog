@@ -60,20 +60,34 @@ export function ProductTour() {
     const [steps, setSteps] = useState<Step[]>([]);
     
     useEffect(() => {
-        if (splitsLoading) return;
+        const isManuallyTriggered = sessionStorage.getItem("tour_manually_triggered") === "true";
+
+        // If not manually triggered, check if tour is already marked completed
+        if (!isManuallyTriggered) {
+            if (localStorage.getItem("tour_completed") === "true") {
+                setRun(false);
+                return;
+            }
+
+            // Do NOT decide to start tour while splits data is still loading!
+            if (splitsLoading || splits === null) {
+                return;
+            }
+
+            // If user already has splits, they are an existing lifter: mark completed and don't run
+            if (splits.length > 0) {
+                localStorage.setItem("tour_completed", "true");
+                localStorage.setItem("tour_phase_1_done", "true");
+                localStorage.setItem("tour_phase_2_done", "true");
+                localStorage.setItem("tour_phase_3_done", "true");
+                setRun(false);
+                return;
+            }
+        }
 
         const isHome = location.pathname === "/";
         const isSplitsList = location.pathname === "/splits";
         const isSplitDetail = location.pathname.match(/^\/splits\/[a-zA-Z0-9-]+$/);
-
-        const isManuallyTriggered = sessionStorage.getItem("tour_manually_triggered") === "true";
-        const hasExistingSplits = splits && splits.length > 0;
-
-        // If user is an existing lifter (already has splits) and didn't manually request the tour, do not run
-        if (hasExistingSplits && !isManuallyTriggered) {
-            setRun(false);
-            return;
-        }
 
         const phase1Done = localStorage.getItem("tour_phase_1_done");
         const phase2Done = localStorage.getItem("tour_phase_2_done");
@@ -165,6 +179,14 @@ export function ProductTour() {
             } else if (location.pathname === "/splits") {
                 localStorage.setItem("tour_phase_2_done", "true");
             } else if (location.pathname.match(/^\/splits\/[a-zA-Z0-9-]+$/)) {
+                localStorage.setItem("tour_phase_3_done", "true");
+                localStorage.setItem("tour_completed", "true");
+                sessionStorage.removeItem("tour_manually_triggered");
+            }
+            if (status === STATUS.SKIPPED) {
+                localStorage.setItem("tour_completed", "true");
+                localStorage.setItem("tour_phase_1_done", "true");
+                localStorage.setItem("tour_phase_2_done", "true");
                 localStorage.setItem("tour_phase_3_done", "true");
                 sessionStorage.removeItem("tour_manually_triggered");
             }
