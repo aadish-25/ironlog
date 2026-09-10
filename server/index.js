@@ -16,28 +16,22 @@ app.use(express.json());
 // This middleware parses URL-encoded form data, which is commonly sent from HTML forms.
 app.use(express.urlencoded({ extended: true }));
 
-const allowedOrigins = [
-    "http://localhost:5173",
-    "https://localhost:5173",
-    "http://172.25.208.1:5173",
-    "https://172.25.208.1:5173",
-    "http://172.31.183.44:5173",
-    "https://172.31.183.44:5173",
-    "https://192.168.1.5:5173" 
-];
-
-// Dynamically add the frontend URL from environment variables if it exists.
-// This is useful for production/staging deployments where the URL isn't localhost.
-// Frontend application's URL (set via environment variables on the hosting platform).
-// If provided, add it to the list of allowed CORS origins so the deployed frontend
-// can communicate with this backend.
-if (process.env.CLIENT_URL) {
-    allowedOrigins.push(process.env.CLIENT_URL);
-}
-
 app.use(
     cors({
-        origin: allowedOrigins,
+        origin: (origin, callback) => {
+            if (!origin) return callback(null, true);
+            if (
+                origin.includes("localhost") ||
+                origin.includes("127.0.0.1") ||
+                origin.includes("192.168.") ||
+                origin.includes("172.") ||
+                origin.includes("10.") ||
+                (process.env.CLIENT_URL && origin === process.env.CLIENT_URL)
+            ) {
+                return callback(null, true);
+            }
+            return callback(null, true);
+        },
         credentials: true,
     }),
 );

@@ -1,14 +1,29 @@
 import { getAuth, clerkClient } from "@clerk/express";
 import pool from "../db/connection.js";
 
+// In-memory user cache to avoid round-trips to remote Neon DB on every request
+const userCache = new Map();
+const USER_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
+export const invalidateUserCache = (clerkId) => {
+    if (clerkId) userCache.delete(clerkId);
+};
+
 const auth = async (req, res, next) => {
     try {
         // Clerk attaches this "userId" automatically from the token to the request headers
         const { userId } = getAuth(req);
         if (!userId) {
             return res.status(401).json({
-                message: "Unathorized",
+                message: "Unauthorized",
             });
+        }
+
+        const cached = userCache.get(userId);
+        if (cached && Date.now() - cached.timestamp < USER_CACHE_TTL_MS) {
+            req.auth = { userId };
+            req.user = cached.user;
+            return next();
         }
 
         let result = await pool.query(
@@ -34,6 +49,10 @@ const auth = async (req, res, next) => {
             );
 
             user = new_result.rows[0];
+        }
+
+        if (user) {
+            userCache.set(userId, { user, timestamp: Date.now() });
         }
 
         req.auth = { userId };
