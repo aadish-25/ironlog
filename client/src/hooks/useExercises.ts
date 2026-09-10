@@ -39,6 +39,7 @@ export function useExercises(exerciseId?: string) {
                 muscles,
                 equipments,
                 prKg: ex.pr_kg ?? null,
+                formGuide: Array.isArray(ex.form_guide) ? ex.form_guide : [],
             };
         }) : [];
     }, [exercisesData]);
@@ -67,10 +68,7 @@ export function useExercises(exerciseId?: string) {
         if (exerciseId && exercisesList.length > 0) {
             const found = exercisesList.find((e) => e.id === exerciseId);
             if (found) {
-                return {
-                    ...found,
-                    formGuide: [],
-                };
+                return found;
             }
         }
         return null;

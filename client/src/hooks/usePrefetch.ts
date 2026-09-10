@@ -43,12 +43,44 @@ export function usePrefetchOnLogin() {
       ];
 
       try {
-        await Promise.allSettled(
+        const results = await Promise.allSettled(
           endpoints.map((endpoint) =>
             mutate(endpoint, fetcher(endpoint), false)
           )
         );
         localStorage.setItem(PREFETCH_KEY, Date.now().toString());
+
+        // Once the exercise list resolves, immediately prefetch details and progress in background
+        const exerciseResult = results[0];
+        if (exerciseResult && exerciseResult.status === "fulfilled" && Array.isArray((exerciseResult as any).value)) {
+          const exercisesList = (exerciseResult as any).value as any[];
+
+          // 1. High-priority: prefetch progress & details for exercises with recorded workouts/PRs
+          const activeExercises = exercisesList.filter((ex: any) => ex.pr_kg !== null && ex.pr_kg > 0);
+          for (const ex of activeExercises) {
+            mutate(`/exercise/${ex.id}/progress`, fetcher(`/exercise/${ex.id}/progress`), false);
+            mutate(`/exercise/${ex.id}`, fetcher(`/exercise/${ex.id}`), false);
+          }
+
+          // 2. Controlled worker pool (max 4 concurrent requests) to smoothly prefetch all remaining exercises
+          const remaining = exercisesList.filter((ex: any) => !ex.pr_kg || ex.pr_kg <= 0);
+          let cursor = 0;
+          const worker = async () => {
+            while (cursor < remaining.length) {
+              const item = remaining[cursor++];
+              if (item) {
+                try {
+                  await mutate(`/exercise/${item.id}`, fetcher(`/exercise/${item.id}`), false);
+                } catch {
+                  // Ignore background prefetch network hiccups
+                }
+              }
+            }
+          };
+          for (let w = 0; w < 4; w++) {
+            worker();
+          }
+        }
       } catch (err) {
         console.error("Failed to prefetch initial data", err);
       }
