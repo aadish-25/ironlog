@@ -67,3 +67,13 @@ const auth = async (req, res, next) => {
 };
 
 export default auth;
+
+// Implement caching using upstash redis since using in memoery wont work in serverless hosting platforms like Vercel
+// import { Redis } from "@upstash/redis";
+// const redis = new Redis({ url: "...", token: "..." });
+
+// // Read from cache
+// const cachedUser = await redis.get(`user:${userId}`);
+
+// // Write to cache with a strict 10-minute TTL (600 seconds)
+// await redis.set(`user:${userId}`, JSON.stringify(user), { ex: 600 });
