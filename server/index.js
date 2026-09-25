@@ -19,7 +19,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
     cors({
         origin: (origin, callback) => {
+            // Allow requests with no origin (like mobile apps or curl)
             if (!origin) return callback(null, true);
+
             if (
                 origin.includes("localhost") ||
                 origin.includes("127.0.0.1") ||
@@ -30,7 +32,9 @@ app.use(
             ) {
                 return callback(null, true);
             }
-            return callback(null, true);
+            // switch if cors causes an issue to essentially allow every origin
+            // return callback(null, true);
+            return callback(null, false)
         },
         credentials: true,
     }),
@@ -39,7 +43,7 @@ app.use(
 app.use(clerkMiddleware());
 
 app.get("/", (req, res) => {
-    res.send("<h1>Phase 1 complete!!</h1>");
+    res.send("<h1>Phase 1 complete!! Phase 2 in progress</h1>");
 });
 
 app.get("/protected", auth, (req, res) => {
