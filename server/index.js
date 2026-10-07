@@ -34,9 +34,10 @@ app.use(
             }
             // switch if cors causes an issue to essentially allow every origin
             // return callback(null, true);
-            return callback(null, false)
+            return callback(null, false);
         },
         credentials: true,
+        maxAge: 86400, // Cache preflight OPTIONS responses for 24 hours
     }),
 );
 
