@@ -4,11 +4,14 @@ import { clerkMiddleware } from "@clerk/express";
 import auth from "./middlewares/clerkAuth.middleware.js";
 import cors from "cors";
 import pool from "./db/connection.js";
+import compression from "compression";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+app.use(compression());
 
 // This middleware parses requests with a JSON body.
 app.use(express.json());

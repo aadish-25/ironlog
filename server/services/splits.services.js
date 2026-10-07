@@ -1,4 +1,5 @@
 import pool from "../db/connection.js";
+import { getCache, setCache, delCache } from "../lib/redis.js";
 
 // Creates a new split AND auto-generates 7 split_day rows (Mon-Sun) for it.
 // Uses a transaction so both inserts succeed or both are rolled back.
@@ -50,6 +51,7 @@ const createSplitWithDaysService = async (userId, name) => {
         );
 
         await client.query("COMMIT");
+        await delCache(`splits:${userId}`);
 
         // Return the new split with an empty days array (days will be fetched separately when needed)
         return { ...split, days: [] };
@@ -68,6 +70,10 @@ const createSplitWithDaysService = async (userId, name) => {
 // fetching everything in bulk and grouping it in JS.
 const getSplitsByUserService = async (userId) => {
     try {
+        const cacheKey = `splits:${userId}`;
+        const cached = await getCache(cacheKey);
+        if (cached) return cached;
+
         // Query 1: Get all splits for this user
         const splitsResult = await pool.query(
             "SELECT * FROM splits WHERE user_id = $1 ORDER BY created_at ASC",
@@ -115,7 +121,7 @@ const getSplitsByUserService = async (userId) => {
         // Assemble the final nested structure:
         // split → days[] → exercises[]
         // Also adds a derived `type` field ("rest" | "train") based on is_rest flag.
-        return splits.map((split) => {
+        const result = splits.map((split) => {
             const days = (daysBySplit[split.id] ?? []).map((day) => {
                 const dayExercises = exercisesByDay[day.id] || [];
                 return {
@@ -126,6 +132,9 @@ const getSplitsByUserService = async (userId) => {
             });
             return { ...split, days };
         });
+
+        await setCache(cacheKey, result, 86400);
+        return result;
     } catch (error) {
         throw new Error("Could not retrieve splits for user", { cause: error });
     }
@@ -203,6 +212,7 @@ const updateSplitService = async (splitId, name, userId) => {
             [name, splitId, userId],
         );
 
+        await delCache(`splits:${userId}`);
         return result.rows[0];
     } catch (error) {
         throw new Error("Could not update split", { cause: error });
@@ -217,6 +227,7 @@ const deleteSplitService = async (splitId, userId) => {
             splitId,
             userId,
         ]);
+        await delCache(`splits:${userId}`);
     } catch (error) {
         throw new Error("Could not delete split", { cause: error });
     }
@@ -249,6 +260,7 @@ const setActiveSplitService = async (userId, splitId) => {
         }
 
         await client.query("COMMIT");
+        await delCache(`splits:${userId}`);
 
         return result.rows[0];
     } catch (error) {

@@ -1,4 +1,5 @@
 import pool from "../db/connection.js";
+import { delCache } from "../lib/redis.js";
 
 const createSessionService = async (
     userId,
@@ -182,6 +183,7 @@ const deleteSessionService = async (sessionId, userId) => {
             [sessionId, userId],
         );
 
+        await delCache(`prs:${userId}`);
         return result;
     } catch (error) {
         throw new Error("Could not delete session", { cause: error });
@@ -425,6 +427,7 @@ const completeSessionService = async (sessionId, userId, sets = []) => {
         );
 
         await client.query("COMMIT");
+        await delCache(`prs:${userId}`);
         return result.rows[0];
     } catch (error) {
         if (client) await client.query("ROLLBACK");

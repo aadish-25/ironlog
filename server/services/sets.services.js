@@ -1,4 +1,5 @@
 import pool from "../db/connection.js";
+import { delCache } from "../lib/redis.js";
 
 const checkIsPR = async (userId, exerciseId, weightKg) => {
     const result = await pool.query(
@@ -44,6 +45,7 @@ const createSetService = async (
             [sessionId, exerciseId, userId, setNumber, weightKg, reps, isPR],
         );
 
+        await delCache(`prs:${userId}`);
         return result.rows[0];
     } catch (error) {
         throw new Error("Could not log set", { cause: error });
@@ -86,6 +88,7 @@ const updateSetService = async (setId, userId, updateData) => {
             values,
         );
 
+        await delCache(`prs:${userId}`);
         return result.rows[0];
     } catch (error) {
         throw error;
@@ -98,6 +101,7 @@ const deleteSetService = async (setId, userId) => {
             setId,
             userId,
         ]);
+        await delCache(`prs:${userId}`);
     } catch (error) {
         throw new Error("Could not delete set", { cause: error });
     }

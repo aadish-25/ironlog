@@ -1,31 +1,46 @@
 import { getAuth, clerkClient } from "@clerk/express";
 import pool from "../db/connection.js";
+import { getCache, setCache, delCache } from "../lib/redis.js";
 
-// In-memory user cache to avoid round-trips to remote Neon DB on every request
-const userCache = new Map();
-const USER_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+// Level 1: In-memory cache for ultra-fast hits during the same serverless invocation
+const memoryUserCache = new Map();
+const MEMORY_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
-export const invalidateUserCache = (clerkId) => {
-    if (clerkId) userCache.delete(clerkId);
+export const invalidateUserCache = async (clerkId) => {
+    if (clerkId) {
+        memoryUserCache.delete(clerkId);
+        await delCache(`user:${clerkId}`);
+    }
 };
 
 const auth = async (req, res, next) => {
     try {
-        // Clerk attaches this "userId" automatically from the token to the request headers
         const { userId } = getAuth(req);
         if (!userId) {
-            return res.status(401).json({
-                message: "Unauthorized",
-            });
+            return res.status(401).json({ message: "Unauthorized" });
         }
 
-        const cached = userCache.get(userId);
-        if (cached && Date.now() - cached.timestamp < USER_CACHE_TTL_MS) {
+        // 1. Check Level 1 In-Memory Cache (0 ms)
+        const inMemory = memoryUserCache.get(userId);
+        if (inMemory && Date.now() - inMemory.timestamp < MEMORY_TTL_MS) {
             req.auth = { userId };
-            req.user = cached.user;
+            req.user = inMemory.user;
             return next();
         }
 
+        // 2. Check Level 2 Upstash Redis (~1 ms)
+        const cachedUser = await getCache(`user:${userId}`);
+        if (cachedUser) {
+            memoryUserCache.set(userId, {
+                user: cachedUser,
+                timestamp: Date.now(),
+            });
+            req.auth = { userId };
+            req.user = cachedUser;
+            return next();
+        }
+
+        // 3. Fallback: Query Neon Database
         let result = await pool.query(
             "SELECT * FROM users WHERE clerk_id = $1",
             [userId],
@@ -34,7 +49,6 @@ const auth = async (req, res, next) => {
 
         if (!user) {
             const clerkUser = await clerkClient.users.getUser(userId);
-
             const name =
                 `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim();
 
@@ -43,37 +57,26 @@ const auth = async (req, res, next) => {
                 [userId, name],
             );
 
-            let new_result = await pool.query(
+            const newResult = await pool.query(
                 "SELECT * FROM users WHERE clerk_id = $1",
                 [userId],
             );
-
-            user = new_result.rows[0];
+            user = newResult.rows[0];
         }
 
+        // 4. Save to both caches (Redis TTL = 1 hour)
         if (user) {
-            userCache.set(userId, { user, timestamp: Date.now() });
+            memoryUserCache.set(userId, { user, timestamp: Date.now() });
+            await setCache(`user:${userId}`, user, 3600);
         }
 
         req.auth = { userId };
         req.user = user;
-
         next();
     } catch (err) {
         console.error("Auth middleware error: ", err);
-
         return res.status(500).json({ message: "Internal server error" });
     }
 };
 
 export default auth;
-
-// Implement caching using upstash redis since using in memoery wont work in serverless hosting platforms like Vercel
-// import { Redis } from "@upstash/redis";
-// const redis = new Redis({ url: "...", token: "..." });
-
-// // Read from cache
-// const cachedUser = await redis.get(`user:${userId}`);
-
-// // Write to cache with a strict 10-minute TTL (600 seconds)
-// await redis.set(`user:${userId}`, JSON.stringify(user), { ex: 600 });

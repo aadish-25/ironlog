@@ -16,6 +16,10 @@ async function getExercises(req, res) {
             muscleGroups,
             equipmentList,
         );
+        res.set(
+            "Cache-Control",
+            "public, max-age=86400, stale-while-revalidate=604800",
+        );
         res.status(200).json({
             message: "Exercises fetched successfully",
             data: result,
@@ -36,6 +40,10 @@ async function getExerciseById(req, res) {
         if (!result) {
             return res.status(404).json({ message: "Exercise not found" });
         }
+        res.set(
+            "Cache-Control",
+            "public, max-age=86400, stale-while-revalidate=604800",
+        );
         res.status(200).json({
             message: "Exercise fetched successfully",
             data: result,

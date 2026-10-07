@@ -1,7 +1,19 @@
 import pool from "../db/connection.js";
+import { getCache, setCache } from "../lib/redis.js";
 
 const getExercisesService = async (muscleGroups, equipment) => {
     try {
+        const hasFilters =
+            (muscleGroups && muscleGroups.length > 0) ||
+            (equipment && equipment.length > 0);
+        const cacheKey = "exercises:all";
+
+        // If no filter parameters, check Redis cache first (0 DB queries!)
+        if (!hasFilters) {
+            const cached = await getCache(cacheKey);
+            if (cached) return cached;
+        }
+
         const values = [];
         let query = "SELECT * FROM exercises";
 
@@ -24,6 +36,12 @@ const getExercisesService = async (muscleGroups, equipment) => {
         query += " ORDER BY name ASC";
 
         const result = await pool.query(query, values);
+
+        // Cache the unfiltered master exercise list for 7 days
+        if (!hasFilters && result.rows.length > 0) {
+            await setCache(cacheKey, result.rows, 86400 * 7);
+        }
+
         return result.rows;
     } catch (error) {
         throw new Error("Could not fetch exercises", { cause: error });

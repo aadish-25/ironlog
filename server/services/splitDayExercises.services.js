@@ -1,4 +1,5 @@
 import pool from "../db/connection.js";
+import { delCache } from "../lib/redis.js";
 
 const addExerciseService = async (
     splitDayId,
@@ -59,6 +60,7 @@ const addExerciseService = async (
 
         const result = await client.query(insertQuery, params);
         await client.query("COMMIT");
+        await delCache(`splits:${userId}`);
         return result.rows;
     } catch (error) {
         if (client) await client.query("ROLLBACK");
@@ -81,6 +83,7 @@ const removeExerciseService = async (exerciseId, userId) => {
                AND s.user_id = $2`,
             [exerciseId, userId],
         );
+        await delCache(`splits:${userId}`);
     } catch (error) {
         throw new Error("Could not remove exercise from split day", {
             cause: error,
@@ -170,6 +173,7 @@ const reorderExerciseService = async (
         );
 
         await client.query("COMMIT");
+        await delCache(`splits:${userId}`);
 
         return result.rows[0];
     } catch (error) {

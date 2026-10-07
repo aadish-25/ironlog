@@ -1,4 +1,5 @@
 import pool from "../db/connection.js";
+import { delCache } from "../lib/redis.js";
 
 const updateSplitDayService = async (id, label, is_rest, userId) => {
     try {
@@ -19,6 +20,8 @@ const updateSplitDayService = async (id, label, is_rest, userId) => {
         );
         if (!result.rows[0])
             throw new Error("Split day not found, or not authorized");
+
+        await delCache(`splits:${userId}`);
         return result.rows[0];
     } catch (error) {
         throw new Error("Could not update split day", { cause: error });

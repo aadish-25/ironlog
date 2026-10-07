@@ -3,6 +3,7 @@ import {
     getUserStatsService,
     getUserPRsService,
 } from "../services/user.services.js";
+import { invalidateUserCache } from "../middlewares/clerkAuth.middleware.js";
 
 async function getCurrentUser(req, res) {
     const user = req.user;
@@ -21,6 +22,9 @@ async function updateCurrentUser(req, res) {
 
     try {
         const result = await updateUserService(id, data);
+        if (req.auth?.userId) {
+            await invalidateUserCache(req.auth.userId);
+        }
         res.status(200).json({ message: "Updated successfully", data: result });
     } catch (error) {
         console.error(error);

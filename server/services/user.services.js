@@ -1,4 +1,5 @@
 import pool from "../db/connection.js";
+import { getCache, setCache } from "../lib/redis.js";
 
 const getUserByIdService = async (id) => {
     const result = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
@@ -172,6 +173,10 @@ const getUserStatsService = async (userId) => {
 
 const getUserPRsService = async (userId) => {
     try {
+        const cacheKey = `prs:${userId}`;
+        const cached = await getCache(cacheKey);
+        if (cached) return cached;
+
         const result = await pool.query(
             `SELECT exercise_id, MAX(weight_kg) AS pr_kg
              FROM sets
@@ -185,6 +190,8 @@ const getUserPRsService = async (userId) => {
         for (const row of result.rows) {
             prs[row.exercise_id] = Number(row.pr_kg);
         }
+
+        await setCache(cacheKey, prs, 3600);
         return prs;
     } catch (error) {
         throw new Error("Could not fetch user PRs", { cause: error });
