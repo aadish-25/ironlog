@@ -23,3 +23,8 @@ export const getUserStats = async (): Promise<UserStats> => {
     const response = await api.get("/users/me/stats");
     return response.data.data as UserStats;
 };
+
+export const getUserPRs = async (): Promise<Record<string, number>> => {
+    const response = await api.get("/users/me/prs");
+    return response.data.data as Record<string, number>;
+};

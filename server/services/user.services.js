@@ -170,4 +170,30 @@ const getUserStatsService = async (userId) => {
     };
 };
 
-export { getUserByIdService, updateUserService, getUserStatsService };
+const getUserPRsService = async (userId) => {
+    try {
+        const result = await pool.query(
+            `SELECT exercise_id, MAX(weight_kg) AS pr_kg
+             FROM sets
+             WHERE user_id = $1 AND weight_kg > 0
+             GROUP BY exercise_id`,
+            [userId],
+        );
+
+        // Return map of exercise_id -> pr_kg for O(1) lookups
+        const prs = {};
+        for (const row of result.rows) {
+            prs[row.exercise_id] = Number(row.pr_kg);
+        }
+        return prs;
+    } catch (error) {
+        throw new Error("Could not fetch user PRs", { cause: error });
+    }
+};
+
+export {
+    getUserByIdService,
+    updateUserService,
+    getUserStatsService,
+    getUserPRsService,
+};

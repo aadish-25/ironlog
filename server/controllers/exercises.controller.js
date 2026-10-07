@@ -15,7 +15,6 @@ async function getExercises(req, res) {
         const result = await getExercisesService(
             muscleGroups,
             equipmentList,
-            userId,
         );
         res.status(200).json({
             message: "Exercises fetched successfully",

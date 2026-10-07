@@ -1,17 +1,9 @@
 import pool from "../db/connection.js";
 
-const getExercisesService = async (muscleGroups, equipment, userId) => {
+const getExercisesService = async (muscleGroups, equipment) => {
     try {
         const values = [];
-        let query = "";
-
-        if (userId) {
-            values.push(userId);
-            query =
-                "SELECT exercises.*, (SELECT MAX(weight_kg) FROM sets WHERE exercise_id = exercises.id AND user_id = $1) AS pr_kg FROM exercises";
-        } else {
-            query = "SELECT exercises.*, NULL as pr_kg FROM exercises";
-        }
+        let query = "SELECT * FROM exercises";
 
         const conditions = [];
 
@@ -29,11 +21,10 @@ const getExercisesService = async (muscleGroups, equipment, userId) => {
             query += ` WHERE ${conditions.join(" AND ")}`;
         }
 
+        query += " ORDER BY name ASC";
+
         const result = await pool.query(query, values);
-        return result.rows.map((r) => ({
-            ...r,
-            pr_kg: r.pr_kg ? Number(r.pr_kg) : null,
-        }));
+        return result.rows;
     } catch (error) {
         throw new Error("Could not fetch exercises", { cause: error });
     }

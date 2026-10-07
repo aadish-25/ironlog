@@ -1,6 +1,7 @@
 import {
     updateUserService,
     getUserStatsService,
+    getUserPRsService,
 } from "../services/user.services.js";
 
 async function getCurrentUser(req, res) {
@@ -49,4 +50,23 @@ async function getUserStats(req, res) {
     }
 }
 
-export { getCurrentUser, updateCurrentUser, getUserStats };
+async function getUserPRs(req, res) {
+    const user = req.user;
+    const id = user?.id;
+
+    try {
+        const prs = await getUserPRsService(id);
+        res.status(200).json({
+            message: "User PRs retrieved successfully",
+            data: prs,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({
+            message: "Error while fetching PRs",
+            error: error.message,
+        });
+    }
+}
+
+export { getCurrentUser, updateCurrentUser, getUserStats, getUserPRs };

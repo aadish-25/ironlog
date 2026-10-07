@@ -11,6 +11,11 @@ export function useExercises(exerciseId?: string) {
         fetcher
     );
 
+    const { data: userPrsData, mutate: mutatePrs } = useSWR<Record<string, number>>(
+        "/users/me/prs",
+        fetcher
+    );
+
     const { data: exerciseData, error: exerciseError, isLoading: loadingExercise, mutate: mutateExercise } = useSWR<any>(
         exerciseId ? `/exercise/${exerciseId}` : null,
         fetcher
@@ -33,16 +38,18 @@ export function useExercises(exerciseId?: string) {
                 : (ex.equipment ? [ex.equipment] : []);
             const equipments = rawEquipments.map((e: string) => e.charAt(0).toUpperCase() + e.slice(1));
 
+            const prKg = userPrsData?.[ex.id] ?? ex.pr_kg ?? null;
+
             return {
                 id: ex.id,
                 name: ex.name,
                 muscles,
                 equipments,
-                prKg: ex.pr_kg ?? null,
+                prKg,
                 formGuide: Array.isArray(ex.form_guide) ? ex.form_guide : [],
             };
         }) : [];
-    }, [exercisesData]);
+    }, [exercisesData, userPrsData]);
 
     const exercise: Exercise | null = useMemo(() => {
         if (exerciseData) {
@@ -61,7 +68,7 @@ export function useExercises(exerciseId?: string) {
                 name: exerciseData.name,
                 muscles,
                 equipments,
-                prKg: exerciseData.pr_kg ?? null,
+                prKg: userPrsData?.[exerciseData.id] ?? exerciseData.pr_kg ?? null,
                 formGuide: Array.isArray(exerciseData.form_guide) ? exerciseData.form_guide : [],
             };
         }
@@ -72,7 +79,7 @@ export function useExercises(exerciseId?: string) {
             }
         }
         return null;
-    }, [exerciseData, exerciseId, exercisesList]);
+    }, [exerciseData, exerciseId, exercisesList, userPrsData]);
 
     const progress: ExerciseProgress[] = useMemo(() => {
         return progressData ? progressData.map((item: any) => ({
@@ -93,11 +100,12 @@ export function useExercises(exerciseId?: string) {
 
     const refetch = useCallback(() => {
         mutateExercises();
+        mutatePrs();
         if (exerciseId) {
             mutateExercise();
             mutateProgress();
         }
-    }, [mutateExercises, mutateExercise, mutateProgress, exerciseId]);
+    }, [mutateExercises, mutatePrs, mutateExercise, mutateProgress, exerciseId]);
 
     return {
         exercisesList,
