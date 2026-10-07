@@ -15,12 +15,52 @@ export function useSession(sessionId: string | null) {
     const [exercises, setExercises] = useState<SessionExercise[]>([]);
     const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
 
-    // Sync exercises when session loads (only once per session ID to prevent overwriting active workout state)
+    // Sync exercises when session loads: check localStorage draft first, fallback to DB
     useEffect(() => {
+        if (!sessionId) return;
+        const draftKey = `ironlog_draft_${sessionId}`;
+        try {
+            const raw = localStorage.getItem(draftKey);
+            if (raw) {
+                const draft = JSON.parse(raw);
+                if (Array.isArray(draft) && draft.length > 0) {
+                    setExercises(draft);
+                    return;
+                }
+            }
+        } catch (e) {
+            console.warn("Could not parse draft", e);
+        }
+
         if (sessionData && sessionData.exercises) {
             setExercises(sessionData.exercises);
         }
-    }, [sessionData?.id]);
+    }, [sessionId, sessionData?.id]);
+
+    // Persist draft to localStorage whenever exercises state changes
+    useEffect(() => {
+        if (!sessionId || exercises.length === 0) return;
+        const draftKey = `ironlog_draft_${sessionId}`;
+        try {
+            localStorage.setItem(draftKey, JSON.stringify(exercises));
+        } catch (e) {
+            // Ignore quota errors
+        }
+    }, [sessionId, exercises]);
+
+    // Ensure draft is saved when user minimizes or closes the tab
+    useEffect(() => {
+        if (!sessionId) return;
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "hidden" && exercises.length > 0) {
+                try {
+                    localStorage.setItem(`ironlog_draft_${sessionId}`, JSON.stringify(exercises));
+                } catch (e) {}
+            }
+        };
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+        return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+    }, [sessionId, exercises]);
 
     let error: string | null = null;
     if (swrError) {
@@ -29,13 +69,41 @@ export function useSession(sessionId: string | null) {
 
     async function completeUserSession(id: string) {
         try {
-            const result = await completeSession(id);
+            // 1. Immediately update SWR cache so Home page says "Finished" without any lag!
+            globalMutate(
+                "/sessions",
+                (prev: any) => {
+                    if (!Array.isArray(prev)) return prev;
+                    return prev.map((s) => (s.id === id ? { ...s, is_completed: true } : s));
+                },
+                false
+            );
+
+            // 2. Collect all logged sets from the session to batch sync to server
+            const allLoggedSets = exercises.flatMap((ex) =>
+                ex.sets
+                    .filter((s) => s.is_logged)
+                    .map((s) => ({
+                        id: s.id,
+                        exercise_id: ex.exercise_id,
+                        set_number: s.set_number,
+                        weight_kg: s.weight,
+                        reps: s.reps,
+                    }))
+            );
+
+            // 3. Complete session on server with all sets in one batch
+            const result = await completeSession(id, allLoggedSets);
+
+            // 4. Clean up the local workout draft now that it's permanently saved
+            localStorage.removeItem(`ironlog_draft_${id}`);
+
             mutate((currentData) => currentData ? { ...currentData, ...result } : undefined, false);
 
             const now = new Date();
             const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
-            // Invalidate all affected caches in parallel to guarantee real-time data freshness
+            // 5. Invalidate all affected caches in parallel in background
             const invalidationPromises: Promise<unknown>[] = [
                 globalMutate("/sessions"),
                 globalMutate("/users/me/stats"),

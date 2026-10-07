@@ -47,7 +47,7 @@ export const deleteSession = async (id: string): Promise<void> => {
     await api.delete(`/sessions/${id}`);
 };
 
-export const completeSession = async (id: string): Promise<Session> => {
-    const response = await api.patch(`/sessions/${id}/complete`);
+export const completeSession = async (id: string, sets?: any[]): Promise<Session> => {
+    const response = await api.patch(`/sessions/${id}/complete`, { sets });
     return response.data.data as Session;
 };

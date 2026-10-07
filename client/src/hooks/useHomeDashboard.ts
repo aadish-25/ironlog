@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useSWR, { mutate } from "swr";
 import { fetcher } from "../services/api";
 import { useCurrentUser } from "./useCurrentUser";
 import { useSplit } from "./useSplit";
-import { createSession, deleteSession } from "../services/sessions";
+import { createSession, deleteSession, completeSession } from "../services/sessions";
 import { type UserStats } from "../services/users";
 import type { Session } from "../types";
 
@@ -19,6 +19,52 @@ export function useHomeDashboard() {
     const sessions = sessionsData || [];
     const stats = statsData || null;
     const error = sessionsError || statsError || null;
+
+    // Auto-sync any lingering drafts from yesterday/past days if user forgot to click "Finish"
+    useEffect(() => {
+        if (!sessions || sessions.length === 0) return;
+        const now = new Date();
+        for (const s of sessions) {
+            const draftKey = `ironlog_draft_${s.id}`;
+            const raw = localStorage.getItem(draftKey);
+            if (raw) {
+                const sDate = (s as any).date || s.started_at;
+                if (!sDate) continue;
+                const d = new Date(sDate);
+                const isPastDay =
+                    d.getFullYear() < now.getFullYear() ||
+                    d.getMonth() < now.getMonth() ||
+                    d.getDate() < now.getDate();
+
+                if (isPastDay && !s.is_completed) {
+                    try {
+                        const parsed = JSON.parse(raw);
+                        const sets = Array.isArray(parsed)
+                            ? parsed.flatMap((ex: any) =>
+                                  (ex.sets || [])
+                                      .filter((set: any) => set.is_logged)
+                                      .map((set: any) => ({
+                                          id: set.id,
+                                          exercise_id: ex.exercise_id,
+                                          set_number: set.set_number,
+                                          weight_kg: set.weight,
+                                          reps: set.reps,
+                                      }))
+                              )
+                            : [];
+                        completeSession(s.id, sets)
+                            .then(() => {
+                                localStorage.removeItem(draftKey);
+                                mutate("/sessions");
+                            })
+                            .catch((err) => console.warn("Failed auto-sync past draft", err));
+                    } catch (e) {
+                        console.error("Failed to parse past draft", e);
+                    }
+                }
+            }
+        }
+    }, [sessions]);
 
     // ─── DERIVED DATA ──────────────────────────────────────────────────────────
 

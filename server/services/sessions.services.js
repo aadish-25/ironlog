@@ -331,15 +331,106 @@ const getSessionsSummaryService = async (userId, monthStr) => {
     }
 };
 
-const completeSessionService = async (sessionId, userId) => {
+const completeSessionService = async (sessionId, userId, sets = []) => {
+    let client;
     try {
-        const result = await pool.query(
+        client = await pool.connect();
+        await client.query("BEGIN");
+
+        // 1. Verify session ownership
+        const sessionCheck = await client.query(
+            "SELECT id FROM sessions WHERE id = $1 AND user_id = $2",
+            [sessionId, userId],
+        );
+        if (sessionCheck.rows.length === 0) {
+            throw new Error("Session not found or not authorized");
+        }
+
+        // 2. If sets are provided, batch upsert them
+        if (Array.isArray(sets) && sets.length > 0) {
+            // Filter valid sets
+            const validSets = sets.filter(
+                (s) => s.exercise_id && Number(s.weight_kg) >= 0 && Number(s.reps) > 0,
+            );
+
+            if (validSets.length > 0) {
+                // Find all unique exercise IDs
+                const exerciseIds = [...new Set(validSets.map((s) => s.exercise_id))];
+
+                // Query prior max weights excluding this session to compute PRs accurately
+                const priorMaxResult = await client.query(
+                    `SELECT exercise_id, MAX(weight_kg) as max_weight 
+                     FROM sets 
+                     WHERE user_id = $1 AND exercise_id = ANY($2) AND session_id != $3 
+                     GROUP BY exercise_id`,
+                    [userId, exerciseIds, sessionId],
+                );
+
+                const maxWeightMap = {};
+                for (const row of priorMaxResult.rows) {
+                    maxWeightMap[row.exercise_id] = Number(row.max_weight) || 0;
+                }
+
+                // Prepare bulk insert
+                const values = [];
+                const valuePlaceholders = [];
+
+                for (let i = 0; i < validSets.length; i++) {
+                    const s = validSets[i];
+                    const weight = Number(s.weight_kg) || 0;
+                    const priorMax = maxWeightMap[s.exercise_id] ?? 0;
+                    const isPr = weight > priorMax;
+                    if (isPr) {
+                        maxWeightMap[s.exercise_id] = weight; // update running max for this workout
+                    }
+
+                    const idx = values.length;
+                    // If id is provided and looks like a UUID, keep it; otherwise generate a new one
+                    const setId = s.id && !s.id.startsWith("temp-") ? s.id : null;
+
+                    values.push(
+                        setId,
+                        sessionId,
+                        s.exercise_id,
+                        userId,
+                        s.set_number || i + 1,
+                        weight,
+                        Number(s.reps) || 0,
+                        isPr,
+                    );
+
+                    valuePlaceholders.push(
+                        `(COALESCE($${idx + 1}, gen_random_uuid()), $${idx + 2}, $${idx + 3}, $${idx + 4}, $${idx + 5}, $${idx + 6}, $${idx + 7}, $${idx + 8})`,
+                    );
+                }
+
+                await client.query(
+                    `INSERT INTO sets (id, session_id, exercise_id, user_id, set_number, weight_kg, reps, is_pr)
+                     VALUES ${valuePlaceholders.join(", ")}
+                     ON CONFLICT (id) DO UPDATE SET
+                        weight_kg = EXCLUDED.weight_kg,
+                        reps = EXCLUDED.reps,
+                        set_number = EXCLUDED.set_number,
+                        is_pr = EXCLUDED.is_pr,
+                        updated_at = now()`,
+                    values,
+                );
+            }
+        }
+
+        // 3. Mark session completed
+        const result = await client.query(
             "UPDATE sessions SET is_completed = true WHERE id = $1 AND user_id = $2 RETURNING *",
             [sessionId, userId],
         );
+
+        await client.query("COMMIT");
         return result.rows[0];
     } catch (error) {
+        if (client) await client.query("ROLLBACK");
         throw new Error("Could not complete session", { cause: error });
+    } finally {
+        if (client) client.release();
     }
 };
 

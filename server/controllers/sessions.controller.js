@@ -163,9 +163,10 @@ async function getSessionsSummary(req, res) {
 async function completeSession(req, res) {
     const { id } = req.params;
     const userId = req.user.id;
+    const { sets } = req.body || {};
 
     try {
-        const result = await completeSessionService(id, userId);
+        const result = await completeSessionService(id, userId, sets);
         res.status(200).json({
             message: "Session completed successfully",
             data: result,

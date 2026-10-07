@@ -55,10 +55,12 @@ export function SessionPage() {
         totalSets > 0 ? (completedSets / totalSets) * 100 : 0;
 
     // ─── EVENT HANDLERS ─────────────────────────────────────────────────────────
-    const handleLogSet = async (index: number) => {
+    const handleLogSet = (index: number) => {
         if (!session || !currentExercise) return;
         const targetSet = currentExercise.sets[index];
-        const result = await saveUserSet(
+
+        // 1. Save set instantly to local state & draft (0 ms delay!)
+        saveUserSet(
             session.id,
             currentExercise.exercise_id,
             targetSet.id,
@@ -67,19 +69,17 @@ export function SessionPage() {
             targetSet.reps,
         );
 
-        if (result) {
-            // Fire PR toast if backend flagged this set as a new personal record
-            const isPR = (result as any).is_pr ?? result.pr_hit;
-            if (isPR) {
-                setPrToast({ name: currentExercise.name, weight: targetSet.weight });
-            }
+        // 2. Fire PR toast immediately if set weight exceeds current PR
+        const currentPr = (currentExercise as any).pr_kg ?? (currentExercise as any).prKg ?? 0;
+        if (targetSet.weight > currentPr && targetSet.weight > 0) {
+            setPrToast({ name: currentExercise.name, weight: targetSet.weight });
+        }
 
-            // Auto-advance when all sets for this exercise are logged
-            const loggedCount = currentExercise.sets.filter((s) => s.is_logged).length;
-            if (loggedCount + 1 >= currentExercise.sets.length) {
-                if (currentExerciseIndex < exercises.length - 1) {
-                    setTimeout(() => handleNextExercise(), 500);
-                }
+        // 3. Auto-advance when all sets for this exercise are logged
+        const loggedCount = currentExercise.sets.filter((s) => s.is_logged).length;
+        if (loggedCount + 1 >= currentExercise.sets.length) {
+            if (currentExerciseIndex < exercises.length - 1) {
+                setTimeout(() => handleNextExercise(), 500);
             }
         }
     };
@@ -90,11 +90,12 @@ export function SessionPage() {
         }
     };
 
-    const handleFinishWorkoutClick = async () => {
-        if (session && !session.is_completed) {
-            await completeUserSession(session.id);
-        }
+    const handleFinishWorkoutClick = () => {
+        // Show celebration / completion screen immediately (0 ms!)
         setShowCompletionOverride(true);
+        if (session && !session.is_completed) {
+            completeUserSession(session.id);
+        }
     };
 
     const handleHeaderFinishRequest = () => {
@@ -208,12 +209,12 @@ export function SessionPage() {
 
     const handleEndSession = () => navigate("/");
 
-    const handleConfirmFinishEarly = async () => {
-        if (session && !session.is_completed) {
-            await completeUserSession(session.id);
-        }
+    const handleConfirmFinishEarly = () => {
         setShowCompletionOverride(true);
         setShowEndConfirm(false);
+        if (session && !session.is_completed) {
+            completeUserSession(session.id);
+        }
     };
 
     const handleGoHome = () => navigate("/");

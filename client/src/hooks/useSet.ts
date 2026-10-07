@@ -10,12 +10,13 @@ export function useSet(
     const [error, setError] = useState<string | null>(null);
 
     async function addUserSet(exerciseId: string) {
+        const newId = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `temp-${Date.now()}`;
         setExercises((prev) =>
             prev.map((ex) => {
                 if (ex.exercise_id === exerciseId) {
                     const lastSet = ex.sets[ex.sets.length - 1];
                     const newSet: SetRecord = {
-                        id: `temp-${Date.now()}`,
+                        id: newId,
                         set_number: ex.sets.length + 1,
                         weight: lastSet ? lastSet.weight : 0,
                         reps: lastSet ? lastSet.reps : 0,
@@ -38,65 +39,66 @@ export function useSet(
         weightKg: number,
         reps: number,
     ) {
+        // 1. Instant optimistic update to local UI (0 ms!)
+        setExercises((prev) =>
+            prev.map((ex) => {
+                if (ex.exercise_id === exerciseId) {
+                    const newSets = ex.sets.map((s) => {
+                        if (s.id === setId) {
+                            return {
+                                ...s,
+                                weight: weightKg,
+                                reps,
+                                set_number: setNumber,
+                                is_logged: true,
+                            };
+                        }
+                        return s;
+                    });
+                    return { ...ex, sets: newSets };
+                }
+                return ex;
+            }),
+        );
+
+        // 2. Silent background sync (non-blocking)
         try {
-            setLoading(true);
-            setError(null);
-
-            let savedRecord: SetRecord;
-
-            // If it's a temporary ID, it means it hasn't been created in the DB yet
             if (setId.startsWith("temp-")) {
-                savedRecord = await createSet(
+                const savedRecord = await createSet(
                     sessionId,
                     exerciseId,
                     setNumber,
                     weightKg,
                     reps,
                 );
+                if (savedRecord?.id) {
+                    setExercises((prev) =>
+                        prev.map((ex) =>
+                            ex.exercise_id === exerciseId
+                                ? {
+                                      ...ex,
+                                      sets: ex.sets.map((s) =>
+                                          s.id === setId
+                                              ? { ...s, id: savedRecord.id }
+                                              : s,
+                                      ),
+                                  }
+                                : ex,
+                        ),
+                    );
+                }
+                return savedRecord;
             } else {
-                // Otherwise it exists, so we update it
-                savedRecord = await updateSet(setId, {
+                return await updateSet(setId, {
                     set_number: setNumber,
                     weight: weightKg,
                     reps,
                 });
             }
-
-            // Update the UI by replacing the old set with the fresh one from the DB
-            setExercises((prev) =>
-                prev.map((ex) => {
-                    if (ex.exercise_id === exerciseId) {
-                        const newSets = ex.sets.map((s) => {
-                            if (s.id === setId) {
-                                // The backend might return weight_kg, map it back to weight
-                                const mappedRecord = {
-                                    ...savedRecord,
-                                    weight:
-                                        (savedRecord as any).weight_kg ??
-                                        weightKg,
-                                    pr_hit: (savedRecord as any).is_pr ?? false,
-                                    is_logged: true,
-                                };
-                                return mappedRecord;
-                            }
-                            return s;
-                        });
-                        return { ...ex, sets: newSets };
-                    }
-                    return ex;
-                }),
-            );
-
-            return savedRecord;
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                setError(err.response?.data?.message ?? err.message);
-            } else {
-                setError((err as Error).message);
-            }
+            // Even if network fails or phone is offline, local draft preserves the set
+            console.warn("Background set sync paused, preserved in local workout draft", err);
             return null;
-        } finally {
-            setLoading(false);
         }
     }
 
