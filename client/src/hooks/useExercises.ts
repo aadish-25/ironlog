@@ -4,11 +4,16 @@ import axios from "axios";
 import { fetcher } from "../services/api";
 import { type Exercise } from "../components/Exercises/types";
 import { type ExerciseProgress } from "../types";
+import defaultExercises from "../data/exercises.json";
 
 export function useExercises(exerciseId?: string) {
     const { data: exercisesData, error: exercisesError, isLoading: loadingExercises, mutate: mutateExercises } = useSWR<any[]>(
         "/exercise",
-        fetcher
+        fetcher,
+        {
+            fallbackData: defaultExercises,
+            revalidateOnFocus: false,
+        }
     );
 
     const { data: userPrsData, mutate: mutatePrs } = useSWR<Record<string, number>>(
@@ -27,7 +32,8 @@ export function useExercises(exerciseId?: string) {
     );
 
     const exercisesList: Exercise[] = useMemo(() => {
-        return exercisesData ? exercisesData.map((ex: any) => {
+        const sourceData = exercisesData && exercisesData.length > 0 ? exercisesData : defaultExercises;
+        return sourceData.map((ex: any) => {
             const rawMuscles = Array.isArray(ex.muscle_groups)
                 ? ex.muscle_groups
                 : (ex.muscle_group ? [ex.muscle_group] : []);
@@ -48,7 +54,7 @@ export function useExercises(exerciseId?: string) {
                 prKg,
                 formGuide: Array.isArray(ex.form_guide) ? ex.form_guide : [],
             };
-        }) : [];
+        });
     }, [exercisesData, userPrsData]);
 
     const exercise: Exercise | null = useMemo(() => {
@@ -90,7 +96,7 @@ export function useExercises(exerciseId?: string) {
         })) : [];
     }, [progressData]);
 
-    const loading = loadingExercises || loadingExercise || loadingProgress;
+    const loading = (loadingExercises && exercisesList.length === 0) || (exerciseId ? (loadingExercise && !exercise) || loadingProgress : false);
     const combinedError = exercisesError || exerciseError || progressError;
     
     let error: string | null = null;

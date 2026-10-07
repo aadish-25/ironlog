@@ -107,6 +107,7 @@ export function useSession(sessionId: string | null) {
             const invalidationPromises: Promise<unknown>[] = [
                 globalMutate("/sessions"),
                 globalMutate("/users/me/stats"),
+                globalMutate("/users/me/prs"),
                 globalMutate("/exercise"),
                 globalMutate(`/sessions/summary?month=${currentMonthStr}`),
                 globalMutate("/sessions/history?limit=10&offset=0"),
