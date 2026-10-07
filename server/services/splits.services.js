@@ -77,36 +77,30 @@ const getSplitsByUserService = async (userId) => {
         const splits = splitsResult.rows;
         if (splits.length === 0) return [];
 
-        // Query 2: Fetch all split_days for ALL splits in one shot using ANY($1).
-        // ANY($1) is Postgres's way of saying WHERE split_id IN (1, 2, 3, ...).
+        // Fetch split_days and exercises concurrently in parallel via Promise.all
         const splitIds = splits.map((s) => s.id);
-        const daysResult = await pool.query(
-            "SELECT * FROM split_days WHERE split_id = ANY($1) ORDER BY day_of_week",
-            [splitIds],
-        );
+        const [daysResult, exercisesResult] = await Promise.all([
+            pool.query(
+                "SELECT * FROM split_days WHERE split_id = ANY($1) ORDER BY day_of_week",
+                [splitIds],
+            ),
+            pool.query(
+                `SELECT sde.*, e.name, e.muscle_groups, e.equipment
+                FROM split_day_exercises sde
+                JOIN exercises e ON sde.exercise_id = e.id
+                JOIN split_days sd ON sde.split_day_id = sd.id
+                WHERE sd.split_id = ANY($1)
+                ORDER BY sde.split_day_id, sde.order_index`,
+                [splitIds],
+            ),
+        ]);
 
         // Group the flat days array into an object keyed by split_id.
-        // e.g. { 1: [day1, day2, ...], 2: [day1, day2, ...] }
-        // This lets us instantly look up days for any split without looping.
         const daysBySplit = {};
         for (const day of daysResult.rows) {
             if (!daysBySplit[day.split_id]) daysBySplit[day.split_id] = [];
             daysBySplit[day.split_id].push(day);
         }
-
-        // Query 3: Fetch all exercises for ALL split days in one shot.
-        // JOINs split_day_exercises → exercises (to get name/muscles/equipment)
-        //                           → split_days  (to filter by split_id via ANY)
-        // Result is flat rows: each row = one exercise assignment with exercise details merged in.
-        const exercisesResult = await pool.query(
-            `SELECT sde.*, e.name, e.muscle_groups, e.equipment
-            FROM split_day_exercises sde
-            JOIN exercises e ON sde.exercise_id = e.id
-            JOIN split_days sd ON sde.split_day_id = sd.id
-            WHERE sd.split_id = ANY($1)
-            ORDER BY sde.split_day_id, sde.order_index`,
-            [splitIds],
-        );
 
         // Group the flat exercises array into an object keyed by split_day_id.
         // e.g. { 3: [benchPress, inclinePress], 5: [squat] }
@@ -160,22 +154,22 @@ const getSplitByIdService = async (splitId, userId) => {
             return null;
         }
 
-        const daysResult = await pool.query(
-            "SELECT * FROM split_days WHERE split_id = $1 ORDER BY day_of_week",
-            [splitId],
-        );
-
-        // Join split_day_exercises with exercises to get exercise details (name, muscles, equipment)
-        // alongside the assignment details (order_index, etc.)
-        const exercisesResult = await pool.query(
-            `SELECT sde.*, e.name, e.muscle_groups, e.equipment
-            FROM split_day_exercises sde
-            JOIN exercises e ON sde.exercise_id = e.id
-            JOIN split_days sd ON sde.split_day_id = sd.id
-            WHERE sd.split_id = $1
-            ORDER BY sde.split_day_id, sde.order_index`,
-            [splitId],
-        );
+        // Fetch split_days and exercises concurrently via Promise.all
+        const [daysResult, exercisesResult] = await Promise.all([
+            pool.query(
+                "SELECT * FROM split_days WHERE split_id = $1 ORDER BY day_of_week",
+                [splitId],
+            ),
+            pool.query(
+                `SELECT sde.*, e.name, e.muscle_groups, e.equipment
+                FROM split_day_exercises sde
+                JOIN exercises e ON sde.exercise_id = e.id
+                JOIN split_days sd ON sde.split_day_id = sd.id
+                WHERE sd.split_id = $1
+                ORDER BY sde.split_day_id, sde.order_index`,
+                [splitId],
+            ),
+        ]);
 
         // Group flat exercise rows by split_day_id for O(1) lookup below
         const exercisesByDay = {};
@@ -244,11 +238,15 @@ const setActiveSplitService = async (userId, splitId) => {
             [userId],
         );
 
-        // Step 2: Activate the chosen split
+        // Step 2: Activate the chosen split (scoped to userId)
         const result = await client.query(
-            "UPDATE splits SET is_active = true WHERE id = $1 RETURNING *",
-            [splitId],
+            "UPDATE splits SET is_active = true WHERE id = $1 AND user_id = $2 RETURNING *",
+            [splitId, userId],
         );
+
+        if (!result.rows[0]) {
+            throw new Error("Split not found or not authorized");
+        }
 
         await client.query("COMMIT");
 

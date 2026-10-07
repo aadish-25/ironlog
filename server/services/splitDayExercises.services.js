@@ -30,25 +30,36 @@ const addExerciseService = async (
             throw new Error("Cannot add exercises to a rest day");
         }
 
-        const results = [];
-        for (let i = 0; i < ids.length; i++) {
-            const result = await client.query(
-                `
-                INSERT INTO split_day_exercises (
-                    split_day_id,
-                    exercise_id,
-                    order_index
-                )
-                VALUES ($1, $2, $3)
-                RETURNING *
-                `,
-                [splitDayId, ids[i], startingOrderIndex + i],
-            );
-            results.push(result.rows[0]);
+        if (ids.length === 0) {
+            await client.query("COMMIT");
+            return [];
         }
 
+        // Build a single bulk INSERT statement:
+        // INSERT INTO split_day_exercises (split_day_id, exercise_id, order_index)
+        // VALUES ($1, $2, $3), ($1, $4, $5), ...
+        const valueClauses = [];
+        const params = [splitDayId];
+        for (let i = 0; i < ids.length; i++) {
+            const exParam = params.length + 1;
+            const orderParam = params.length + 2;
+            params.push(ids[i], startingOrderIndex + i);
+            valueClauses.push(`($1, $${exParam}, $${orderParam})`);
+        }
+
+        const insertQuery = `
+            INSERT INTO split_day_exercises (
+                split_day_id,
+                exercise_id,
+                order_index
+            )
+            VALUES ${valueClauses.join(", ")}
+            RETURNING *
+        `;
+
+        const result = await client.query(insertQuery, params);
         await client.query("COMMIT");
-        return results;
+        return result.rows;
     } catch (error) {
         if (client) await client.query("ROLLBACK");
         throw new Error("Could not add exercises to split day", {
@@ -162,10 +173,10 @@ const reorderExerciseService = async (
 
         return result.rows[0];
     } catch (error) {
-        await client.query("ROLLBACK");
+        if (client) await client.query("ROLLBACK");
         throw error;
     } finally {
-        client.release();
+        if (client) client.release();
     }
 };
 
