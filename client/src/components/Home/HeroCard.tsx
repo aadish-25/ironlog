@@ -254,13 +254,18 @@ export function HeroCard({
                 New PRs
               </div>
               {newPRs && newPRs.length > 0 ? (
-                <div className="max-h-[148px] overflow-y-auto subtle-scrollbar pr-1 flex flex-col gap-1.5">
+                <div className="max-h-[156px] overflow-y-auto subtle-scrollbar pr-1 flex flex-col gap-1.5">
                   {newPRs.map((pr) => (
-                    <div key={pr.name} className="bg-bg rounded-[10px] p-[9px_12px] flex items-center justify-between">
+                    <div
+                      key={pr.name}
+                      className="bg-bg rounded-[10px] py-[8px] pl-3 pr-[10px] flex items-center justify-between"
+                    >
                       <span className="text-[12px] text-dim">{pr.name}</span>
                       <div className="flex items-baseline gap-1">
                         <span className="text-[8px] tracking-[1px] text-heat uppercase">PR</span>
-                        <span className="font-display text-lg text-heat tracking-[1px]">{pr.kg} kg</span>
+                        <span className="font-display text-lg text-heat tracking-[1px]">
+                          {pr.kg} kg
+                        </span>
                       </div>
                     </div>
                   ))}

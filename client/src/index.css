@@ -48,28 +48,42 @@
     font-family: inherit;
   }
 
-  /* Custom grey scrollbar */
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-border) transparent;
+  /* Disable scrollbar arrow buttons across all platforms and elements */
+  *::-webkit-scrollbar-button,
+  ::-webkit-scrollbar-button {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
   }
 
+  *::-webkit-scrollbar,
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
 
+  *::-webkit-scrollbar-track,
   ::-webkit-scrollbar-track {
     background: transparent;
   }
 
+  *::-webkit-scrollbar-thumb,
   ::-webkit-scrollbar-thumb {
     background: var(--color-border);
-    border-radius: 10px;
+    border-radius: 9999px;
   }
 
+  *::-webkit-scrollbar-thumb:hover,
   ::-webkit-scrollbar-thumb:hover {
     background: var(--color-ghost);
+  }
+}
+
+/* Fallback for non-webkit browsers (e.g. Firefox) */
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
   }
 }
 
@@ -78,27 +92,33 @@
   .no-scrollbar {
     scrollbar-width: none;
   }
-  .no-scrollbar::-webkit-scrollbar {
+  .no-scrollbar::-webkit-scrollbar,
+  .no-scrollbar *::-webkit-scrollbar {
     display: none;
   }
 
-  /* Subtle custom scrollbar */
-  .subtle-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
-  }
+  /* Subtle custom scrollbar - always clearly visible, rounded pill, zero arrows */
   .subtle-scrollbar::-webkit-scrollbar {
     width: 4px;
+    height: 4px;
+  }
+  .subtle-scrollbar::-webkit-scrollbar-button,
+  .subtle-scrollbar::-webkit-scrollbar-button:single-button,
+  .subtle-scrollbar::-webkit-scrollbar-button:vertical:decrement,
+  .subtle-scrollbar::-webkit-scrollbar-button:vertical:increment {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
   }
   .subtle-scrollbar::-webkit-scrollbar-track {
     background: transparent;
   }
   .subtle-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.28);
     border-radius: 9999px;
   }
   .subtle-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.50);
   }
 }
 
