@@ -305,18 +305,10 @@ export function HeroCard({
           {/* ── Standalone Up Next Themed Preview Card ── */}
           <div className="mx-5 bg-card rounded-[18px] border border-border p-[15px_18px] relative overflow-hidden flex items-center justify-between">
             {/* Left 3.5px accent line */}
-            <div
-              className={`absolute top-0 bottom-0 left-0 w-[3.5px] ${
-                tomorrowWorkout?.isRestDay ? "bg-[#38bdf8]" : "bg-[#a855f7]"
-              }`}
-            />
+            <div className="absolute top-0 bottom-0 left-0 w-[3.5px] bg-[#38bdf8]" />
 
             <div className="flex-1 min-w-0 pr-3 pt-0.5 pl-1.5">
-              <div
-                className={`text-[9px] tracking-[2px] uppercase font-semibold mb-1 ${
-                  tomorrowWorkout?.isRestDay ? "text-[#38bdf8]" : "text-[#c084fc]"
-                }`}
-              >
+              <div className="text-[9px] tracking-[2px] uppercase font-semibold mb-1 text-[#38bdf8]">
                 {tomorrowWorkout?.headerBadge || "UP NEXT"}
               </div>
               <div className="font-display text-[24px] text-white tracking-[1px] uppercase truncate leading-tight">
@@ -327,16 +319,6 @@ export function HeroCard({
                   {tomorrowWorkout.muscles}
                 </div>
               ) : null}
-            </div>
-
-            <div
-              className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
-                tomorrowWorkout?.isRestDay
-                  ? "bg-[#38bdf8]/10 border border-[#38bdf8]/25 text-[#38bdf8]"
-                  : "bg-[#a855f7]/10 border border-[#a855f7]/25 text-[#c084fc]"
-              }`}
-            >
-              {tomorrowWorkout?.isRestDay ? <Moon size={18} /> : <Dumbbell size={18} />}
             </div>
           </div>
         </motion.div>
