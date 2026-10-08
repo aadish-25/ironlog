@@ -34,25 +34,26 @@ export function CompletionScreen({
   const [motivation] = useState(() => MOTIVATIONAL_MESSAGES[Math.floor(Math.random() * MOTIVATIONAL_MESSAGES.length)]);
 
   // Compute totals
-  const totalSetsLogged = exercises.reduce(
-    (n, e) => n + e.sets.filter((s) => s.is_logged).length,
+  const safeExercises = exercises || [];
+  const totalSetsLogged = safeExercises.reduce(
+    (n, e) => n + (e.sets || []).filter((s) => s.is_logged).length,
     0
   );
-  const totalVolume = exercises.reduce(
+  const totalVolume = safeExercises.reduce(
     (n, e) =>
       n +
-      e.sets
+      (e.sets || [])
         .filter((s) => s.is_logged)
-        .reduce((m, s) => m + s.weight * s.reps, 0),
+        .reduce((m, s) => m + (Number(s.weight) || 0) * (Number(s.reps) || 0), 0),
     0
   );
 
   // Compute PRs dynamically
   const prMap: Record<string, number> = {};
-  for (const ex of exercises) {
-    const prSets = ex.sets.filter((s) => s.is_logged && s.pr_hit);
+  for (const ex of safeExercises) {
+    const prSets = (ex.sets || []).filter((s) => s.is_logged && s.pr_hit);
     if (prSets.length > 0) {
-      const maxLogged = Math.max(...prSets.map((s) => s.weight));
+      const maxLogged = Math.max(...prSets.map((s) => Number(s.weight) || 0));
       prMap[ex.name] = maxLogged;
     }
   }

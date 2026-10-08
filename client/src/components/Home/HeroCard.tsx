@@ -281,6 +281,13 @@ export function HeroCard({
                     : "Take it easy."}
                 </div>
               </div>
+
+              <button
+                onClick={onStartWorkout}
+                className="mt-4 block w-full py-[11px] bg-[#1a1a1c] border border-[#333] rounded-xl text-[#ccc] font-display text-[14px] tracking-[2px] cursor-pointer hover:bg-[#252528] hover:text-white transition-colors uppercase text-center"
+              >
+                VIEW SESSION &nbsp;→
+              </button>
             </div>
           </div>
         </motion.div>

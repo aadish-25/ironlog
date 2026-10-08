@@ -57,7 +57,7 @@ const getSessionsService = async (userId) => {
              LEFT JOIN sets ON sets.session_id = sessions.id
              WHERE sessions.user_id = $1
              GROUP BY sessions.id, split_days.label
-             ORDER BY sessions.date DESC`,
+             ORDER BY sessions.date DESC, sessions.updated_at DESC, sessions.created_at DESC`,
             [userId],
         );
         return result.rows.map((r) => ({
@@ -75,7 +75,10 @@ const getSessionsService = async (userId) => {
 const getSessionByIdService = async (sessionId, userId) => {
     try {
         const sessionResult = await pool.query(
-            "SELECT * FROM sessions WHERE id = $1 AND user_id = $2",
+            `SELECT sessions.*, split_days.label as split_day_label
+             FROM sessions
+             LEFT JOIN split_days ON sessions.split_day_id = split_days.id
+             WHERE sessions.id = $1 AND sessions.user_id = $2`,
             [sessionId, userId],
         );
         if (sessionResult.rows.length === 0)
@@ -144,25 +147,28 @@ const getSessionByIdService = async (sessionId, userId) => {
                     exercise_id: set.exercise_id,
                     name: set.name,
                     previous_best: null, // Extra exercises added on the fly won't have previous best cached easily unless we do another query
-                    sets: setsByExercise[set.exercise_id],
+                    sets: setsByExercise[set.exercise_id] || [],
                 });
             }
         }
 
         const exercises = Array.from(exerciseMap.values());
 
-        for (const ex of exercises) {
-            if (ex.sets.length === 0) {
-                for (let i = 1; i <= 3; i++) {
-                    ex.sets.push({
-                        id: `temp-${Date.now()}-${Math.random()}`,
-                        set_number: i,
-                        weight: 30,
-                        reps: 10,
-                        is_logged: false,
-                        is_overload: false,
-                        pr_hit: false,
-                    });
+        // For in-progress sessions, generate starting placeholder sets if none are logged yet
+        if (!session.is_completed) {
+            for (const ex of exercises) {
+                if (ex.sets.length === 0) {
+                    for (let i = 1; i <= 3; i++) {
+                        ex.sets.push({
+                            id: `temp-${Date.now()}-${Math.random()}`,
+                            set_number: i,
+                            weight: 30,
+                            reps: 10,
+                            is_logged: false,
+                            is_overload: false,
+                            pr_hit: false,
+                        });
+                    }
                 }
             }
         }

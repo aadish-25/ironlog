@@ -230,16 +230,6 @@ export function SessionPage() {
         );
     }
 
-    // ─── EMPTY STATE ────────────────────────────────────────────────────────────
-    if (exercises.length === 0) {
-        return (
-            <EmptySessionState
-                onBack={() => navigate("/")}
-                onCreateSplit={() => navigate("/splits")}
-            />
-        );
-    }
-
     const showCompletion = showCompletionOverride ?? session?.is_completed ?? false;
 
     if (showCompletion) {
@@ -263,6 +253,16 @@ export function SessionPage() {
                 exercises={exercises}
                 onBack={() => setShowCompletionOverride(true)}
                 onEdit={() => setShowSummary(false)}
+            />
+        );
+    }
+
+    // ─── EMPTY STATE ────────────────────────────────────────────────────────────
+    if (exercises.length === 0) {
+        return (
+            <EmptySessionState
+                onBack={() => navigate("/")}
+                onCreateSplit={() => navigate("/splits")}
             />
         );
     }

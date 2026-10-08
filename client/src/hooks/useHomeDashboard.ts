@@ -82,8 +82,8 @@ export function useHomeDashboard() {
     const activeSplitDay = activeSplit?.days?.find((d: any) => d.day_of_week === dbDayOfWeek) || null;
     const tomorrowSplitDay = activeSplit?.days?.find((d: any) => d.day_of_week === tomorrowDbDayOfWeek) || null;
 
-    // 3. Today's Session
-    const todaySession = sessions.find(s => {
+    // 3. Today's Sessions Resolution
+    const todayCandidateSessions = sessions.filter(s => {
         const sDate = (s as any).date || s.started_at;
         if (!sDate) return false;
         if (typeof sDate === "string") {
@@ -95,6 +95,20 @@ export function useHomeDashboard() {
                d.getMonth() === today.getMonth() &&
                d.getFullYear() === today.getFullYear();
     });
+
+    // Precedence: Completed workout > In-progress workout > Skipped day
+    // Within each category, prefer a session matching current active split day
+    const completedForToday = todayCandidateSessions.find(s => s.is_completed && !s.is_skipped && s.split_day_id === activeSplitDay?.id)
+        || todayCandidateSessions.find(s => s.is_completed && !s.is_skipped);
+
+    const inProgressForToday = todayCandidateSessions.find(s => !s.is_completed && !s.is_skipped && s.split_day_id === activeSplitDay?.id)
+        || todayCandidateSessions.find(s => !s.is_completed && !s.is_skipped);
+
+    const skippedForToday = todayCandidateSessions.find(s => s.is_skipped && s.split_day_id === activeSplitDay?.id)
+        || todayCandidateSessions.find(s => s.is_skipped);
+
+    const todaySession = completedForToday || inProgressForToday || skippedForToday || null;
+
     const workoutDone = !!todaySession && !todaySession.is_skipped && todaySession.is_completed;
     const skipped = !!todaySession && todaySession.is_skipped;
     const inProgress = !!todaySession && !skipped && !todaySession.is_completed;
@@ -115,16 +129,20 @@ export function useHomeDashboard() {
             pastDate.setDate(today.getDate() - daysAgo);
             const pastDateStr = new Date(pastDate.getTime() - pastDate.getTimezoneOffset() * 60000).toISOString().split('T')[0];
             
-            const sessionOnDay = sessions.find(s => {
+            const isCompletedOnDay = sessions.some(s => {
                 const sDate = (s as any).date || s.started_at;
                 if (!sDate) return false;
+                if (typeof sDate === "string" && sDate.split("T")[0] === pastDateStr) {
+                    return s.is_completed && !s.is_skipped;
+                }
                 const d = new Date(sDate);
                 return d.getDate() === pastDate.getDate() &&
                        d.getMonth() === pastDate.getMonth() &&
-                       d.getFullYear() === pastDate.getFullYear();
+                       d.getFullYear() === pastDate.getFullYear() &&
+                       s.is_completed && !s.is_skipped;
             });
             
-            if (sessionOnDay && !sessionOnDay.is_skipped) {
+            if (isCompletedOnDay) {
                 type = "done";
             } else {
                 // Was it a rest day?
@@ -132,8 +150,6 @@ export function useHomeDashboard() {
                 if (splitDayForPast?.type === "rest") {
                     type = "rest";
                 } else {
-                    // It was a training day, but no session found (missed)
-                    // The UI 'rest' dot represents a missed day or rest day based on design.
                     type = "rest";
                 }
             }

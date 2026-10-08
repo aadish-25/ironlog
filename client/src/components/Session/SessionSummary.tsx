@@ -33,19 +33,24 @@ export function SessionSummary({ splitDayName, exercises, onBack, onEdit }: Sess
       </header>
 
       <div className="flex-1 overflow-y-auto p-5 pb-[40px] flex flex-col gap-6">
-        {exercises.map((ex, i) => {
-            const loggedSets = ex.sets.filter(s => s.is_logged);
+        {(!exercises || exercises.length === 0) ? (
+          <div className="bg-[#141414] rounded-2xl p-6 text-center border border-border">
+            <span className="text-ghost text-xs italic tracking-widest">No exercises logged in this session</span>
+          </div>
+        ) : (
+          exercises.map((ex, i) => {
+            const loggedSets = (ex.sets || []).filter(s => s.is_logged);
             
             return (
-                <div key={ex.id} className="flex flex-col gap-3">
+                <div key={ex.id || `ex-${i}`} className="flex flex-col gap-3">
                     <h2 className="font-display text-lg tracking-[1.5px] text-white uppercase flex items-center gap-2">
                     <span className="text-dim text-sm">{i + 1}.</span> {ex.name}
                     </h2>
                     <div className="flex flex-col bg-[#141414] rounded-2xl p-4 border border-border">
                     {loggedSets.map((set, setIdx) => (
-                        <div key={set.id} className="flex items-center justify-between py-2 border-b border-[#222] last:border-0">
+                        <div key={set.id || `set-${setIdx}`} className="flex items-center justify-between py-2 border-b border-[#222] last:border-0">
                             <div className="flex items-center gap-2">
-                                <span className="text-ghost text-xs tracking-[2px] font-display">SET {set.set_number}</span>
+                                <span className="text-ghost text-xs tracking-[2px] font-display">SET {set.set_number || setIdx + 1}</span>
                                 {set.pr_hit && (
                                     <div className="px-1 py-0.5 bg-[#4a3410] border border-[#a67c00] rounded text-[8px] text-[#ffd700] font-bold tracking-widest uppercase leading-none">
                                         PR
@@ -53,8 +58,8 @@ export function SessionSummary({ splitDayName, exercises, onBack, onEdit }: Sess
                                 )}
                             </div>
                             <div className="flex gap-6 font-display text-lg tracking-[1.5px] text-[#eee]">
-                                <span>{set.weight} <span className="text-ghost text-xs">KG</span></span>
-                                <span>{set.reps} <span className="text-ghost text-xs">REPS</span></span>
+                                <span>{set.weight ?? 0} <span className="text-ghost text-xs">KG</span></span>
+                                <span>{set.reps ?? 0} <span className="text-ghost text-xs">REPS</span></span>
                             </div>
                         </div>
                     ))}
@@ -64,7 +69,8 @@ export function SessionSummary({ splitDayName, exercises, onBack, onEdit }: Sess
                     </div>
                 </div>
             );
-        })}
+          })
+        )}
       </div>
     </div>
   );
