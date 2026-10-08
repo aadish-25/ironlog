@@ -62,6 +62,23 @@ export function useSession(sessionId: string | null) {
         return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
     }, [sessionId, exercises]);
 
+    // Auto-complete if session date is in the past and has logged sets (midnight passed)
+    useEffect(() => {
+        if (!sessionData || sessionData.is_completed || !sessionId) return;
+        const sDate = sessionData.date || (sessionData as any).started_at;
+        if (!sDate) return;
+        const d = new Date(sDate);
+        const now = new Date();
+        const isPastDay =
+            d.getFullYear() < now.getFullYear() ||
+            d.getMonth() < now.getMonth() ||
+            d.getDate() < now.getDate();
+
+        if (isPastDay && exercises.some((ex) => ex.sets.some((s) => s.is_logged))) {
+            completeUserSession(sessionId);
+        }
+    }, [sessionId, sessionData?.date, sessionData?.is_completed, exercises]);
+
     let error: string | null = null;
     if (swrError) {
         error = axios.isAxiosError(swrError) ? swrError.response?.data?.message ?? swrError.message : (swrError as Error).message;

@@ -27,16 +27,16 @@ export function useHomeDashboard() {
         for (const s of sessions) {
             const draftKey = `ironlog_draft_${s.id}`;
             const raw = localStorage.getItem(draftKey);
-            if (raw) {
-                const sDate = (s as any).date || s.started_at;
-                if (!sDate) continue;
-                const d = new Date(sDate);
-                const isPastDay =
-                    d.getFullYear() < now.getFullYear() ||
-                    d.getMonth() < now.getMonth() ||
-                    d.getDate() < now.getDate();
+            const sDate = (s as any).date || s.started_at;
+            if (!sDate) continue;
+            const d = new Date(sDate);
+            const isPastDay =
+                d.getFullYear() < now.getFullYear() ||
+                d.getMonth() < now.getMonth() ||
+                d.getDate() < now.getDate();
 
-                if (isPastDay && !s.is_completed) {
+            if (isPastDay && !s.is_completed) {
+                if (raw) {
                     try {
                         const parsed = JSON.parse(raw);
                         const sets = Array.isArray(parsed)
@@ -56,11 +56,19 @@ export function useHomeDashboard() {
                             .then(() => {
                                 localStorage.removeItem(draftKey);
                                 mutate("/sessions");
+                                mutate("/users/me/stats");
                             })
                             .catch((err) => console.warn("Failed auto-sync past draft", err));
                     } catch (e) {
                         console.error("Failed to parse past draft", e);
                     }
+                } else if ((s as any).sets_logged > 0) {
+                    completeSession(s.id, [])
+                        .then(() => {
+                            mutate("/sessions");
+                            mutate("/users/me/stats");
+                        })
+                        .catch((err) => console.warn("Failed auto-sync past session", err));
                 }
             }
         }
@@ -72,6 +80,20 @@ export function useHomeDashboard() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+
+    // Auto-check for midnight rollover every 30 seconds to advance the calendar day
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const currentToday = new Date();
+            currentToday.setHours(0, 0, 0, 0);
+            const currentTodayStr = new Date(currentToday.getTime() - currentToday.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+            if (currentTodayStr !== todayStr) {
+                mutate("/sessions");
+                mutate("/users/me/stats");
+            }
+        }, 30000);
+        return () => clearInterval(interval);
+    }, [todayStr]);
 
     // DB day_of_week: 0 = Mon, ..., 6 = Sun
     // JS getDay(): 0 = Sun, 1 = Mon, ..., 6 = Sat

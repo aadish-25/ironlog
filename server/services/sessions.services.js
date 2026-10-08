@@ -38,8 +38,42 @@ const createSessionService = async (
     }
 };
 
+const autoCompletePastSessionsService = async (userId) => {
+    try {
+        // 1. Delete abandoned empty sessions from past days (0 sets logged, never completed)
+        await pool.query(
+            `DELETE FROM sessions 
+             WHERE user_id = $1 
+               AND is_completed = false 
+               AND is_skipped = false 
+               AND (date < CURRENT_DATE OR created_at < now() - interval '12 hours')
+               AND id NOT IN (SELECT DISTINCT session_id FROM sets WHERE user_id = $1)`,
+            [userId],
+        );
+
+        // 2. Auto-complete past sessions that have at least one set logged
+        const autoCompleted = await pool.query(
+            `UPDATE sessions 
+             SET is_completed = true, is_skipped = false, updated_at = now() 
+             WHERE user_id = $1 
+               AND is_completed = false 
+               AND (date < CURRENT_DATE OR created_at < now() - interval '8 hours')
+               AND id IN (SELECT DISTINCT session_id FROM sets WHERE user_id = $1)
+             RETURNING id`,
+            [userId],
+        );
+
+        if (autoCompleted.rows.length > 0) {
+            await delCache(`prs:${userId}`);
+        }
+    } catch (err) {
+        console.warn("Could not auto-complete past sessions:", err.message);
+    }
+};
+
 const getSessionsService = async (userId) => {
     try {
+        await autoCompletePastSessionsService(userId);
         const result = await pool.query(
             `SELECT sessions.*,
              split_days.label as split_day_name,
@@ -198,6 +232,7 @@ const deleteSessionService = async (sessionId, userId) => {
 
 const getMissedSessionsService = async (userId) => {
     try {
+        await autoCompletePastSessionsService(userId);
         // 1. Get the user's active split's non-Rest split_days
         const splitDaysResult = await pool.query(
             `SELECT split_days.*
@@ -256,6 +291,7 @@ const getMissedSessionsService = async (userId) => {
 
 const getSessionsHistoryService = async (userId, limit, offset) => {
     try {
+        await autoCompletePastSessionsService(userId);
         const result = await pool.query(
             `SELECT sessions.id, sessions.date, split_days.label as name, 
             COALESCE(SUM(sets.weight_kg * sets.reps), 0) as "volumeKg"
@@ -452,4 +488,5 @@ export {
     getSessionsHistoryService,
     getSessionsSummaryService,
     completeSessionService,
+    autoCompletePastSessionsService,
 };

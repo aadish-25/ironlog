@@ -63,6 +63,7 @@ export type Session = {
   id: string;
   split_day_id: string;
   split_day_label: string;
+  date?: string;
   started_at: string;
   ended_at: string | null;
   is_skipped: boolean;

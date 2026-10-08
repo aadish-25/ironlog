@@ -1,5 +1,6 @@
 import pool from "../db/connection.js";
 import { getCache, setCache } from "../lib/redis.js";
+import { autoCompletePastSessionsService } from "./sessions.services.js";
 
 const getUserByIdService = async (id) => {
     const result = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
@@ -57,6 +58,7 @@ const updateUserService = async (id, data) => {
 };
 
 const getUserStatsService = async (userId) => {
+    await autoCompletePastSessionsService(userId);
     // Fetch all non-skipped session dates for the user, ordered descending
     const result = await pool.query(
         "SELECT date FROM sessions WHERE user_id = $1 AND is_skipped = false AND is_completed = true ORDER BY date DESC",
