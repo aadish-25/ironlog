@@ -55,7 +55,7 @@ const getSessionsService = async (userId) => {
              FROM sessions
              LEFT JOIN split_days ON sessions.split_day_id = split_days.id
              LEFT JOIN sets ON sets.session_id = sessions.id
-             WHERE sessions.user_id = $1 AND sessions.is_completed = true
+             WHERE sessions.user_id = $1
              GROUP BY sessions.id, split_days.label
              ORDER BY sessions.date DESC`,
             [userId],
@@ -420,9 +420,9 @@ const completeSessionService = async (sessionId, userId, sets = []) => {
             }
         }
 
-        // 3. Mark session completed
+        // 3. Mark session completed and reset skipped flag
         const result = await client.query(
-            "UPDATE sessions SET is_completed = true WHERE id = $1 AND user_id = $2 RETURNING *",
+            "UPDATE sessions SET is_completed = true, is_skipped = false WHERE id = $1 AND user_id = $2 RETURNING *",
             [sessionId, userId],
         );
 

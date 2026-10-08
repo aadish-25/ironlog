@@ -86,6 +86,10 @@ export function useHomeDashboard() {
     const todaySession = sessions.find(s => {
         const sDate = (s as any).date || s.started_at;
         if (!sDate) return false;
+        if (typeof sDate === "string") {
+            const dateStr = sDate.split("T")[0];
+            if (dateStr === todayStr) return true;
+        }
         const d = new Date(sDate);
         return d.getDate() === today.getDate() &&
                d.getMonth() === today.getMonth() &&
@@ -183,6 +187,7 @@ export function useHomeDashboard() {
                 id: `temp-${Date.now()}`,
                 split_day_id: activeSplitDay.id,
                 split_day_label: activeSplitDay.label,
+                date: todayStr,
                 started_at: new Date().toISOString(),
                 is_skipped: false,
                 total_volume: 0,
@@ -213,6 +218,7 @@ export function useHomeDashboard() {
                 id: `temp-${Date.now()}`,
                 split_day_id: activeSplitDay.id,
                 split_day_label: activeSplitDay.label,
+                date: todayStr,
                 started_at: new Date().toISOString(),
                 ended_at: new Date().toISOString(),
                 is_skipped: true,

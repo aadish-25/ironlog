@@ -100,6 +100,25 @@ export function useSession(sessionId: string | null) {
 
             mutate((currentData) => currentData ? { ...currentData, ...result } : undefined, false);
 
+            // Optimistically update /sessions so Home page sees it completed in 0ms
+            globalMutate(
+                "/sessions",
+                (current: any) => {
+                    if (!current || !Array.isArray(current)) return current;
+                    return current.map((s: any) =>
+                        s.id === id
+                            ? {
+                                  ...s,
+                                  is_completed: true,
+                                  is_skipped: false,
+                                  sets_logged: allLoggedSets.length,
+                              }
+                            : s
+                    );
+                },
+                false
+            );
+
             const now = new Date();
             const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
