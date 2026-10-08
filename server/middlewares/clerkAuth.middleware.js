@@ -2,13 +2,8 @@ import { getAuth, clerkClient } from "@clerk/express";
 import pool from "../db/connection.js";
 import { getCache, setCache, delCache } from "../lib/redis.js";
 
-// Level 1: In-memory cache for ultra-fast hits during the same serverless invocation
-const memoryUserCache = new Map();
-const MEMORY_TTL_MS = 5 * 60 * 1000; // 5 minutes
-
 export const invalidateUserCache = async (clerkId) => {
     if (clerkId) {
-        memoryUserCache.delete(clerkId);
         await delCache(`user:${clerkId}`);
     }
 };
@@ -20,27 +15,15 @@ const auth = async (req, res, next) => {
             return res.status(401).json({ message: "Unauthorized" });
         }
 
-        // 1. Check Level 1 In-Memory Cache (0 ms)
-        const inMemory = memoryUserCache.get(userId);
-        if (inMemory && Date.now() - inMemory.timestamp < MEMORY_TTL_MS) {
-            req.auth = { userId };
-            req.user = inMemory.user;
-            return next();
-        }
-
-        // 2. Check Level 2 Upstash Redis (~1 ms)
+        // 1. Check Upstash Redis (~1 ms)
         const cachedUser = await getCache(`user:${userId}`);
         if (cachedUser) {
-            memoryUserCache.set(userId, {
-                user: cachedUser,
-                timestamp: Date.now(),
-            });
             req.auth = { userId };
             req.user = cachedUser;
             return next();
         }
 
-        // 3. Fallback: Query Neon Database
+        // 2. Fallback: Query Neon Database
         let result = await pool.query(
             "SELECT * FROM users WHERE clerk_id = $1",
             [userId],
@@ -64,10 +47,9 @@ const auth = async (req, res, next) => {
             user = newResult.rows[0];
         }
 
-        // 4. Save to both caches (Redis TTL = 1 hour)
+        // 3. Save to Redis (TTL = 24 hours)
         if (user) {
-            memoryUserCache.set(userId, { user, timestamp: Date.now() });
-            await setCache(`user:${userId}`, user, 3600);
+            await setCache(`user:${userId}`, user, 86400);
         }
 
         req.auth = { userId };

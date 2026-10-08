@@ -2,6 +2,9 @@ import {
     getExercisesService,
     getExerciseByIdService,
     getExerciseProgressService,
+    createExerciseService,
+    updateExerciseService,
+    deleteExerciseService,
 } from "../services/exercises.services.js";
 
 async function getExercises(req, res) {
@@ -82,4 +85,61 @@ async function getExerciseProgress(req, res) {
     }
 }
 
-export { getExercises, getExerciseById, getExerciseProgress };
+async function createExercise(req, res) {
+    try {
+        const result = await createExerciseService(req.body);
+        res.status(201).json({
+            message: "Exercise created successfully",
+            data: result,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({
+            message: "Error while creating exercise",
+            error: error.message,
+        });
+    }
+}
+
+async function updateExercise(req, res) {
+    const { id } = req.params;
+    try {
+        const result = await updateExerciseService(id, req.body);
+        res.status(200).json({
+            message: "Exercise updated successfully",
+            data: result,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({
+            message: "Error while updating exercise",
+            error: error.message,
+        });
+    }
+}
+
+async function deleteExercise(req, res) {
+    const { id } = req.params;
+    try {
+        const result = await deleteExerciseService(id);
+        res.status(200).json({
+            message: "Exercise deleted successfully",
+            data: result,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({
+            message: "Error while deleting exercise",
+            error: error.message,
+        });
+    }
+}
+
+export {
+    getExercises,
+    getExerciseById,
+    getExerciseProgress,
+    createExercise,
+    updateExercise,
+    deleteExercise,
+};
