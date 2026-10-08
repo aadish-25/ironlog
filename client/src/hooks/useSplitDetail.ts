@@ -25,7 +25,7 @@ export function useSplitDetail(splitId: string) {
         if (actionLoading) return;
         setActionLoading(true);
         try {
-            // Optimistic update
+            // Optimistic update for single split
             mutateSplit(prev => {
                 if (!prev) return prev;
                 return {
@@ -33,12 +33,30 @@ export function useSplitDetail(splitId: string) {
                     days: prev.days.map(d => d.id === dayId ? { ...d, ...updates } : d)
                 };
             }, false);
+
+            // Optimistic update for global splits list (/splits)
+            globalMutate(
+                "/splits",
+                (prevSplits: Split[] | undefined) => {
+                    if (!prevSplits) return prevSplits;
+                    return prevSplits.map(s => {
+                        if (s.id !== splitId) return s;
+                        return {
+                            ...s,
+                            days: s.days.map(d => d.id === dayId ? { ...d, ...updates } : d)
+                        };
+                    });
+                },
+                false
+            );
+
             await updateSplitDay(dayId, updates);
             mutateSplit();
             globalMutate("/splits");
         } catch (err) {
             console.error(err);
             mutateSplit(); // rollback on error
+            globalMutate("/splits");
         } finally {
             setActionLoading(false);
         }
@@ -77,6 +95,28 @@ export function useSplitDetail(splitId: string) {
                         } : d)
                     };
                 }, false);
+
+                // Optimistically update global /splits so Home dashboard gets new exercise count instantly (0 ms!)
+                globalMutate(
+                    "/splits",
+                    (prevSplits: Split[] | undefined) => {
+                        if (!prevSplits) return prevSplits;
+                        return prevSplits.map(s => {
+                            if (s.id !== splitId) return s;
+                            return {
+                                ...s,
+                                days: s.days.map(d => {
+                                    if (d.id !== dayId) return d;
+                                    return {
+                                        ...d,
+                                        exercises: [...(d.exercises || []), ...newExercises]
+                                    };
+                                })
+                            };
+                        });
+                    },
+                    false
+                );
             }
 
             await addExercisesToDay(dayId, exerciseIds, startingIndex);
@@ -85,6 +125,7 @@ export function useSplitDetail(splitId: string) {
         } catch (err) {
             console.error(err);
             mutateSplit(); // Rollback optimistic update
+            globalMutate("/splits");
         } finally {
             setActionLoading(false);
         }
@@ -110,12 +151,35 @@ export function useSplitDetail(splitId: string) {
                     })
                 };
             }, false);
+
+            globalMutate(
+                "/splits",
+                (prevSplits: Split[] | undefined) => {
+                    if (!prevSplits) return prevSplits;
+                    return prevSplits.map(s => {
+                        if (s.id !== splitId) return s;
+                        return {
+                            ...s,
+                            days: s.days.map(d => {
+                                if (d.id !== dayId) return d;
+                                return {
+                                    ...d,
+                                    exercises: d.exercises.filter(e => e.id !== splitDayExerciseId)
+                                };
+                            })
+                        };
+                    });
+                },
+                false
+            );
+
             await removeExerciseFromDay(splitDayExerciseId);
             mutateSplit();
             globalMutate("/splits");
         } catch (err) {
             console.error(err);
             mutateSplit();
+            globalMutate("/splits");
         } finally {
             setActionLoading(false);
         }
@@ -131,6 +195,7 @@ export function useSplitDetail(splitId: string) {
         } catch (err) {
             console.error(err);
             mutateSplit();
+            globalMutate("/splits");
         } finally {
             setActionLoading(false);
         }
@@ -141,12 +206,21 @@ export function useSplitDetail(splitId: string) {
         setActionLoading(true);
         try {
             mutateSplit(prev => prev ? { ...prev, name: newName } : prev, false);
+            globalMutate(
+                "/splits",
+                (prevSplits: Split[] | undefined) => {
+                    if (!prevSplits) return prevSplits;
+                    return prevSplits.map(s => (s.id === splitId ? { ...s, name: newName } : s));
+                },
+                false
+            );
             await updateSplit(splitId, newName);
             mutateSplit();
             globalMutate("/splits");
         } catch (err) {
             console.error(err);
             mutateSplit();
+            globalMutate("/splits");
         } finally {
             setActionLoading(false);
         }

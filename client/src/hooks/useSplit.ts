@@ -11,7 +11,14 @@ import {
 import { type Split } from "../types";
 
 export function useSplit() {
-    const { data: splits, error: swrError, isLoading: loading, mutate } = useSWR<Split[]>("/splits", fetcher);
+    const { data: splits, error: swrError, isLoading: loading, mutate } = useSWR<Split[]>(
+        "/splits",
+        fetcher,
+        {
+            revalidateOnMount: true,
+            revalidateIfStale: true,
+        }
+    );
     const [actionLoading, setActionLoading] = useState(false);
 
     let error: string | null = null;

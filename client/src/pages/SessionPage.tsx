@@ -25,6 +25,7 @@ export function SessionPage() {
         currentExerciseIndex,
         setCurrentExerciseIndex,
         loading,
+        error,
         completeUserSession
     } = useSession(sessionId || null);
 
@@ -254,6 +255,25 @@ export function SessionPage() {
                 onBack={() => setShowCompletionOverride(true)}
                 onEdit={() => setShowSummary(false)}
             />
+        );
+    }
+
+    // ─── ERROR STATE ────────────────────────────────────────────────────────────
+    if (error && !session) {
+        return (
+            <div className="bg-bg min-h-screen text-ink font-body flex flex-col items-center justify-center p-6 text-center">
+                <span className="text-3xl mb-4">⚠️</span>
+                <p className="text-white font-display text-xl tracking-wider mb-2 uppercase">Session Not Found</p>
+                <p className="text-[#888] text-xs max-w-[280px] mb-6 leading-relaxed">
+                    This workout session could not be loaded or may have been removed.
+                </p>
+                <button
+                    onClick={() => navigate("/")}
+                    className="py-3 px-6 bg-[#222] border border-[#444] rounded-xl text-white font-display text-sm tracking-widest uppercase hover:bg-[#333] transition-colors"
+                >
+                    Return Home
+                </button>
+            </div>
         );
     }
 

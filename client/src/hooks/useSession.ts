@@ -79,6 +79,24 @@ export function useSession(sessionId: string | null) {
                 false
             );
 
+            // 2. Immediately update /users/me/stats optimistically so CompletionScreen & Home show the new streak!
+            globalMutate(
+                "/users/me/stats",
+                (prev: any) => {
+                    if (!prev) return prev;
+                    const newStreak = (prev.currentStreak || 0) + 1;
+                    return {
+                        ...prev,
+                        totalSessions: (prev.totalSessions || 0) + 1,
+                        monthlySessions: (prev.monthlySessions || 0) + 1,
+                        weeklySessions: (prev.weeklySessions || 0) + 1,
+                        currentStreak: newStreak,
+                        bestStreak: Math.max(prev.bestStreak || 0, newStreak),
+                    };
+                },
+                false
+            );
+
             // 2. Collect all logged sets from the session to batch sync to server
             const allLoggedSets = exercises.flatMap((ex) =>
                 ex.sets

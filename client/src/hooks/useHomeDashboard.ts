@@ -13,8 +13,8 @@ export function useHomeDashboard() {
     const activeSplit = splits?.find(s => s.is_active) || null;
     const [actionLoading, setActionLoading] = useState(false);
     
-    const { data: sessionsData, isLoading: sessionsLoading, error: sessionsError } = useSWR<Session[]>("/sessions", fetcher);
-    const { data: statsData, error: statsError } = useSWR<UserStats>("/users/me/stats", fetcher);
+    const { data: sessionsData, isLoading: sessionsLoading, error: sessionsError } = useSWR<Session[]>("/sessions", fetcher, { revalidateOnMount: true, revalidateIfStale: true });
+    const { data: statsData, error: statsError } = useSWR<UserStats>("/users/me/stats", fetcher, { revalidateOnMount: true, revalidateIfStale: true });
 
     const sessions = sessionsData || [];
     const stats = statsData || null;
@@ -97,15 +97,18 @@ export function useHomeDashboard() {
     });
 
     // Precedence: Completed workout > In-progress workout > Skipped day
-    // Within each category, prefer a session matching current active split day
-    const completedForToday = todayCandidateSessions.find(s => s.is_completed && !s.is_skipped && s.split_day_id === activeSplitDay?.id)
-        || todayCandidateSessions.find(s => s.is_completed && !s.is_skipped);
+    // When activeSplitDay exists, strictly require the session to belong to activeSplitDay!
+    const completedForToday = activeSplitDay
+        ? todayCandidateSessions.find(s => s.is_completed && !s.is_skipped && s.split_day_id === activeSplitDay.id)
+        : todayCandidateSessions.find(s => s.is_completed && !s.is_skipped);
 
-    const inProgressForToday = todayCandidateSessions.find(s => !s.is_completed && !s.is_skipped && s.split_day_id === activeSplitDay?.id)
-        || todayCandidateSessions.find(s => !s.is_completed && !s.is_skipped);
+    const inProgressForToday = activeSplitDay
+        ? todayCandidateSessions.find(s => !s.is_completed && !s.is_skipped && s.split_day_id === activeSplitDay.id)
+        : todayCandidateSessions.find(s => !s.is_completed && !s.is_skipped);
 
-    const skippedForToday = todayCandidateSessions.find(s => s.is_skipped && s.split_day_id === activeSplitDay?.id)
-        || todayCandidateSessions.find(s => s.is_skipped);
+    const skippedForToday = activeSplitDay
+        ? todayCandidateSessions.find(s => s.is_skipped && s.split_day_id === activeSplitDay.id)
+        : todayCandidateSessions.find(s => s.is_skipped);
 
     const todaySession = completedForToday || inProgressForToday || skippedForToday || null;
 
@@ -198,20 +201,6 @@ export function useHomeDashboard() {
         if (!activeSplitDay || actionLoading) return null;
         setActionLoading(true);
         try {
-            // Optimistic Update
-            const fakeSession = {
-                id: `temp-${Date.now()}`,
-                split_day_id: activeSplitDay.id,
-                split_day_label: activeSplitDay.label,
-                date: todayStr,
-                started_at: new Date().toISOString(),
-                is_skipped: false,
-                total_volume: 0,
-                sets_logged: 0,
-                is_completed: false
-            };
-            mutate("/sessions", (current: any) => [...(current || []), fakeSession], false);
-
             const session = await createSession(activeSplitDay.id, todayStr);
             mutate("/sessions");
             mutate("/users/me/stats");
@@ -229,21 +218,6 @@ export function useHomeDashboard() {
         if (!activeSplitDay || actionLoading) return null;
         setActionLoading(true);
         try {
-            // Optimistic update
-            const fakeSession = {
-                id: `temp-${Date.now()}`,
-                split_day_id: activeSplitDay.id,
-                split_day_label: activeSplitDay.label,
-                date: todayStr,
-                started_at: new Date().toISOString(),
-                ended_at: new Date().toISOString(),
-                is_skipped: true,
-                total_volume: 0,
-                sets_logged: 0,
-                is_completed: true
-            };
-            mutate("/sessions", (current: any) => [...(current || []), fakeSession], false);
-
             await createSession(activeSplitDay.id, todayStr, true);
             mutate("/sessions");
             mutate("/users/me/stats");
