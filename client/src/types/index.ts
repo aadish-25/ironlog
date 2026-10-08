@@ -79,6 +79,7 @@ export interface SessionExercise {
   sets: SetRecord[];
   muscles?: string[];
   previous_best?: string | null;
+  pr_kg?: number;
 }
 
 export type SetRecord = {

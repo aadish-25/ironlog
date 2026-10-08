@@ -38,6 +38,7 @@ export function useSet(
         setNumber: number,
         weightKg: number,
         reps: number,
+        prHit: boolean = false,
     ) {
         // 1. Instant optimistic update to local UI (0 ms!)
         setExercises((prev) =>
@@ -51,6 +52,7 @@ export function useSet(
                                 reps,
                                 set_number: setNumber,
                                 is_logged: true,
+                                pr_hit: prHit,
                             };
                         }
                         return s;

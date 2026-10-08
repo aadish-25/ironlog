@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSession } from "../hooks/useSession";
 import { useSet } from "../hooks/useSet";
@@ -38,9 +38,34 @@ export function SessionPage() {
     const [showCompletionOverride, setShowCompletionOverride] = useState<boolean | null>(null);
     const [showSummary, setShowSummary] = useState(false);
 
-    // ─── PR TOAST STATE ─────────────────────────────────────────────────────────
+    // ─── PR TOAST & BENCHMARK TRACKING ──────────────────────────────────────────
     const [prToast, setPrToast] = useState<{ name: string; weight: number } | null>(null);
     const dismissPrToast = useCallback(() => setPrToast(null), []);
+
+    // Live PR benchmark per exercise during this session
+    // Initialized from exercise.pr_kg (prior PR from DB, or 0)
+    const [prTracker, setPrTracker] = useState<Record<string, number>>({});
+
+    useEffect(() => {
+        if (!exercises || exercises.length === 0) return;
+        setPrTracker((prev) => {
+            let changed = false;
+            const updated = { ...prev };
+            for (const ex of exercises) {
+                if (updated[ex.exercise_id] === undefined) {
+                    const baselinePr = Number(ex.pr_kg) || 0;
+                    // Check if already logged sets exist in draft
+                    const loggedWeights = (ex.sets || [])
+                        .filter((s) => s.is_logged && Number(s.weight) > 0 && Number(s.reps) > 0)
+                        .map((s) => Number(s.weight));
+                    const maxLogged = loggedWeights.length > 0 ? Math.max(...loggedWeights) : 0;
+                    updated[ex.exercise_id] = Math.max(baselinePr, maxLogged);
+                    changed = true;
+                }
+            }
+            return changed ? updated : prev;
+        });
+    }, [exercises]);
 
     const splitDayName = session?.split_day_label ?? null;
 
@@ -59,24 +84,37 @@ export function SessionPage() {
     const handleLogSet = (index: number) => {
         if (!session || !currentExercise) return;
         const targetSet = currentExercise.sets[index];
+        const weight = Number(targetSet.weight) || 0;
+        const reps = Number(targetSet.reps) || 0;
 
-        // 1. Save set instantly to local state & draft (0 ms delay!)
+        // Current benchmark PR for this exercise
+        const currentPr = prTracker[currentExercise.exercise_id] ?? (Number(currentExercise.pr_kg) || 0);
+
+        // A new PR is achieved ONLY when weight exceeds previous best, and weight > 0, reps > 0
+        const isNewPr = weight > currentPr && weight > 0 && reps > 0;
+
+        if (isNewPr) {
+            // Update PR benchmark so subsequent sets in this workout must beat this new weight
+            setPrTracker((prev) => ({
+                ...prev,
+                [currentExercise.exercise_id]: weight,
+            }));
+            // Fire celebration toast
+            setPrToast({ name: currentExercise.name, weight });
+        }
+
+        // 1. Save set instantly to local state & draft with accurate pr_hit flag (0 ms delay!)
         saveUserSet(
             session.id,
             currentExercise.exercise_id,
             targetSet.id,
             targetSet.set_number,
-            targetSet.weight,
-            targetSet.reps,
+            weight,
+            reps,
+            isNewPr,
         );
 
-        // 2. Fire PR toast immediately if set weight exceeds current PR
-        const currentPr = (currentExercise as any).pr_kg ?? (currentExercise as any).prKg ?? 0;
-        if (targetSet.weight > currentPr && targetSet.weight > 0) {
-            setPrToast({ name: currentExercise.name, weight: targetSet.weight });
-        }
-
-        // 3. Auto-advance when all sets for this exercise are logged
+        // 2. Auto-advance when all sets for this exercise are logged
         const loggedCount = currentExercise.sets.filter((s) => s.is_logged).length;
         if (loggedCount + 1 >= currentExercise.sets.length) {
             if (currentExerciseIndex < exercises.length - 1) {
@@ -174,7 +212,19 @@ export function SessionPage() {
             prev.map((ex) => {
                 if (ex.exercise_id === currentExercise.exercise_id) {
                     const newSets = [...ex.sets];
-                    newSets[index] = { ...newSets[index], is_logged: false };
+                    newSets[index] = { ...newSets[index], is_logged: false, pr_hit: false };
+
+                    // Recalculate benchmark PR from remaining logged sets and DB baseline
+                    const baselinePr = Number(ex.pr_kg) || 0;
+                    const remainingLogged = newSets
+                        .filter((s) => s.is_logged && Number(s.weight) > 0 && Number(s.reps) > 0)
+                        .map((s) => Number(s.weight));
+                    const newMax = remainingLogged.length > 0 ? Math.max(baselinePr, ...remainingLogged) : baselinePr;
+                    setPrTracker((tracker) => ({
+                        ...tracker,
+                        [ex.exercise_id]: newMax,
+                    }));
+
                     return { ...ex, sets: newSets };
                 }
                 return ex;
@@ -188,7 +238,8 @@ export function SessionPage() {
             exercise_id: id,
             name,
             sets: [],
-            muscles: []
+            muscles: [],
+            pr_kg: 0,
         };
         setExercises((prev) => [...prev, newEx]);
         setPickerMode(null);
