@@ -1,5 +1,6 @@
 import type { Split } from "./types";
 import { DayPips } from "./DayPips";
+import { ClipboardList } from "lucide-react";
 
 interface SplitListProps {
   splits: Split[];
@@ -12,7 +13,7 @@ export function SplitList({ splits, onSelectSplit, onActivateSplit, hasActiveSpl
   if (splits.length === 0 && !hasActiveSplit) {
     return (
       <div className="mx-5 mt-4 bg-[#111111] border border-dashed border-[#333333] rounded-[14px] p-8 flex flex-col items-center gap-3 text-center">
-        <div className="text-[32px] opacity-50 grayscale">📋</div>
+        <ClipboardList size={32} className="opacity-40 text-ghost mb-1" />
         <p className="text-[13px] text-[#666666] leading-relaxed">
           No splits created yet.
           <br />

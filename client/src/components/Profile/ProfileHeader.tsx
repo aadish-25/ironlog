@@ -1,3 +1,5 @@
+import { Flame } from "lucide-react";
+
 interface ProfileHeaderProps {
   userName: string | null;
   memberSince: string | null;
@@ -28,7 +30,7 @@ export function ProfileHeader({
         </div>
         {/* Streak badge */}
         <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 bg-heat rounded-full px-2.5 py-[3px] flex items-center gap-1 whitespace-nowrap border-2 border-bg">
-          <span className="text-[10px]">🔥</span>
+          <Flame size={12} className="text-white fill-white" />
           <span className="text-[11px] font-semibold text-white">
             {currentStreak ?? 0} day streak
           </span>

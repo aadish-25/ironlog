@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Edit2, GripVertical, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Edit2, GripVertical, Plus, Trash2, ClipboardList, Moon } from "lucide-react";
 import { useSplitDetail } from "../hooks/useSplitDetail";
 import { useExercises } from "../hooks/useExercises";
 import { ExerciseSelectorModal } from "../components/Splits/ExerciseSelectorModal";
@@ -237,7 +237,7 @@ export function SplitDayDetailPage() {
                             </DndContext>
                         ) : (
                             <div className="text-center py-10">
-                                <div className="text-[32px] opacity-20 mb-3">📋</div>
+                                <ClipboardList size={32} className="opacity-20 mb-3 mx-auto text-ghost" />
                                 <p className="text-[13px] text-ghost">No exercises added yet.</p>
                             </div>
                         )}
@@ -253,7 +253,7 @@ export function SplitDayDetailPage() {
                 ) : (
                     <div className="flex flex-col items-center justify-center text-center mt-10 px-4 mb-6">
                         <div className="w-16 h-16 rounded-full bg-raised border border-[#2a2a2a] flex items-center justify-center mb-5">
-                            <span className="text-2xl">🔋</span>
+                            <Moon size={24} className="text-[#38bdf8]" />
                         </div>
                         <h3 className="text-white font-display text-xl tracking-[1px] mb-2">Rest Day</h3>
                         <p className="text-[#888] text-[13px] leading-relaxed max-w-65">

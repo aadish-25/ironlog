@@ -1,11 +1,13 @@
+import type { ReactNode } from "react";
+
 export interface StatCard {
-  icon: string;
+  icon: ReactNode;
   label: string;
   value: string;
 }
 
 export interface SettingsItem {
-  icon: string;
+  icon: ReactNode;
   label: string;
   onClick?: () => void;
 }

@@ -1,4 +1,4 @@
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Bell } from "lucide-react";
 import type { SettingsItem } from "./types";
 
 interface SettingsListProps {
@@ -24,8 +24,8 @@ export function SettingsList({
         {onToggleNotifications && (
           <div className="flex items-center justify-between p-4 border-b border-border">
             <div className="flex items-center gap-2.5">
-              <span className="text-base text-ghost" aria-hidden="true">
-                🔔
+              <span className="w-5 h-5 flex items-center justify-center text-ghost" aria-hidden="true">
+                <Bell size={16} className="text-heat" />
               </span>
               <span className="text-[15px] font-display tracking-[0.5px] text-heat">Notifications</span>
             </div>
@@ -57,7 +57,7 @@ export function SettingsList({
             aria-label={item.label}
           >
             <div className="flex items-center gap-2.5">
-              <span className="text-base text-ghost" aria-hidden="true">
+              <span className="w-5 h-5 flex items-center justify-center text-ghost" aria-hidden="true">
                 {item.icon}
               </span>
               <span className="text-[15px] font-display tracking-[0.5px] text-dim">{item.label}</span>

@@ -1,5 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { Moon, Dumbbell, ClipboardList } from "lucide-react";
 import { WeekDot } from "../ui/WeekDot";
 
 interface HeroCardProps {
@@ -14,7 +15,17 @@ interface HeroCardProps {
   setsLogged: number | null;
   volumeKg: number | null;
   newPRs: { name: string; kg: number }[] | null;
-  tomorrowWorkout: { name: string; muscles: string; exercisesCount: number } | null;
+  tomorrowWorkout: {
+    name: string;
+    muscles: string;
+    exercisesCount: number;
+    isRestDay?: boolean;
+    headerBadge?: string;
+    dayLabel?: string;
+    dayName?: string;
+    dateStr?: string;
+    nextWorkoutSummary?: string;
+  } | null;
   isRestDay?: boolean;
   hasActiveSplit?: boolean;
   onStartWorkout: () => void;
@@ -84,16 +95,16 @@ export function HeroCard({
               </div>
               <div className="pt-3 border-t border-raised">
                 <div className="text-[9px] tracking-[2px] text-ghost uppercase mb-0.5">
-                  Tomorrow
+                  {tomorrowWorkout?.headerBadge || "Tomorrow"}
                 </div>
                 <div className="font-display text-[22px] text-dim tracking-[1px] uppercase">
                   {tomorrowWorkout ? tomorrowWorkout.name : "REST DAY"}
                 </div>
-                <div className="text-[11px] text-ghost mt-0.5">
-                  {tomorrowWorkout
-                    ? `${tomorrowWorkout.muscles} · ${tomorrowWorkout.exercisesCount} exercises`
-                    : "Take it easy."}
-                </div>
+                {tomorrowWorkout?.muscles ? (
+                  <div className="text-[11px] text-ghost mt-0.5">
+                    {tomorrowWorkout.muscles}
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>
@@ -109,7 +120,9 @@ export function HeroCard({
           {!hasActiveSplit ? (
             <div className="mx-5 bg-card rounded-[18px] border border-border p-6 relative overflow-hidden text-center shadow-lg">
               <div className="absolute top-0 left-0 right-0 h-[3px] bg-heat" />
-              <div className="text-[40px] mb-3 mt-2">👋</div>
+              <div className="w-12 h-12 rounded-2xl bg-heat/10 border border-heat/25 text-heat flex items-center justify-center mx-auto mb-3 mt-1">
+                <Dumbbell size={24} />
+              </div>
               <div className="font-display text-[22px] text-white tracking-[1.5px] mb-2 uppercase">
                 Welcome to IronLog
               </div>
@@ -167,7 +180,9 @@ export function HeroCard({
               
               {isRestDay ? (
                 <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-4 text-center mt-3">
-                  <div className="text-[24px] mb-2">🔋</div>
+                  <div className="w-10 h-10 rounded-xl bg-[#38bdf8]/10 border border-[#38bdf8]/25 text-[#38bdf8] flex items-center justify-center mx-auto mb-2.5">
+                    <Moon size={20} />
+                  </div>
                   <p className="text-[13px] text-white font-medium mb-1">
                     Scheduled Rest Day
                   </p>
@@ -177,7 +192,9 @@ export function HeroCard({
                 </div>
               ) : exerciseCount === 0 ? (
                 <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-4 text-center mt-3">
-                  <div className="text-[20px] mb-2">📋</div>
+                  <div className="w-10 h-10 rounded-xl bg-raised border border-border text-dim flex items-center justify-center mx-auto mb-2.5">
+                    <ClipboardList size={20} />
+                  </div>
                   <p className="text-[12px] text-ghost leading-relaxed mb-3">
                     No exercises added to this training day yet.
                   </p>
@@ -285,23 +302,41 @@ export function HeroCard({
             </div>
           </div>
 
-          {/* ── Standalone Tomorrow Preview Card ── */}
-          <div className="mx-5 bg-card rounded-[16px] border border-border p-[14px_18px] flex items-center justify-between">
-            <div className="flex-1 min-w-0 pr-3">
-              <div className="text-[9px] tracking-[2px] text-ghost uppercase mb-0.5">
-                Up Next · Tomorrow
+          {/* ── Standalone Up Next Themed Preview Card ── */}
+          <div className="mx-5 bg-card rounded-[18px] border border-border p-[15px_18px] relative overflow-hidden flex items-center justify-between">
+            {/* Left 3.5px accent line */}
+            <div
+              className={`absolute top-0 bottom-0 left-0 w-[3.5px] ${
+                tomorrowWorkout?.isRestDay ? "bg-[#38bdf8]" : "bg-[#a855f7]"
+              }`}
+            />
+
+            <div className="flex-1 min-w-0 pr-3 pt-0.5 pl-1.5">
+              <div
+                className={`text-[9px] tracking-[2px] uppercase font-semibold mb-1 ${
+                  tomorrowWorkout?.isRestDay ? "text-[#38bdf8]" : "text-[#c084fc]"
+                }`}
+              >
+                {tomorrowWorkout?.headerBadge || "UP NEXT"}
               </div>
-              <div className="font-display text-[22px] text-white tracking-[1px] uppercase truncate leading-tight">
+              <div className="font-display text-[24px] text-white tracking-[1px] uppercase truncate leading-tight">
                 {tomorrowWorkout ? tomorrowWorkout.name : "REST DAY"}
               </div>
-              <div className="text-[11px] text-ghost mt-0.5 truncate">
-                {tomorrowWorkout
-                  ? `${tomorrowWorkout.muscles} · ${tomorrowWorkout.exercisesCount} exercises`
-                  : "Take it easy."}
-              </div>
+              {tomorrowWorkout?.muscles ? (
+                <div className="text-[11px] text-ghost mt-0.5 truncate leading-snug">
+                  {tomorrowWorkout.muscles}
+                </div>
+              ) : null}
             </div>
-            <div className="w-9 h-9 rounded-xl bg-raised border border-border flex items-center justify-center shrink-0 text-sm">
-              🗓️
+
+            <div
+              className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+                tomorrowWorkout?.isRestDay
+                  ? "bg-[#38bdf8]/10 border border-[#38bdf8]/25 text-[#38bdf8]"
+                  : "bg-[#a855f7]/10 border border-[#a855f7]/25 text-[#c084fc]"
+              }`}
+            >
+              {tomorrowWorkout?.isRestDay ? <Moon size={18} /> : <Dumbbell size={18} />}
             </div>
           </div>
         </motion.div>

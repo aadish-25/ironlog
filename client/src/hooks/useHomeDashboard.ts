@@ -290,16 +290,38 @@ export function useHomeDashboard() {
         return arr.length > 0 ? arr.join(" · ") : null;
     };
 
+    // Calculate tomorrow's day name, formatted date, and rest day status
+    const dayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    const tomorrowDate = new Date(today);
+    tomorrowDate.setDate(today.getDate() + 1);
+    const tomorrowDayName = dayNames[tomorrowDbDayOfWeek];
+    const tomorrowFormattedDate = tomorrowDate.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+    const isTomorrowRest = !tomorrowSplitDay || 
+        tomorrowSplitDay.is_rest === true || 
+        tomorrowSplitDay.type === "rest" || 
+        tomorrowSplitDay.label?.trim().toLowerCase() === "rest";
+
+    const tomorrowWorkoutInfo = {
+        name: isTomorrowRest ? "REST DAY" : (tomorrowSplitDay?.label || "REST DAY"),
+        muscles: isTomorrowRest 
+            ? "" 
+            : (getMusclesStr(tomorrowSplitDay) 
+                ? `${getMusclesStr(tomorrowSplitDay)} · ${tomorrowSplitDay?.exercises?.length || 0} exercises` 
+                : `${tomorrowSplitDay?.exercises?.length || 0} exercises`),
+        exercisesCount: isTomorrowRest ? 0 : (tomorrowSplitDay?.exercises?.length || 0),
+        isRestDay: isTomorrowRest,
+        headerBadge: `UP NEXT · ${tomorrowDayName.toUpperCase()} (${tomorrowFormattedDate.toUpperCase()})`,
+        dayName: tomorrowDayName,
+        dateStr: tomorrowFormattedDate,
+    };
+
     return {
         user,
         activeSplitDayName: activeSplitDay?.label || "Rest",
         activeSplitDayMuscles: getMusclesStr(activeSplitDay) || "Rest and Recover",
         exerciseCount: activeSplitDay?.exercises?.length || 0,
-        tomorrowWorkout: tomorrowSplitDay ? {
-            name: tomorrowSplitDay.label,
-            muscles: getMusclesStr(tomorrowSplitDay) || "No specific muscles",
-            exercisesCount: tomorrowSplitDay.exercises?.length || 0
-        } : null,
+        tomorrowWorkout: tomorrowWorkoutInfo,
         workoutDone,
         inProgress,
         skipped,
@@ -317,7 +339,7 @@ export function useHomeDashboard() {
         todaySessionId: todaySession?.id || null,
         lifetimeStats,
         recentSessions,
-        isRestDay: activeSplitDay?.type === "rest",
+        isRestDay: !!(activeSplitDay?.is_rest || activeSplitDay?.type === "rest" || activeSplitDay?.label?.trim().toLowerCase() === "rest"),
         streak: stats?.currentStreak ?? 0,
         hasActiveSplit: !!activeSplit
     };

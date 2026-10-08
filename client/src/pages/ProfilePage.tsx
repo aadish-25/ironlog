@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { LogOut } from "lucide-react";
+import { LogOut, User as UserIcon, Lock, Compass, HelpCircle, Info, Calendar, Flame, Activity } from "lucide-react";
 import { useClerk } from "@clerk/clerk-react";
 import { mutate } from "swr";
 import { ProfileHeader } from "../components/Profile/ProfileHeader";
@@ -30,9 +30,9 @@ export function ProfilePage() {
 
   // ─── MONTHLY STATS ──────────────────────────────────────────────────────────
   const monthlyStats: StatCard[] = [
-    { icon: "→→", label: "Sessions", value: String(stats?.monthlySessions ?? 0) },
-    { icon: "📅", label: "This week", value: String(stats?.weeklySessions ?? 0) },
-    { icon: "🔥", label: "Best streak", value: String(stats?.bestStreak ?? 0) },
+    { icon: <Activity size={18} className="text-dim" />, label: "Sessions", value: String(stats?.monthlySessions ?? 0) },
+    { icon: <Calendar size={18} className="text-dim" />, label: "This week", value: String(stats?.weeklySessions ?? 0) },
+    { icon: <Flame size={18} className="text-heat" />, label: "Best streak", value: String(stats?.bestStreak ?? 0) },
   ];
 
   // ─── SETTINGS ───────────────────────────────────────────────────────────────
@@ -46,14 +46,14 @@ export function ProfilePage() {
   };
 
   const accountItems: SettingsItem[] = [
-    { icon: "✏️", label: "Edit profile", onClick: () => setActiveTab("edit") },
-    { icon: "🔒", label: "Privacy & data", onClick: () => setActiveTab("privacy") },
+    { icon: <UserIcon size={16} className="text-dim" />, label: "Edit profile", onClick: () => setActiveTab("edit") },
+    { icon: <Lock size={16} className="text-dim" />, label: "Privacy & data", onClick: () => setActiveTab("privacy") },
   ];
 
   const preferenceItems: SettingsItem[] = [
-    { icon: "🧭", label: "App Tutorial", onClick: handleStartTour },
-    { icon: "❓", label: "Help & support", onClick: () => setActiveTab("help") },
-    { icon: "ℹ️", label: "About", onClick: () => setActiveTab("about") },
+    { icon: <Compass size={16} className="text-dim" />, label: "App Tutorial", onClick: handleStartTour },
+    { icon: <HelpCircle size={16} className="text-dim" />, label: "Help & support", onClick: () => setActiveTab("help") },
+    { icon: <Info size={16} className="text-dim" />, label: "About", onClick: () => setActiveTab("about") },
   ];
 
   const handleToggleNotifications = async () => {

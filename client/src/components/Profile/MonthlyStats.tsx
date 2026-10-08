@@ -16,7 +16,7 @@ export function MonthlyStats({ stats }: MonthlyStatsProps) {
             key={stat.label}
             className="bg-card rounded-xl p-[14px_12px] text-center border border-border"
           >
-            <div className="text-lg mb-1.5" aria-hidden="true">
+            <div className="flex items-center justify-center h-6 mb-1.5" aria-hidden="true">
               {stat.icon}
             </div>
             <div className="font-display text-[28px] text-white tracking-[1px] leading-none">
