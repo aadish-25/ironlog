@@ -213,6 +213,7 @@ export function HeroCard({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          className="flex flex-col gap-3"
         >
           <div className="mx-5 bg-card rounded-[18px] border border-border p-5 relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-[3px] bg-done" />
@@ -253,34 +254,22 @@ export function HeroCard({
                 New PRs
               </div>
               {newPRs && newPRs.length > 0 ? (
-                newPRs.map((pr) => (
-                  <div key={pr.name} className="bg-bg rounded-[10px] p-[9px_12px] mb-1.5 flex items-center justify-between">
-                    <span className="text-[12px] text-dim">{pr.name}</span>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-[8px] tracking-[1px] text-heat uppercase">PR</span>
-                      <span className="font-display text-lg text-heat tracking-[1px]">{pr.kg} kg</span>
+                <div className="max-h-[148px] overflow-y-auto subtle-scrollbar pr-1 flex flex-col gap-1.5">
+                  {newPRs.map((pr) => (
+                    <div key={pr.name} className="bg-bg rounded-[10px] p-[9px_12px] flex items-center justify-between">
+                      <span className="text-[12px] text-dim">{pr.name}</span>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-[8px] tracking-[1px] text-heat uppercase">PR</span>
+                        <span className="font-display text-lg text-heat tracking-[1px]">{pr.kg} kg</span>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               ) : (
                 <div className="text-[11px] text-ghost italic mb-2">
                   No PRs logged in today's session.
                 </div>
               )}
-
-              <div className="mt-3 pt-3 border-t border-raised">
-                <div className="text-[9px] tracking-[2px] text-ghost uppercase mb-0.5">
-                  Tomorrow
-                </div>
-                <div className="font-display text-[22px] text-white tracking-[1px] uppercase">
-                  {tomorrowWorkout ? tomorrowWorkout.name : "REST DAY"}
-                </div>
-                <div className="text-[11px] text-ghost mt-0.5">
-                  {tomorrowWorkout
-                    ? `${tomorrowWorkout.muscles} · ${tomorrowWorkout.exercisesCount} exercises`
-                    : "Take it easy."}
-                </div>
-              </div>
 
               <button
                 onClick={onStartWorkout}
@@ -288,6 +277,26 @@ export function HeroCard({
               >
                 VIEW SESSION &nbsp;→
               </button>
+            </div>
+          </div>
+
+          {/* ── Standalone Tomorrow Preview Card ── */}
+          <div className="mx-5 bg-card rounded-[16px] border border-border p-[14px_18px] flex items-center justify-between">
+            <div className="flex-1 min-w-0 pr-3">
+              <div className="text-[9px] tracking-[2px] text-ghost uppercase mb-0.5">
+                Up Next · Tomorrow
+              </div>
+              <div className="font-display text-[22px] text-white tracking-[1px] uppercase truncate leading-tight">
+                {tomorrowWorkout ? tomorrowWorkout.name : "REST DAY"}
+              </div>
+              <div className="text-[11px] text-ghost mt-0.5 truncate">
+                {tomorrowWorkout
+                  ? `${tomorrowWorkout.muscles} · ${tomorrowWorkout.exercisesCount} exercises`
+                  : "Take it easy."}
+              </div>
+            </div>
+            <div className="w-9 h-9 rounded-xl bg-raised border border-border flex items-center justify-center shrink-0 text-sm">
+              🗓️
             </div>
           </div>
         </motion.div>
