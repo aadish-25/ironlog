@@ -119,21 +119,26 @@ const getSessionByIdService = async (sessionId, userId) => {
             throw new Error("Session not found");
         const session = sessionResult.rows[0];
 
-        // 1. Fetch split day exercises (the plan)
+        // 1. Fetch split day exercises (the plan) with accurate prior PR baseline
         const planResult = await pool.query(
             `SELECT sde.id, sde.exercise_id, e.name,
              (
                  SELECT CONCAT(weight_kg, ' kg × ', reps)
                  FROM sets
-                 WHERE user_id = $2 AND exercise_id = sde.exercise_id
+                 WHERE user_id = $2 AND exercise_id = sde.exercise_id AND session_id != $3
                  ORDER BY weight_kg DESC, reps DESC
                  LIMIT 1
-             ) as previous_best
+             ) as previous_best,
+             (
+                 SELECT COALESCE(MAX(weight_kg), 0)
+                 FROM sets
+                 WHERE user_id = $2 AND exercise_id = sde.exercise_id AND session_id != $3
+             ) as pr_kg
              FROM split_day_exercises sde
              JOIN exercises e ON sde.exercise_id = e.id
              WHERE sde.split_day_id = $1
              ORDER BY sde.order_index ASC`,
-            [session.split_day_id, userId],
+            [session.split_day_id, userId, sessionId],
         );
 
         // 2. Fetch actually logged sets for this session
@@ -170,6 +175,7 @@ const getSessionByIdService = async (sessionId, userId) => {
                 exercise_id: planEx.exercise_id,
                 name: planEx.name,
                 previous_best: planEx.previous_best || null,
+                pr_kg: Number(planEx.pr_kg) || 0,
                 sets: setsByExercise[planEx.exercise_id] || [],
             });
         }
@@ -180,7 +186,8 @@ const getSessionByIdService = async (sessionId, userId) => {
                     id: `extra-${set.exercise_id}`,
                     exercise_id: set.exercise_id,
                     name: set.name,
-                    previous_best: null, // Extra exercises added on the fly won't have previous best cached easily unless we do another query
+                    previous_best: null,
+                    pr_kg: 0,
                     sets: setsByExercise[set.exercise_id] || [],
                 });
             }

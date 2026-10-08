@@ -2,6 +2,9 @@ import pool from "../db/connection.js";
 import { delCache } from "../lib/redis.js";
 
 const checkIsPR = async (userId, exerciseId, weightKg) => {
+    const w = Number(weightKg) || 0;
+    if (w <= 0) return false;
+
     const result = await pool.query(
         `SELECT MAX(weight_kg) AS max_weight 
          FROM sets 
@@ -10,11 +13,11 @@ const checkIsPR = async (userId, exerciseId, weightKg) => {
     );
 
     const currentMaxWeight =
-        result.rows[0]?.max_weight !== undefined
-            ? result.rows[0].max_weight
-            : null;
-    if (currentMaxWeight === null) return true;
-    return Number(weightKg) > Number(currentMaxWeight);
+        result.rows[0]?.max_weight !== undefined && result.rows[0]?.max_weight !== null
+            ? Number(result.rows[0].max_weight)
+            : 0;
+
+    return w > currentMaxWeight;
 };
 
 const createSetService = async (
