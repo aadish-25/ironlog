@@ -16,6 +16,8 @@ import { SignUpPage }    from "./pages/SignUpPage";
 import { ExerciseDetailPage } from "./pages/ExerciseDetailPage";
 import { SplitDetailPage } from "./pages/SplitDetailPage";
 import { SplitDayDetailPage } from "./pages/SplitDayDetailPage";
+import { StatusBar, Style } from "@capacitor/status-bar";
+import { Capacitor } from "@capacitor/core";
 
 function AuthGate({ children }: { children: React.ReactNode }) {
   const { isLoaded, isSignedIn } = useAuth();
@@ -58,7 +60,16 @@ function ScrollToTop() {
   return null;
 }
 
+
 export default function App() {
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
+      StatusBar.setBackgroundColor({ color: "#0f0f0f" }).catch(() => {});
+      StatusBar.setOverlaysWebView({ overlay: false }).catch(() => {});
+    }
+  }, []);
+
   return (
     <BrowserRouter>
       <ScrollToTop />

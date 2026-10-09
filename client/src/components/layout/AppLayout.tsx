@@ -7,7 +7,7 @@ export function AppLayout() {
   const isSessionActive = location.pathname.startsWith("/session");
 
   return (
-    <div className="w-full max-w-[430px] mx-auto min-h-screen relative bg-bg border-x border-border/10 flex flex-col justify-between">
+    <div className="w-full max-w-[430px] mx-auto min-h-screen relative bg-bg border-x border-border/10 flex flex-col justify-between pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)]">
       <ProductTour />
       <main className="flex-1 w-full">
         <Outlet />
