@@ -7,7 +7,7 @@ interface MonthlyStatsProps {
 export function MonthlyStats({ stats }: MonthlyStatsProps) {
   return (
     <div>
-      <p className="text-[11px] font-display tracking-[2.5px] text-ghost uppercase mb-2">
+      <p className="text-[13px] font-display font-semibold tracking-[2px] text-ghost uppercase mb-2">
         This Month
       </p>
       <div className="grid grid-cols-3 gap-2">

@@ -16,18 +16,18 @@ export function SettingsList({
 }: SettingsListProps) {
   return (
     <div>
-      <p className="text-[11px] font-display tracking-[2.5px] text-ghost uppercase mb-2">
+      <p className="text-[13px] font-display font-semibold tracking-[2px] text-ghost uppercase mb-2">
         {title}
       </p>
       <div className="bg-card rounded-xl border border-border overflow-hidden">
         {/* Special case for Notifications toggle if present */}
         {onToggleNotifications && (
           <div className="flex items-center justify-between p-4 border-b border-border">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-3">
               <span className="w-5 h-5 flex items-center justify-center text-ghost" aria-hidden="true">
-                <Bell size={16} className="text-heat" />
+                <Bell size={18} className="text-heat" />
               </span>
-              <span className="text-[15px] font-display tracking-[0.5px] text-heat">Notifications</span>
+              <span className="text-[17px] font-display font-medium tracking-[0.5px] text-heat">Notifications</span>
             </div>
             <button
               onClick={onToggleNotifications}
@@ -56,13 +56,13 @@ export function SettingsList({
             }`}
             aria-label={item.label}
           >
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-3">
               <span className="w-5 h-5 flex items-center justify-center text-ghost" aria-hidden="true">
                 {item.icon}
               </span>
-              <span className="text-[15px] font-display tracking-[0.5px] text-dim">{item.label}</span>
+              <span className="text-[17px] font-display font-medium tracking-[0.5px] text-ink">{item.label}</span>
             </div>
-            <ChevronRight size={14} className="text-ghost" />
+            <ChevronRight size={16} className="text-ghost" />
           </button>
         ))}
       </div>
