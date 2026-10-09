@@ -145,7 +145,7 @@ export function HeroCard({
                 onClick={onStartWorkout}
                 className="tour-create-split block w-full py-[12px] bg-heat border-none rounded-xl text-white font-display text-[15px] tracking-[2px] cursor-pointer hover:opacity-90 transition-opacity"
               >
-                CREATE SPLIT &nbsp;→
+                CREATE SPLIT
               </button>
             </div>
           ) : (
@@ -233,7 +233,7 @@ export function HeroCard({
                         onClick={onStartWorkout}
                         className="block w-full py-[10px] bg-heat border-none rounded-xl text-white font-display text-[16px] tracking-[3px] cursor-pointer hover:opacity-90 transition-opacity uppercase text-center"
                       >
-                        {inProgress ? "RESUME WORKOUT \u00a0\u2192" : activeSplitDayName ? "START WORKOUT \u00a0\u2192" : "CREATE SPLIT \u00a0\u2192"}
+                        {inProgress ? "RESUME WORKOUT" : activeSplitDayName ? "START WORKOUT" : "CREATE SPLIT"}
                       </button>
                       <button
                         type="button"
@@ -346,7 +346,7 @@ export function HeroCard({
                 onClick={onStartWorkout}
                 className="mt-4 block w-full py-[11px] bg-[#1a1a1c] border border-[#333] rounded-xl text-[#ccc] font-display text-[14px] tracking-[2px] cursor-pointer hover:bg-[#252528] hover:text-white transition-colors uppercase text-center"
               >
-                VIEW SESSION &nbsp;→
+                VIEW SESSION
               </button>
             </div>
           </div>

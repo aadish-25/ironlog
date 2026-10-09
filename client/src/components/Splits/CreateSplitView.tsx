@@ -73,7 +73,7 @@ export function CreateSplitView({
             opacity: isSubmitting ? 0.7 : 1,
           }}
         >
-          {isSubmitting ? "CREATING..." : "CREATE SPLIT →"}
+          {isSubmitting ? "CREATING..." : "CREATE SPLIT"}
         </button>
       </div>
     </div>
