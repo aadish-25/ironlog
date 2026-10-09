@@ -12,12 +12,16 @@ export function SplitDetailPage() {
     const { deleteUserSplit } = useSplit();
     const [isEditing, setIsEditing] = useState(false);
     const [editName, setEditName] = useState("");
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-    const handleDeleteSplit = async () => {
-        if (window.confirm("Are you sure you want to delete this split? This cannot be undone.")) {
-            await deleteUserSplit(id!);
-            navigate("/splits");
-        }
+    const handleDeleteSplit = () => {
+        setShowDeleteModal(true);
+    };
+
+    const confirmDelete = async () => {
+        setShowDeleteModal(false);
+        await deleteUserSplit(id!);
+        navigate("/splits");
     };
 
     const handleSaveName = async () => {
@@ -122,6 +126,35 @@ export function SplitDetailPage() {
                     );
                 })}
             </div>
+
+            {/* Custom Delete Confirmation Modal */}
+            {showDeleteModal && (
+                <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-5">
+                    <div className="bg-[#161616] border border-[#2a2a2a] rounded-2xl p-6 max-w-[340px] w-full shadow-2xl flex flex-col items-center text-center">
+                        <div className="w-12 h-12 rounded-full bg-[#2a1616] border border-[#4a1c1c] flex items-center justify-center text-[#e05252] mb-4">
+                            <Trash2 size={22} />
+                        </div>
+                        <h3 className="font-display text-2xl text-white tracking-[1px] mb-2">Delete Split?</h3>
+                        <p className="text-xs text-[#999] leading-relaxed mb-6">
+                            Are you sure you want to delete <span className="text-white font-semibold">"{split.name}"</span>? Your workout history and past logged lifts will remain safe.
+                        </p>
+                        <div className="flex gap-3 w-full">
+                            <button
+                                onClick={() => setShowDeleteModal(false)}
+                                className="flex-1 h-11 rounded-xl bg-[#222] border border-[#333] text-sm text-[#ccc] font-medium hover:bg-[#2a2a2a] transition-colors cursor-pointer"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={confirmDelete}
+                                className="flex-1 h-11 rounded-xl bg-[#e05252] border-none text-sm text-white font-bold hover:bg-[#c93b3b] transition-colors cursor-pointer shadow-lg shadow-[#e05252]/20"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </section>
     );
 }
