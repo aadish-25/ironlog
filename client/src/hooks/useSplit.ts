@@ -35,7 +35,7 @@ export function useSplit() {
         setActionLoading(true);
         try {
             const result = await createSplit(name);
-            mutate((prev) => (prev ? [...prev, result] : [result]), false);
+            mutate((prev) => (prev ? [...prev.map(s => ({ ...s, is_active: false })), { ...result, is_active: true }] : [{ ...result, is_active: true }]), false);
             mutate();
             return result;
         } catch (err) {

@@ -10,16 +10,15 @@ const createSplitWithDaysService = async (userId, name) => {
         client = await pool.connect();
         await client.query("BEGIN");
 
-        // If this is the user's very first split, auto-set it as active
-        const countResult = await client.query(
-            "SELECT COUNT(*) FROM splits WHERE user_id = $1",
+        // Deactivate all existing splits for this user so the newly created split becomes active by default
+        await client.query(
+            "UPDATE splits SET is_active = false WHERE user_id = $1",
             [userId],
         );
-        const isFirstSplit = parseInt(countResult.rows[0].count) === 0;
 
         const created_split = await client.query(
-            "INSERT INTO splits(user_id, name, is_active) VALUES($1, $2, $3) RETURNING *;",
-            [userId, name, isFirstSplit],
+            "INSERT INTO splits(user_id, name, is_active) VALUES($1, $2, true) RETURNING *;",
+            [userId, name],
         );
 
         const split = created_split.rows[0];
