@@ -18,8 +18,8 @@ export function useSet(
                     const newSet: SetRecord = {
                         id: newId,
                         set_number: ex.sets.length + 1,
-                        weight: lastSet ? lastSet.weight : 0,
-                        reps: lastSet ? lastSet.reps : 0,
+                        weight: lastSet ? lastSet.weight : (Number(ex.pr_kg) || 30),
+                        reps: lastSet ? lastSet.reps : 10,
                         is_logged: false,
                         is_overload: false,
                         pr_hit: false,

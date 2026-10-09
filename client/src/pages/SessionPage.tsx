@@ -39,6 +39,7 @@ export function SessionPage() {
     const [showEndConfirm, setShowEndConfirm] = useState(false);
     const [showCompletionOverride, setShowCompletionOverride] = useState<boolean | null>(null);
     const [showSummary, setShowSummary] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
 
     // ─── PR TOAST & BENCHMARK TRACKING ──────────────────────────────────────────
     const [prToast, setPrToast] = useState<{ name: string; weight: number } | null>(null);
@@ -135,13 +136,14 @@ export function SessionPage() {
     const handleFinishWorkoutClick = () => {
         // Show celebration / completion screen immediately (0 ms!)
         setShowCompletionOverride(true);
-        if (session && !session.is_completed) {
+        if (session) {
             completeUserSession(session.id);
         }
+        setIsEditing(false);
     };
 
     const handleHeaderFinishRequest = () => {
-        if (completedSets < totalSets) {
+        if (completedSets < totalSets && !isEditing) {
             setShowEndConfirm(true);
         } else {
             handleFinishWorkoutClick();
@@ -262,14 +264,21 @@ export function SessionPage() {
     const handleSwapExerciseClick = () => setPickerMode("swap");
     const handleAddExerciseClick = () => setPickerMode("add");
 
-    const handleEndSession = () => navigate("/");
+    const handleEndSession = () => {
+        if (isEditing) {
+            setIsEditing(false);
+        } else {
+            navigate("/");
+        }
+    };
 
     const handleConfirmFinishEarly = () => {
         setShowCompletionOverride(true);
         setShowEndConfirm(false);
-        if (session && !session.is_completed) {
+        if (session) {
             completeUserSession(session.id);
         }
+        setIsEditing(false);
     };
 
     const handleGoHome = () => navigate("/");
@@ -296,18 +305,19 @@ export function SessionPage() {
                 onBackToWorkout={() => {
                     setShowCompletionOverride(false);
                     setShowSummary(true);
+                    setIsEditing(false);
                 }}
             />
         );
     }
 
-    if (session?.is_completed || showSummary) {
+    if ((session?.is_completed || showSummary) && !isEditing) {
         return (
             <SessionSummary
                 splitDayName={splitDayName}
-                exercises={session?.exercises || exercises}
+                exercises={exercises.length > 0 ? exercises : (session?.exercises || [])}
                 onBack={handleGoHome}
-                onEdit={() => setShowSummary(false)}
+                onEdit={() => setIsEditing(true)}
             />
         );
     }

@@ -57,7 +57,11 @@ export function useSession(sessionId: string | null) {
         // If the session is already completed, the server database is the single source of truth!
         if (sessionData.is_completed) {
             localStorage.removeItem(draftKey);
-            setExercises(serverExercises);
+            setExercises((prev) => {
+                const hasLogged = prev.some((e) => e.sets?.some((s) => s.is_logged));
+                if (hasLogged) return prev;
+                return serverExercises;
+            });
             return;
         }
 
@@ -229,7 +233,7 @@ export function useSession(sessionId: string | null) {
             // 4. Clean up the local workout draft now that it's permanently saved
             localStorage.removeItem(`ironlog_draft_${id}`);
 
-            mutate((currentData) => currentData ? { ...currentData, ...result } : undefined, false);
+            mutate((currentData) => currentData ? { ...currentData, ...result, exercises } : undefined, false);
 
             // Optimistically update /sessions so Home page sees it completed in 0ms
             globalMutate(
