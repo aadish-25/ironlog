@@ -64,5 +64,14 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
     }
 
     @Override
+    public void onActionModeStarted(android.view.ActionMode mode) {
+        if (mode != null && mode.getType() == android.view.ActionMode.TYPE_FLOATING) {
+            mode.finish();
+            return;
+        }
+        super.onActionModeStarted(mode);
+    }
+
+    @Override
     public void IHaveModifiedTheMainActivityForTheUseWithSocialLoginPlugin() {}
 }

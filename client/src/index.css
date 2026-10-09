@@ -45,10 +45,20 @@
     background-color: var(--color-bg, #0f0f0f);
     font-family: var(--font-body, 'Inter', sans-serif);
     -webkit-font-smoothing: antialiased;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
   }
 
   button, input, textarea, select {
     font-family: inherit;
+  }
+
+  input, textarea, [contenteditable="true"] {
+    -webkit-user-select: text !important;
+    user-select: text !important;
+    -webkit-touch-callout: default !important;
+    caret-color: #e8460a;
   }
 
   /* Disable scrollbar arrow buttons across all platforms and elements */
