@@ -21,7 +21,9 @@ export function useSession(sessionId: string | null) {
                 const parsed = JSON.parse(raw);
                 if (Array.isArray(parsed) && parsed.length > 0) return parsed;
             }
-        } catch (e) {}
+        } catch {
+            // Ignore parse error
+        }
         return [];
     });
     const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
@@ -47,6 +49,7 @@ export function useSession(sessionId: string | null) {
         // Before sessionData loads, render draft optimistically if available
         if (!sessionData) {
             if (draft && draft.length > 0) {
+                // eslint-disable-next-line react-hooks/set-state-in-effect
                 setExercises(draft);
             }
             return;
@@ -114,7 +117,7 @@ export function useSession(sessionId: string | null) {
         }
 
         // 2. Any exercise in draft that was removed from split is ONLY kept if it has logged sets
-        for (const [_, draftEx] of draftMap.entries()) {
+        for (const [, draftEx] of draftMap.entries()) {
             if (draftEx.sets?.some(s => s.is_logged)) {
                 reconciled.push(draftEx);
             }
@@ -138,7 +141,7 @@ export function useSession(sessionId: string | null) {
             } else {
                 localStorage.setItem(draftKey, JSON.stringify(exercises));
             }
-        } catch (e) {
+        } catch {
             // Ignore quota errors
         }
     }, [sessionId, exercises, sessionData?.is_completed]);
@@ -155,17 +158,19 @@ export function useSession(sessionId: string | null) {
                     } else {
                         localStorage.removeItem(draftKey);
                     }
-                } catch (e) {}
+                } catch {
+                    // Ignore quota errors
+                }
             }
         };
         document.addEventListener("visibilitychange", handleVisibilityChange);
         return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-    }, [sessionId, exercises]);
+    }, [sessionId, exercises, sessionData?.is_completed]);
 
     // Auto-complete if session date is in the past and has logged sets (midnight passed)
     useEffect(() => {
         if (!sessionData || sessionData.is_completed || !sessionId) return;
-        const sDate = sessionData.date || (sessionData as any).started_at;
+        const sDate = sessionData.date || (sessionData as { started_at?: string }).started_at;
         if (!sDate) return;
         const d = new Date(sDate);
         const now = new Date();
@@ -177,7 +182,7 @@ export function useSession(sessionId: string | null) {
         if (isPastDay && exercises.some((ex) => ex.sets.some((s) => s.is_logged))) {
             completeUserSession(sessionId);
         }
-    }, [sessionId, sessionData?.date, sessionData?.is_completed, exercises]);
+    }, [sessionId, sessionData, exercises]);
 
     let error: string | null = null;
     if (swrError) {
@@ -189,7 +194,7 @@ export function useSession(sessionId: string | null) {
             // 1. Immediately update SWR cache so Home page says "Finished" without any lag!
             globalMutate(
                 "/sessions",
-                (prev: any) => {
+                (prev: Array<{ id: string; is_completed?: boolean }> | undefined) => {
                     if (!Array.isArray(prev)) return prev;
                     return prev.map((s) => (s.id === id ? { ...s, is_completed: true } : s));
                 },
@@ -199,7 +204,7 @@ export function useSession(sessionId: string | null) {
             // 2. Immediately update /users/me/stats optimistically so CompletionScreen & Home show the new streak!
             globalMutate(
                 "/users/me/stats",
-                (prev: any) => {
+                (prev: { currentStreak?: number; totalSessions?: number; monthlySessions?: number; weeklySessions?: number; bestStreak?: number } | undefined) => {
                     if (!prev) return prev;
                     const newStreak = (prev.currentStreak || 0) + 1;
                     return {
@@ -238,9 +243,9 @@ export function useSession(sessionId: string | null) {
             // Optimistically update /sessions so Home page sees it completed in 0ms
             globalMutate(
                 "/sessions",
-                (current: any) => {
+                (current: Array<{ id: string; is_completed?: boolean; is_skipped?: boolean; sets_logged?: number }> | undefined) => {
                     if (!current || !Array.isArray(current)) return current;
-                    return current.map((s: any) =>
+                    return current.map((s) =>
                         s.id === id
                             ? {
                                   ...s,

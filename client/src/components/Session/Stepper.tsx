@@ -16,6 +16,7 @@ export function Stepper({
   const [localValue, setLocalValue] = React.useState(value.toString());
 
   React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocalValue(value.toString());
   }, [value]);
 

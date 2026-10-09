@@ -6,7 +6,7 @@ interface BottomNavProps {
   totalExercises: number;
   activeSetsLogged: number;
   activeSetsTotal: number;
-  sessionSetsLogged: number;
+  sessionSetsLogged?: number;
   onSwapExercise: () => void;
   onAddExercise: () => void;
   onPrevExercise: () => void;
@@ -19,7 +19,6 @@ export function BottomNav({
   totalExercises,
   activeSetsLogged,
   activeSetsTotal,
-  sessionSetsLogged,
   onSwapExercise,
   onAddExercise,
   onPrevExercise,

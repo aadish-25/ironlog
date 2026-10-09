@@ -161,7 +161,7 @@ export function useHomeDashboard() {
     // 4. Week History (Current week Mon-Sun)
     const weekHistory = [0, 1, 2, 3, 4, 5, 6].map((dbDay) => {
         const labels = ["M", "T", "W", "T", "F", "S", "S"];
-        let type: "done" | "rest" | "today" | "future" = "future";
+        let type: "done" | "rest" | "today" | "future";
 
         if (dbDay === dbDayOfWeek) {
             type = "today";

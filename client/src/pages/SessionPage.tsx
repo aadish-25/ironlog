@@ -344,12 +344,14 @@ export function SessionPage() {
     // ─── EMPTY STATE ────────────────────────────────────────────────────────────
     if (exercises.length === 0) {
         const handleEmptySessionExit = async (path: string) => {
-            if (sessionId && (!session || (!session.is_completed && Number((session as any).sets_logged || 0) === 0))) {
+            if (sessionId && (!session || (!session.is_completed && Number((session as { sets_logged?: number }).sets_logged || 0) === 0))) {
                 try {
                     await deleteSession(sessionId);
                     localStorage.removeItem(`ironlog_draft_${sessionId}`);
                     globalMutate("/sessions");
-                } catch (e) {}
+                } catch {
+                    // Ignore deletion error
+                }
             }
             navigate(path);
         };
