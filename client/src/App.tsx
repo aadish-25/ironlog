@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { SignedIn, SignedOut, RedirectToSignIn, useAuth, AuthenticateWithRedirectCallback } from "@clerk/clerk-react";
 import { AxiosInterceptor } from "./components/Auth/AxiosInterceptor";
 
@@ -18,6 +18,7 @@ import { SplitDetailPage } from "./pages/SplitDetailPage";
 import { SplitDayDetailPage } from "./pages/SplitDayDetailPage";
 import { StatusBar, Style } from "@capacitor/status-bar";
 import { Capacitor } from "@capacitor/core";
+import { App as CapApp } from "@capacitor/app";
 
 function AuthGate({ children }: { children: React.ReactNode }) {
   const { isLoaded, isSignedIn } = useAuth();
@@ -60,6 +61,37 @@ function ScrollToTop() {
   return null;
 }
 
+/**
+ * Handles Android Hardware and Gesture Back Button:
+ * - If on root/home page, exits the app.
+ * - Otherwise navigates back through React Router history.
+ */
+function NativeBackButtonHandler() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    let removeListener: (() => void) | undefined;
+
+    CapApp.addListener("backButton", () => {
+      if (location.pathname === "/" || location.pathname === "/home") {
+        CapApp.exitApp();
+      } else {
+        navigate(-1);
+      }
+    }).then((sub) => {
+      removeListener = () => sub.remove();
+    });
+
+    return () => {
+      if (removeListener) removeListener();
+    };
+  }, [location.pathname, navigate]);
+
+  return null;
+}
 
 export default function App() {
   useEffect(() => {
@@ -73,6 +105,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <NativeBackButtonHandler />
       <AxiosInterceptor />
       <Routes>
         {/* Public Routes */}
