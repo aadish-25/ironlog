@@ -97,7 +97,7 @@ export default function App() {
   useEffect(() => {
     if (Capacitor.isNativePlatform()) {
       StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
-      StatusBar.setBackgroundColor({ color: "#0f0f0f" }).catch(() => {});
+      StatusBar.setBackgroundColor({ color: "#000000" }).catch(() => {});
       StatusBar.setOverlaysWebView({ overlay: false }).catch(() => {});
     }
   }, []);

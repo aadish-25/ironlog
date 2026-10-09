@@ -17,16 +17,17 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
         super.onCreate(savedInstanceState);
 
         Window window = getWindow();
-        window.setStatusBarColor(Color.parseColor("#0F0F0F"));
-        window.setNavigationBarColor(Color.parseColor("#0F0F0F"));
+        window.setStatusBarColor(Color.BLACK);
+        window.setNavigationBarColor(Color.BLACK);
 
-        // Ensure status bar icons are light (white) on the dark background
+        // Ensure status bar and navigation bar icons/gestures are light (white) on the black background
         WindowCompat.getInsetsController(window, window.getDecorView()).setAppearanceLightStatusBars(false);
+        WindowCompat.getInsetsController(window, window.getDecorView()).setAppearanceLightNavigationBars(false);
 
         // Pad the root content view by status bar height so WebView starts strictly below the notification bar
         View contentView = findViewById(android.R.id.content);
         if (contentView != null) {
-            contentView.setBackgroundColor(Color.parseColor("#0F0F0F"));
+            contentView.setBackgroundColor(Color.BLACK);
             ViewCompat.setOnApplyWindowInsetsListener(contentView, (v, insets) -> {
                 Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
                 v.setPadding(0, systemBars.top, 0, 0);
