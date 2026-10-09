@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import useSWR, { mutate as globalMutate } from "swr";
 import axios from "axios";
 import { fetcher } from "../services/api";
@@ -20,6 +20,8 @@ export function useSplitDetail(splitId: string) {
     }
 
     const [actionLoading, setActionLoading] = useState(false);
+    const deletingIdsRef = useRef<Set<string>>(new Set());
+    const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
 
     const updateDay = async (dayId: string, updates: { label?: string, is_rest?: boolean }) => {
         if (actionLoading) return;
@@ -53,10 +55,12 @@ export function useSplitDetail(splitId: string) {
             await updateSplitDay(dayId, updates);
             mutateSplit();
             globalMutate("/splits");
+            globalMutate("/sessions");
         } catch (err) {
             console.error(err);
             mutateSplit(); // rollback on error
             globalMutate("/splits");
+            globalMutate("/sessions");
         } finally {
             setActionLoading(false);
         }
@@ -119,23 +123,68 @@ export function useSplitDetail(splitId: string) {
                 );
             }
 
-            await addExercisesToDay(dayId, exerciseIds, startingIndex);
+            const created = await addExercisesToDay(dayId, exerciseIds, startingIndex);
+
+            // Replace temporary optimistic items with real DB records immediately
+            if (created && Array.isArray(created) && created.length > 0) {
+                mutateSplit(prev => {
+                    if (!prev) return prev;
+                    return {
+                        ...prev,
+                        days: prev.days.map(d => {
+                            if (d.id !== dayId) return d;
+                            const nonTemp = (d.exercises || []).filter(e => !e.id.startsWith("temp-"));
+                            return {
+                                ...d,
+                                exercises: [...nonTemp, ...created]
+                            };
+                        })
+                    };
+                }, false);
+
+                globalMutate(
+                    "/splits",
+                    (prevSplits: Split[] | undefined) => {
+                        if (!prevSplits) return prevSplits;
+                        return prevSplits.map(s => {
+                            if (s.id !== splitId) return s;
+                            return {
+                                ...s,
+                                days: s.days.map(d => {
+                                    if (d.id !== dayId) return d;
+                                    const nonTemp = (d.exercises || []).filter(e => !e.id.startsWith("temp-"));
+                                    return {
+                                        ...d,
+                                        exercises: [...nonTemp, ...created]
+                                    };
+                                })
+                            };
+                        });
+                    },
+                    false
+                );
+            }
+
             mutateSplit(); // Background re-fetch
             globalMutate("/splits");
+            globalMutate("/sessions");
         } catch (err) {
             console.error(err);
             mutateSplit(); // Rollback optimistic update
             globalMutate("/splits");
+            globalMutate("/sessions");
         } finally {
             setActionLoading(false);
         }
     };
 
     const removeExercise = async (dayId: string, splitDayExerciseId: string) => {
-        if (actionLoading) return;
-        setActionLoading(true);
+        if (deletingIdsRef.current.has(splitDayExerciseId)) return;
+        deletingIdsRef.current.add(splitDayExerciseId);
+        setDeletingIds(new Set(deletingIdsRef.current));
+
         try {
-            // Optimistic update
+            // Optimistic update in split detail
             mutateSplit(prev => {
                 if (!prev) return prev;
                 return {
@@ -144,7 +193,7 @@ export function useSplitDetail(splitId: string) {
                         if (d.id === dayId) {
                             return {
                                 ...d,
-                                exercises: d.exercises.filter(e => e.id !== splitDayExerciseId)
+                                exercises: (d.exercises || []).filter(e => e.id !== splitDayExerciseId)
                             };
                         }
                         return d;
@@ -152,6 +201,7 @@ export function useSplitDetail(splitId: string) {
                 };
             }, false);
 
+            // Optimistic update in global /splits
             globalMutate(
                 "/splits",
                 (prevSplits: Split[] | undefined) => {
@@ -164,7 +214,7 @@ export function useSplitDetail(splitId: string) {
                                 if (d.id !== dayId) return d;
                                 return {
                                     ...d,
-                                    exercises: d.exercises.filter(e => e.id !== splitDayExerciseId)
+                                    exercises: (d.exercises || []).filter(e => e.id !== splitDayExerciseId)
                                 };
                             })
                         };
@@ -173,15 +223,21 @@ export function useSplitDetail(splitId: string) {
                 false
             );
 
-            await removeExerciseFromDay(splitDayExerciseId);
+            // Only send DELETE to DB if it's a real persisted UUID
+            if (!splitDayExerciseId.startsWith("temp-")) {
+                await removeExerciseFromDay(splitDayExerciseId);
+            }
             mutateSplit();
             globalMutate("/splits");
+            globalMutate("/sessions");
         } catch (err) {
             console.error(err);
             mutateSplit();
             globalMutate("/splits");
+            globalMutate("/sessions");
         } finally {
-            setActionLoading(false);
+            deletingIdsRef.current.delete(splitDayExerciseId);
+            setDeletingIds(new Set(deletingIdsRef.current));
         }
     };
 
@@ -192,10 +248,12 @@ export function useSplitDetail(splitId: string) {
             await reorderExerciseInDay(splitDayExerciseId, newIndex);
             mutateSplit(); // Backend handles shifting other items, so just re-fetch
             globalMutate("/splits");
+            globalMutate("/sessions");
         } catch (err) {
             console.error(err);
             mutateSplit();
             globalMutate("/splits");
+            globalMutate("/sessions");
         } finally {
             setActionLoading(false);
         }
@@ -217,10 +275,12 @@ export function useSplitDetail(splitId: string) {
             await updateSplit(splitId, newName);
             mutateSplit();
             globalMutate("/splits");
+            globalMutate("/sessions");
         } catch (err) {
             console.error(err);
             mutateSplit();
             globalMutate("/splits");
+            globalMutate("/sessions");
         } finally {
             setActionLoading(false);
         }
@@ -230,6 +290,7 @@ export function useSplitDetail(splitId: string) {
         split,
         loading,
         error,
+        deletingIds,
         updateDay,
         updateSplitName,
         addExercises,

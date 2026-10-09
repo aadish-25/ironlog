@@ -171,14 +171,14 @@ export function HeroCard({
                   <div className="text-[11px] text-ghost mb-3">
                     Recovery is part of progress. Streak is protected today.
                   </div>
-                ) : exerciseCount === 0 ? (
+                ) : exerciseCount === 0 && (!inProgress || !setsLogged || setsLogged === 0) ? (
                   <div className="text-[11px] text-ghost mb-3">
                     No exercises configured
                   </div>
                 ) : (
                   <div className="text-[11px] text-ghost mb-3">
                     <strong className="text-dim font-medium">
-                      {activeSplitDayMuscles || "No training days scheduled"}
+                      {activeSplitDayMuscles || "Workout in progress"}
                     </strong>{" "}
                     &nbsp;·&nbsp; {exerciseCount ?? 0} exercises
                   </div>
@@ -202,7 +202,7 @@ export function HeroCard({
                 </div>
                 
                 {!isRestDay && (
-                  exerciseCount === 0 ? (
+                  exerciseCount === 0 && (!inProgress || !setsLogged || setsLogged === 0) ? (
                     <>
                       <p className="text-[12px] text-ghost text-center mb-3">
                         Head over to your split to add exercises or mark as rest.

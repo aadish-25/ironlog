@@ -15,46 +15,123 @@ export function useSession(sessionId: string | null) {
     const [exercises, setExercises] = useState<SessionExercise[]>([]);
     const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
 
-    // Sync exercises when session loads: check localStorage draft first, fallback to DB
+    // Reconcile exercises when session loads:
+    // Merges local draft sets with latest split plan from sessionData
     useEffect(() => {
         if (!sessionId) return;
         const draftKey = `ironlog_draft_${sessionId}`;
+        let draft: SessionExercise[] | null = null;
         try {
             const raw = localStorage.getItem(draftKey);
             if (raw) {
-                const draft = JSON.parse(raw);
-                if (Array.isArray(draft) && draft.length > 0) {
-                    setExercises(draft);
-                    return;
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) {
+                    draft = parsed;
                 }
             }
         } catch (e) {
             console.warn("Could not parse draft", e);
         }
 
-        if (sessionData && sessionData.exercises) {
-            setExercises(sessionData.exercises);
+        // Before sessionData loads, render draft optimistically if available
+        if (!sessionData) {
+            if (draft && draft.length > 0) {
+                setExercises(draft);
+            }
+            return;
         }
-    }, [sessionId, sessionData?.id]);
+
+        const serverExercises = sessionData.exercises || [];
+        const hasDraftLoggedSets = draft?.some(ex => ex.sets?.some(s => s.is_logged)) ?? false;
+
+        // If split day has 0 exercises configured on server:
+        if (serverExercises.length === 0) {
+            if (!hasDraftLoggedSets) {
+                // Completely empty session with no logged sets: clean up stale draft and show empty state
+                localStorage.removeItem(draftKey);
+                setExercises([]);
+                return;
+            } else if (draft) {
+                // User logged sets on exercises that were subsequently deleted from the split day:
+                // Preserve ONLY exercises that have at least one logged set!
+                const kept = draft.filter(ex => ex.sets?.some(s => s.is_logged));
+                localStorage.setItem(draftKey, JSON.stringify(kept));
+                setExercises(kept);
+                return;
+            }
+        }
+
+        // Split day has exercises configured:
+        if (!draft || draft.length === 0) {
+            setExercises(serverExercises);
+            return;
+        }
+
+        // Reconcile draft with server exercises
+        const draftMap = new Map<string, SessionExercise>();
+        for (const ex of draft) {
+            draftMap.set(ex.exercise_id, ex);
+        }
+
+        const reconciled: SessionExercise[] = [];
+
+        // 1. Keep planned server exercises (latest split plan)
+        for (const serverEx of serverExercises) {
+            const draftEx = draftMap.get(serverEx.exercise_id);
+            if (draftEx && draftEx.sets && draftEx.sets.length > 0) {
+                // Merge draft's user-entered sets while keeping server metadata
+                reconciled.push({
+                    ...serverEx,
+                    sets: draftEx.sets,
+                });
+            } else {
+                reconciled.push(serverEx);
+            }
+            draftMap.delete(serverEx.exercise_id);
+        }
+
+        // 2. Any exercise in draft that was removed from split is ONLY kept if it has logged sets
+        for (const [_, draftEx] of draftMap.entries()) {
+            if (draftEx.sets?.some(s => s.is_logged)) {
+                reconciled.push(draftEx);
+            }
+        }
+
+        setExercises(reconciled);
+        if (reconciled.length > 0) {
+            localStorage.setItem(draftKey, JSON.stringify(reconciled));
+        } else {
+            localStorage.removeItem(draftKey);
+        }
+    }, [sessionId, sessionData?.id, sessionData?.exercises]);
 
     // Persist draft to localStorage whenever exercises state changes
     useEffect(() => {
-        if (!sessionId || exercises.length === 0) return;
+        if (!sessionId) return;
         const draftKey = `ironlog_draft_${sessionId}`;
         try {
-            localStorage.setItem(draftKey, JSON.stringify(exercises));
+            if (exercises.length === 0) {
+                localStorage.removeItem(draftKey);
+            } else {
+                localStorage.setItem(draftKey, JSON.stringify(exercises));
+            }
         } catch (e) {
             // Ignore quota errors
         }
     }, [sessionId, exercises]);
 
-    // Ensure draft is saved when user minimizes or closes the tab
+    // Ensure draft is saved or cleaned when user minimizes or closes the tab
     useEffect(() => {
         if (!sessionId) return;
+        const draftKey = `ironlog_draft_${sessionId}`;
         const handleVisibilityChange = () => {
-            if (document.visibilityState === "hidden" && exercises.length > 0) {
+            if (document.visibilityState === "hidden") {
                 try {
-                    localStorage.setItem(`ironlog_draft_${sessionId}`, JSON.stringify(exercises));
+                    if (exercises.length > 0) {
+                        localStorage.setItem(draftKey, JSON.stringify(exercises));
+                    } else {
+                        localStorage.removeItem(draftKey);
+                    }
                 } catch (e) {}
             }
         };

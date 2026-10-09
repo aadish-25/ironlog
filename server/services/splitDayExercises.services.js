@@ -74,6 +74,10 @@ const addExerciseService = async (
 
 const removeExerciseService = async (exerciseId, userId) => {
     try {
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(exerciseId);
+        if (!isUuid) {
+            return;
+        }
         const result = await pool.query(
             `DELETE FROM split_day_exercises sde
              USING split_days sd, splits s

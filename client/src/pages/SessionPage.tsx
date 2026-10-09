@@ -12,6 +12,8 @@ import { AllExercisesSheet } from "../components/Session/AllExercisesSheet";
 import { EndSessionDialog } from "../components/Session/EndSessionDialog";
 import { SessionSummary } from "../components/Session/SessionSummary";
 import { PRToast } from "../components/Session/PRToast";
+import { deleteSession } from "../services/sessions";
+import { mutate as globalMutate } from "swr";
 import type { SessionExercise } from "../types";
 
 export function SessionPage() {
@@ -331,10 +333,21 @@ export function SessionPage() {
 
     // ─── EMPTY STATE ────────────────────────────────────────────────────────────
     if (exercises.length === 0) {
+        const handleEmptySessionExit = async (path: string) => {
+            if (sessionId && (!session || (!session.is_completed && Number((session as any).sets_logged || 0) === 0))) {
+                try {
+                    await deleteSession(sessionId);
+                    localStorage.removeItem(`ironlog_draft_${sessionId}`);
+                    globalMutate("/sessions");
+                } catch (e) {}
+            }
+            navigate(path);
+        };
+
         return (
             <EmptySessionState
-                onBack={() => navigate("/")}
-                onCreateSplit={() => navigate("/splits")}
+                onBack={() => handleEmptySessionExit("/")}
+                onCreateSplit={() => handleEmptySessionExit("/splits")}
             />
         );
     }

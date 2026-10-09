@@ -136,7 +136,27 @@ export function useHomeDashboard() {
 
     const workoutDone = !!todaySession && !todaySession.is_skipped && todaySession.is_completed;
     const skipped = !!todaySession && todaySession.is_skipped;
-    const inProgress = !!todaySession && !skipped && !todaySession.is_completed;
+    const hasExercisesOrSets = (activeSplitDay?.exercises?.length || 0) > 0 || (Number(todaySession?.sets_logged || 0) > 0);
+    const inProgress = !!todaySession && !skipped && !todaySession.is_completed && hasExercisesOrSets;
+
+    // Auto-clean abandoned empty sessions for today (0 sets logged and 0 exercises configured in split)
+    useEffect(() => {
+        if (
+            todaySession &&
+            !todaySession.is_completed &&
+            !todaySession.is_skipped &&
+            Number(todaySession.sets_logged || 0) === 0 &&
+            activeSplitDay &&
+            (activeSplitDay.exercises?.length || 0) === 0
+        ) {
+            deleteSession(todaySession.id)
+                .then(() => {
+                    localStorage.removeItem(`ironlog_draft_${todaySession.id}`);
+                    mutate("/sessions");
+                })
+                .catch((err) => console.warn("Failed to clean up empty session", err));
+        }
+    }, [todaySession?.id, todaySession?.is_completed, todaySession?.is_skipped, todaySession?.sets_logged, activeSplitDay?.exercises?.length]);
 
     // 4. Week History (Current week Mon-Sun)
     const weekHistory = [0, 1, 2, 3, 4, 5, 6].map((dbDay) => {

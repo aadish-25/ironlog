@@ -26,10 +26,11 @@ import { CSS } from "@dnd-kit/utilities";
 interface SortableExerciseItemProps {
     ex: SplitDayExercise;
     index: number;
+    isDeleting?: boolean;
     onRemoveExercise: (exerciseId: string) => void;
 }
 
-function SortableExerciseItem({ ex, index, onRemoveExercise }: SortableExerciseItemProps) {
+function SortableExerciseItem({ ex, index, isDeleting, onRemoveExercise }: SortableExerciseItemProps) {
     const {
         attributes,
         listeners,
@@ -71,8 +72,11 @@ function SortableExerciseItem({ ex, index, onRemoveExercise }: SortableExerciseI
                 </span>
             )}
             <button
+                disabled={isDeleting}
                 onClick={() => onRemoveExercise(ex.id)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#2a0f00] text-heat hover:bg-heat hover:text-white transition-colors"
+                className={`w-8 h-8 flex items-center justify-center rounded-lg bg-[#2a0f00] text-heat hover:bg-heat hover:text-white transition-colors ${
+                    isDeleting ? "opacity-40 cursor-not-allowed" : "cursor-pointer"
+                }`}
             >
                 <Trash2 size={14} />
             </button>
@@ -91,6 +95,7 @@ export function SplitDayDetailPage() {
         split,
         loading,
         error,
+        deletingIds,
         updateDay,
         addExercises,
         removeExercise,
@@ -230,6 +235,7 @@ export function SplitDayDetailPage() {
                                             key={ex.id}
                                             ex={ex}
                                             index={index}
+                                            isDeleting={deletingIds.has(ex.id)}
                                             onRemoveExercise={(exId) => removeExercise(day.id, exId)}
                                         />
                                     ))}
