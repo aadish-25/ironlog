@@ -9,7 +9,7 @@ interface CoachNudgeProps {
 }
 
 export function CoachNudge({ skipped, workoutDone, coachNudge, isRestDay }: CoachNudgeProps) {
-  if (skipped || isRestDay) return null;
+  if (skipped || isRestDay || workoutDone) return null;
 
   return (
     <div
