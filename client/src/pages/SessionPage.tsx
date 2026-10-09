@@ -48,6 +48,7 @@ export function SessionPage() {
 
     useEffect(() => {
         if (!exercises || exercises.length === 0) return;
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setPrTracker((prev) => {
             let changed = false;
             const updated = { ...prev };

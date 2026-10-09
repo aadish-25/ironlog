@@ -148,6 +148,7 @@ export function HomePage() {
                     skipped={skipped}
                     workoutDone={workoutDone}
                     coachNudge={coachNudge}
+                    isRestDay={isRestDay}
                 />
                 {/* ── Quick Stats ── */}
                 <QuickStats lifetimeStats={lifetimeStats} />

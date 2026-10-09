@@ -319,7 +319,7 @@ export function useHomeDashboard() {
     return {
         user,
         activeSplitDayName: activeSplitDay?.label || "Rest",
-        activeSplitDayMuscles: getMusclesStr(activeSplitDay) || "Rest and Recover",
+        activeSplitDayMuscles: getMusclesStr(activeSplitDay) || (activeSplitDay?.is_rest || activeSplitDay?.type === "rest" || activeSplitDay?.label?.trim().toLowerCase() === "rest" ? "Rest and Recover" : "No exercises scheduled"),
         exerciseCount: activeSplitDay?.exercises?.length || 0,
         tomorrowWorkout: tomorrowWorkoutInfo,
         workoutDone,

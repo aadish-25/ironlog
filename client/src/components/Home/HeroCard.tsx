@@ -1,6 +1,7 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { Moon, Dumbbell, ClipboardList } from "lucide-react";
+import { RotateCcw, Dumbbell } from "lucide-react";
 import { WeekDot } from "../ui/WeekDot";
 
 interface HeroCardProps {
@@ -52,6 +53,8 @@ export function HeroCard({
   onSkipToday,
   onUndoSkip,
 }: HeroCardProps) {
+  const navigate = useNavigate();
+
   return (
     <AnimatePresence mode="wait">
       {skipped ? (
@@ -61,6 +64,7 @@ export function HeroCard({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          className="flex flex-col gap-3"
         >
           <div className="mx-5 bg-card rounded-[18px] border border-border p-5 relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-[3px] bg-skip" />
@@ -74,38 +78,41 @@ export function HeroCard({
             </div>
             <div className="pt-1">
               <div className="text-[9px] tracking-[2px] text-skip uppercase mb-1">
-                Today · {activeSplitDayName || "Rest Day"}
+                Today
               </div>
-              <div className="font-display text-[36px] leading-[0.93] tracking-[2px] text-skip mb-3 pr-16 truncate">
+              <div className="font-display text-[36px] leading-[0.93] tracking-[2px] text-skip mb-2 pr-16 truncate">
                 SKIPPED<br />TODAY.
               </div>
-              <div className="bg-bg rounded-[10px] p-[10px_13px] mb-3 border border-raised">
-                <div className="text-[12px] font-semibold text-dim mb-0.5">
-                  Today's session skipped.
-                </div>
-                <div className="text-[11px] text-ghost leading-[1.55]">
-                  Rest up — you're back at it tomorrow. Recovery is part of the process.
-                </div>
-                <button
-                  onClick={onUndoSkip || undefined}
-                  className="text-[11px] text-skip bg-none border-none cursor-pointer underline underline-offset-2 inline-block mt-1.5 p-0"
-                >
-                  Undo skip →
-                </button>
+              <p className="text-[12px] text-ghost leading-relaxed mb-4 max-w-[300px]">
+                Rest up. You're back at it tomorrow. Recovery is part of the process.
+              </p>
+              <button
+                onClick={onUndoSkip || undefined}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-raised border border-border text-[11px] font-semibold text-dim hover:text-white hover:border-skip/40 transition-colors cursor-pointer uppercase tracking-[1px]"
+              >
+                <RotateCcw size={12} className="text-skip" />
+                <span>Undo Skip</span>
+              </button>
+            </div>
+          </div>
+
+          {/* ── Standalone Up Next Themed Preview Card (on Skipped) ── */}
+          <div className="mx-5 bg-card rounded-[18px] border border-border p-[15px_18px] relative overflow-hidden flex items-center justify-between">
+            {/* Left 3.5px accent line */}
+            <div className="absolute top-0 bottom-0 left-0 w-[3.5px] bg-[#38bdf8]" />
+
+            <div className="flex-1 min-w-0 pr-3 pt-0.5 pl-1.5">
+              <div className="text-[9px] tracking-[2px] uppercase font-semibold mb-1 text-[#38bdf8]">
+                {tomorrowWorkout?.headerBadge || "UP NEXT"}
               </div>
-              <div className="pt-3 border-t border-raised">
-                <div className="text-[9px] tracking-[2px] text-ghost uppercase mb-0.5">
-                  {tomorrowWorkout?.headerBadge || "Tomorrow"}
-                </div>
-                <div className="font-display text-[22px] text-dim tracking-[1px] uppercase">
-                  {tomorrowWorkout ? tomorrowWorkout.name : "REST DAY"}
-                </div>
-                {tomorrowWorkout?.muscles ? (
-                  <div className="text-[11px] text-ghost mt-0.5">
-                    {tomorrowWorkout.muscles}
-                  </div>
-                ) : null}
+              <div className="font-display text-[24px] text-white tracking-[1px] uppercase truncate leading-tight">
+                {tomorrowWorkout ? tomorrowWorkout.name : "REST DAY"}
               </div>
+              {tomorrowWorkout?.muscles ? (
+                <div className="text-[11px] text-ghost mt-0.5 truncate leading-snug">
+                  {tomorrowWorkout.muscles}
+                </div>
+              ) : null}
             </div>
           </div>
         </motion.div>
@@ -116,6 +123,7 @@ export function HeroCard({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          className={isRestDay ? "flex flex-col gap-3" : undefined}
         >
           {!hasActiveSplit ? (
             <div className="mx-5 bg-card rounded-[18px] border border-border p-6 relative overflow-hidden text-center shadow-lg">
@@ -137,90 +145,118 @@ export function HeroCard({
               </button>
             </div>
           ) : (
-          <div className="mx-5 bg-card rounded-[18px] border border-border p-5 relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-[3px] bg-heat" />
-            <div className="absolute top-4 right-4 text-center">
-              <div className="font-display text-[28px] leading-none text-heat">
-                {streak ?? 0}
+          <>
+            <div className="mx-5 bg-card rounded-[18px] border border-border p-5 relative overflow-hidden">
+              <div className={`absolute top-0 left-0 right-0 h-[3px] ${isRestDay ? "bg-skip" : "bg-heat"}`} />
+              <div className="absolute top-4 right-4 text-center">
+                <div className={`font-display text-[28px] leading-none ${isRestDay ? "text-skip" : "text-heat"}`}>
+                  {streak ?? 0}
+                </div>
+                <div className="text-[7px] text-ghost tracking-[1.5px] uppercase">
+                  Day Streak
+                </div>
               </div>
-              <div className="text-[7px] text-ghost tracking-[1.5px] uppercase">
-                Day Streak
-              </div>
-            </div>
-            <div className="pt-1">
-              <div className="text-[9px] tracking-[2px] text-ghost uppercase mb-1">
-                Today · {activeSplitDayName || "Workout Plan"}
-              </div>
-              <div className="font-display text-[36px] leading-[0.93] tracking-[2px] text-white mb-1.5 uppercase pr-16 truncate">
-                {activeSplitDayName || "PLAN SPLIT"}
-              </div>
-              <div className="text-[11px] text-ghost mb-3">
-                <strong className="text-dim font-medium">
-                  {activeSplitDayMuscles || "No training days scheduled"}
-                </strong>{" "}
-                &nbsp;·&nbsp; {exerciseCount ?? 0} exercises
-              </div>
-              {/* Week tracker */}
-              <div className="flex justify-between mb-3">
-                {weekHistory ? (
-                  weekHistory.map((d, i) => (
-                    <div key={i} className="flex flex-col items-center gap-1">
-                      <WeekDot type={d.type} />
-                      <span className={`text-[8px] tracking-[1px] uppercase ${
-                        d.type === "today" ? "text-white" : d.type === "done" ? "text-dim" : "text-ghost"
-                      }`}>
-                        {d.label}
-                      </span>
-                    </div>
-                  ))
+              <div className="pt-1">
+                <div className={`text-[9px] tracking-[2px] uppercase mb-1 ${isRestDay ? "text-skip font-semibold" : "text-ghost"}`}>
+                  Today
+                </div>
+                <div className="font-display text-[36px] leading-[0.93] tracking-[2px] text-white uppercase pr-16 truncate mb-1.5">
+                  {isRestDay ? "REST DAY" : (activeSplitDayName || "PLAN SPLIT")}
+                </div>
+                {isRestDay ? (
+                  <div className="text-[11px] text-ghost mb-3">
+                    Recovery is part of progress. Streak is protected today.
+                  </div>
+                ) : exerciseCount === 0 ? (
+                  <div className="text-[11px] text-ghost mb-3">
+                    No exercises added to this workout yet
+                  </div>
                 ) : (
-                  <div className="h-[38px]" />
+                  <div className="text-[11px] text-ghost mb-3">
+                    <strong className="text-dim font-medium">
+                      {activeSplitDayMuscles || "No training days scheduled"}
+                    </strong>{" "}
+                    &nbsp;·&nbsp; {exerciseCount ?? 0} exercises
+                  </div>
+                )}
+                {/* Week tracker */}
+                <div className="flex justify-between mb-3">
+                  {weekHistory ? (
+                    weekHistory.map((d, i) => (
+                      <div key={i} className="flex flex-col items-center gap-1">
+                        <WeekDot type={d.type} />
+                        <span className={`text-[8px] tracking-[1px] uppercase ${
+                          d.type === "today" ? (isRestDay ? "text-skip font-semibold" : "text-white") : d.type === "done" ? "text-dim" : "text-ghost"
+                        }`}>
+                          {d.label}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="h-[38px]" />
+                  )}
+                </div>
+                
+                {!isRestDay && (
+                  exerciseCount === 0 ? (
+                    <>
+                      <button
+                        onClick={() => navigate("/splits")}
+                        className="block w-full py-[10px] bg-heat border-none rounded-xl text-white font-display text-[16px] tracking-[3px] cursor-pointer hover:opacity-90 transition-opacity uppercase text-center"
+                      >
+                        ADD EXERCISES &nbsp;→
+                      </button>
+                      <button
+                        type="button"
+                        onClick={activeSplitDayName ? (onSkipToday || undefined) : undefined}
+                        className={`w-full mt-2.5 text-center text-[12px] text-ghost hover:text-white transition-colors cursor-pointer bg-transparent border-none ${activeSplitDayName ? '' : 'opacity-0 pointer-events-none'}`}
+                      >
+                        Skip Today
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={onStartWorkout}
+                        className="block w-full py-[10px] bg-heat border-none rounded-xl text-white font-display text-[16px] tracking-[3px] cursor-pointer hover:opacity-90 transition-opacity uppercase text-center"
+                      >
+                        {inProgress ? "RESUME WORKOUT \u00a0\u2192" : activeSplitDayName ? "START WORKOUT \u00a0\u2192" : "CREATE SPLIT \u00a0\u2192"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={activeSplitDayName ? (onSkipToday || undefined) : undefined}
+                        className={`w-full mt-2.5 text-center text-[12px] text-ghost hover:text-white transition-colors cursor-pointer bg-transparent border-none ${activeSplitDayName ? '' : 'opacity-0 pointer-events-none'}`}
+                      >
+                        Skip Today
+                      </button>
+                    </>
+                  )
                 )}
               </div>
-              
-              {isRestDay ? (
-                <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-4 text-center mt-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#38bdf8]/10 border border-[#38bdf8]/25 text-[#38bdf8] flex items-center justify-center mx-auto mb-2.5">
-                    <Moon size={20} />
-                  </div>
-                  <p className="text-[13px] text-white font-medium mb-1">
-                    Scheduled Rest Day
-                  </p>
-                  <p className="text-[11px] text-[#666] leading-relaxed">
-                    Take time to recover. Your streak is protected today.
-                  </p>
-                </div>
-              ) : exerciseCount === 0 ? (
-                <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-4 text-center mt-3">
-                  <div className="w-10 h-10 rounded-xl bg-raised border border-border text-dim flex items-center justify-center mx-auto mb-2.5">
-                    <ClipboardList size={20} />
-                  </div>
-                  <p className="text-[12px] text-ghost leading-relaxed mb-3">
-                    No exercises added to this training day yet.
-                  </p>
-                  <p className="text-[11px] text-[#555] leading-relaxed">
-                    Head over to your split to add exercises or explicitly mark this day as a Rest Day.
-                  </p>
-                </div>
-              ) : (
-                <button
-                  onClick={onStartWorkout}
-                  className="block w-full py-[10px] bg-heat border-none rounded-xl text-white font-display text-[16px] tracking-[3px] cursor-pointer hover:opacity-90 transition-opacity"
-                >
-                  {inProgress ? "RESUME WORKOUT \u00a0\u2192" : activeSplitDayName ? "START WORKOUT \u00a0\u2192" : "CREATE SPLIT \u00a0\u2192"}
-                </button>
-              )}
-
-              {!isRestDay && (
-                <div
-                  onClick={activeSplitDayName ? (onSkipToday || undefined) : undefined}
-                  className={`text-center mt-2.5 text-[12px] text-ghost tracking-[0.3px] transition-colors ${activeSplitDayName ? 'cursor-pointer hover:text-white' : 'opacity-0 pointer-events-none'}`}
-                >
-                  skip today
-                </div>
-              )}
             </div>
-          </div>
+
+            {/* ── Standalone Up Next Themed Preview Card (on Rest Day) ── */}
+            {isRestDay && (
+              <div className="mx-5 bg-card rounded-[18px] border border-border p-[15px_18px] relative overflow-hidden flex items-center justify-between">
+                {/* Left 3.5px accent line */}
+                <div className="absolute top-0 bottom-0 left-0 w-[3.5px] bg-[#38bdf8]" />
+
+                <div className="flex-1 min-w-0 pr-3 pt-0.5 pl-1.5">
+                  <div className="text-[9px] tracking-[2px] uppercase font-semibold mb-1 text-[#38bdf8]">
+                    {tomorrowWorkout?.headerBadge || "UP NEXT"}
+                  </div>
+                  <div className="font-display text-[24px] text-white tracking-[1px] uppercase truncate leading-tight">
+                    {tomorrowWorkout ? tomorrowWorkout.name : "REST DAY"}
+                  </div>
+                  {tomorrowWorkout?.muscles ? (
+                    <div className="text-[11px] text-ghost mt-0.5 truncate leading-snug">
+                      {tomorrowWorkout.muscles}
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            )}
+          </>
           )}
         </motion.div>
       ) : (

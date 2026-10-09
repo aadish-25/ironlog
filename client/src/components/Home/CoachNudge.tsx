@@ -5,10 +5,11 @@ interface CoachNudgeProps {
   skipped: boolean | null;
   workoutDone: boolean | null;
   coachNudge: string | null;
+  isRestDay?: boolean | null;
 }
 
-export function CoachNudge({ skipped, workoutDone, coachNudge }: CoachNudgeProps) {
-  if (skipped) return null;
+export function CoachNudge({ skipped, workoutDone, coachNudge, isRestDay }: CoachNudgeProps) {
+  if (skipped || isRestDay) return null;
 
   return (
     <div
