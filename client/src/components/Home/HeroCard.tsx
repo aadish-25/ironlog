@@ -29,6 +29,8 @@ interface HeroCardProps {
   } | null;
   isRestDay?: boolean;
   hasActiveSplit?: boolean;
+  activeSplitId?: string | null;
+  activeSplitDayId?: string | null;
   onStartWorkout: () => void;
   onSkipToday: (() => void) | null;
   onUndoSkip: (() => void) | null;
@@ -49,6 +51,8 @@ export function HeroCard({
   tomorrowWorkout,
   isRestDay = false,
   hasActiveSplit = true,
+  activeSplitId,
+  activeSplitDayId,
   onStartWorkout,
   onSkipToday,
   onUndoSkip,
@@ -169,7 +173,7 @@ export function HeroCard({
                   </div>
                 ) : exerciseCount === 0 ? (
                   <div className="text-[11px] text-ghost mb-3">
-                    No exercises added to this workout yet
+                    No exercises configured
                   </div>
                 ) : (
                   <div className="text-[11px] text-ghost mb-3">
@@ -200,18 +204,27 @@ export function HeroCard({
                 {!isRestDay && (
                   exerciseCount === 0 ? (
                     <>
+                      <p className="text-[12px] text-ghost text-center mb-3">
+                        Head over to your split to add exercises or mark as rest.
+                      </p>
                       <button
-                        onClick={() => navigate("/splits")}
+                        onClick={() => {
+                          if (activeSplitId && activeSplitDayId) {
+                            navigate(`/splits/${activeSplitId}/day/${activeSplitDayId}`);
+                          } else {
+                            navigate("/splits");
+                          }
+                        }}
                         className="block w-full py-[10px] bg-heat border-none rounded-xl text-white font-display text-[16px] tracking-[3px] cursor-pointer hover:opacity-90 transition-opacity uppercase text-center"
                       >
-                        ADD EXERCISES &nbsp;→
+                        ADD EXERCISES
                       </button>
                       <button
                         type="button"
                         onClick={activeSplitDayName ? (onSkipToday || undefined) : undefined}
-                        className={`w-full mt-2.5 text-center text-[12px] text-ghost hover:text-white transition-colors cursor-pointer bg-transparent border-none ${activeSplitDayName ? '' : 'opacity-0 pointer-events-none'}`}
+                        className={`block w-full mt-2.5 py-[9px] bg-transparent border border-border rounded-xl text-dim hover:text-white hover:border-zinc-700 transition-colors font-display text-[14px] tracking-[2px] uppercase text-center cursor-pointer ${activeSplitDayName ? '' : 'opacity-0 pointer-events-none'}`}
                       >
-                        Skip Today
+                        SKIP TODAY
                       </button>
                     </>
                   ) : (
@@ -225,9 +238,9 @@ export function HeroCard({
                       <button
                         type="button"
                         onClick={activeSplitDayName ? (onSkipToday || undefined) : undefined}
-                        className={`w-full mt-2.5 text-center text-[12px] text-ghost hover:text-white transition-colors cursor-pointer bg-transparent border-none ${activeSplitDayName ? '' : 'opacity-0 pointer-events-none'}`}
+                        className={`block w-full mt-2.5 py-[9px] bg-transparent border border-border rounded-xl text-dim hover:text-white hover:border-zinc-700 transition-colors font-display text-[14px] tracking-[2px] uppercase text-center cursor-pointer ${activeSplitDayName ? '' : 'opacity-0 pointer-events-none'}`}
                       >
-                        Skip Today
+                        SKIP TODAY
                       </button>
                     </>
                   )

@@ -26,6 +26,7 @@ export function HomePage() {
         startWorkout,
         skipWorkout,
         undoSkip,
+        activeSplitId,
         activeSplitDayId,
         todaySessionId,
         lifetimeStats,
@@ -139,6 +140,8 @@ export function HomePage() {
                     tomorrowWorkout={tomorrowWorkout}
                     isRestDay={isRestDay}
                     hasActiveSplit={hasActiveSplit}
+                    activeSplitId={activeSplitId}
+                    activeSplitDayId={activeSplitDayId}
                     onStartWorkout={handleStartWorkout}
                     onSkipToday={handleSkipToday}
                     onUndoSkip={handleUndoSkip}

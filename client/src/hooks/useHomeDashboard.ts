@@ -278,12 +278,20 @@ export function useHomeDashboard() {
 
     const loading = userLoading || splitsLoading || sessionsLoading;
 
+    const formatMuscle = (m: string) => {
+        if (!m) return "";
+        return m
+            .split(" ")
+            .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+            .join(" ");
+    };
+
     const getMusclesStr = (day: any) => {
         if (!day || !day.exercises || day.exercises.length === 0) return null;
         const muscles = new Set<string>();
         day.exercises.forEach((ex: any) => {
             if (ex.muscle_groups && ex.muscle_groups.length > 0) {
-                muscles.add(ex.muscle_groups[0]);
+                muscles.add(formatMuscle(ex.muscle_groups[0]));
             }
         });
         const arr = Array.from(muscles);
@@ -335,6 +343,7 @@ export function useHomeDashboard() {
         startWorkout,
         skipWorkout,
         undoSkip,
+        activeSplitId: activeSplit?.id || null,
         activeSplitDayId: activeSplitDay?.id || null,
         todaySessionId: todaySession?.id || null,
         lifetimeStats,
