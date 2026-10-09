@@ -18,7 +18,13 @@ import ee.forgr.capacitor.social.login.ModifiedMainActivityForSocialLoginPlugin;
 public class MainActivity extends BridgeActivity implements ModifiedMainActivityForSocialLoginPlugin {
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme_NoActionBar);
         super.onCreate(savedInstanceState);
+
+        int brandBgColor = Color.parseColor("#0F0F0F");
+        if (getBridge() != null && getBridge().getWebView() != null) {
+            getBridge().getWebView().setBackgroundColor(brandBgColor);
+        }
 
         Window window = getWindow();
 
@@ -32,7 +38,6 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
-        int brandBgColor = Color.parseColor("#0F0F0F");
 
         window.setStatusBarColor(brandBgColor);
         window.setNavigationBarColor(brandBgColor);
