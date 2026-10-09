@@ -12,7 +12,18 @@ export function useSession(sessionId: string | null) {
     );
 
     // Session page uses local state for exercises during the workout
-    const [exercises, setExercises] = useState<SessionExercise[]>([]);
+    const [exercises, setExercises] = useState<SessionExercise[]>(() => {
+        if (!sessionId) return [];
+        const draftKey = `ironlog_draft_${sessionId}`;
+        try {
+            const raw = localStorage.getItem(draftKey);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            }
+        } catch (e) {}
+        return [];
+    });
     const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
 
     // Reconcile exercises when session loads:
@@ -42,6 +53,14 @@ export function useSession(sessionId: string | null) {
         }
 
         const serverExercises = sessionData.exercises || [];
+
+        // If the session is already completed, the server database is the single source of truth!
+        if (sessionData.is_completed) {
+            localStorage.removeItem(draftKey);
+            setExercises(serverExercises);
+            return;
+        }
+
         const hasDraftLoggedSets = draft?.some(ex => ex.sets?.some(s => s.is_logged)) ?? false;
 
         // If split day has 0 exercises configured on server:
@@ -103,11 +122,11 @@ export function useSession(sessionId: string | null) {
         } else {
             localStorage.removeItem(draftKey);
         }
-    }, [sessionId, sessionData?.id, sessionData?.exercises]);
+    }, [sessionId, sessionData?.id, sessionData?.is_completed, sessionData?.exercises]);
 
-    // Persist draft to localStorage whenever exercises state changes
+    // Persist draft to localStorage whenever exercises state changes (ONLY for active/incomplete workouts)
     useEffect(() => {
-        if (!sessionId) return;
+        if (!sessionId || sessionData?.is_completed) return;
         const draftKey = `ironlog_draft_${sessionId}`;
         try {
             if (exercises.length === 0) {
@@ -118,11 +137,11 @@ export function useSession(sessionId: string | null) {
         } catch (e) {
             // Ignore quota errors
         }
-    }, [sessionId, exercises]);
+    }, [sessionId, exercises, sessionData?.is_completed]);
 
-    // Ensure draft is saved or cleaned when user minimizes or closes the tab
+    // Ensure draft is saved or cleaned when user minimizes or closes the tab (ONLY for active workouts)
     useEffect(() => {
-        if (!sessionId) return;
+        if (!sessionId || sessionData?.is_completed) return;
         const draftKey = `ironlog_draft_${sessionId}`;
         const handleVisibilityChange = () => {
             if (document.visibilityState === "hidden") {

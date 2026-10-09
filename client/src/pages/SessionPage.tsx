@@ -285,13 +285,13 @@ export function SessionPage() {
         );
     }
 
-    const showCompletion = showCompletionOverride ?? session?.is_completed ?? false;
+    const showCelebration = showCompletionOverride === true;
 
-    if (showCompletion) {
+    if (showCelebration) {
         return (
             <CompletionScreen
                 splitDayName={splitDayName}
-                exercises={exercises}
+                exercises={exercises.length > 0 ? exercises : (session?.exercises || [])}
                 onComplete={handleGoHome}
                 onBackToWorkout={() => {
                     setShowCompletionOverride(false);
@@ -301,12 +301,12 @@ export function SessionPage() {
         );
     }
 
-    if (showSummary) {
+    if (session?.is_completed || showSummary) {
         return (
             <SessionSummary
                 splitDayName={splitDayName}
-                exercises={exercises}
-                onBack={() => setShowCompletionOverride(true)}
+                exercises={session?.exercises || exercises}
+                onBack={handleGoHome}
                 onEdit={() => setShowSummary(false)}
             />
         );

@@ -39,7 +39,9 @@ export function SessionSummary({ splitDayName, exercises, onBack, onEdit }: Sess
           </div>
         ) : (
           exercises.map((ex, i) => {
-            const loggedSets = (ex.sets || []).filter(s => s.is_logged);
+            const loggedSets = (ex.sets || []).filter(
+              (s) => s.is_logged || (s.weight != null && s.reps != null && (Number(s.weight) > 0 || Number(s.reps) > 0))
+            );
             
             return (
                 <div key={ex.id || `ex-${i}`} className="flex flex-col gap-3">
