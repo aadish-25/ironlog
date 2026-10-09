@@ -4,7 +4,6 @@ import { LogOut, User as UserIcon, Lock, Compass, HelpCircle, Info, Calendar, Fl
 import { useClerk } from "@clerk/clerk-react";
 import { mutate } from "swr";
 import { ProfileHeader } from "../components/Profile/ProfileHeader";
-import { JourneyStrip } from "../components/Profile/JourneyStrip";
 import { MonthlyStats } from "../components/Profile/MonthlyStats";
 import { SettingsList } from "../components/Profile/SettingsList";
 import { EditProfileView } from "../components/Profile/EditProfileView";
@@ -105,12 +104,6 @@ export function ProfilePage() {
         />
 
         <div className="px-5 flex flex-col gap-3">
-          {/* ── Journey strip ── */}
-          <JourneyStrip
-            memberSince={memberSince}
-            daysSinceJoined={daysSinceJoined}
-          />
-
           {/* ── Monthly stats ── */}
           <MonthlyStats stats={monthlyStats} />
 
