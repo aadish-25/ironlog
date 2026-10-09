@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { SignedIn, SignedOut, RedirectToSignIn, useAuth } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, RedirectToSignIn, useAuth, AuthenticateWithRedirectCallback } from "@clerk/clerk-react";
 import { AxiosInterceptor } from "./components/Auth/AxiosInterceptor";
 
 import { AppLayout }     from "./components/layout/AppLayout";
@@ -19,8 +19,14 @@ import { SplitDayDetailPage } from "./pages/SplitDayDetailPage";
 
 function AuthGate({ children }: { children: React.ReactNode }) {
   const { isLoaded, isSignedIn } = useAuth();
+  const location = useLocation();
 
-  if (!isLoaded) {
+  const isHandshakeInProgress = 
+    location.search.includes("__clerk_handshake") || 
+    location.search.includes("__clerk_ticket") ||
+    location.search.includes("sso-callback");
+
+  if (!isLoaded || isHandshakeInProgress) {
     return (
       <div className="min-h-screen bg-bg flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
@@ -59,6 +65,9 @@ export default function App() {
       <AxiosInterceptor />
       <Routes>
         {/* Public Routes */}
+        <Route path="/sign-in/sso-callback" element={<AuthenticateWithRedirectCallback signInForceRedirectUrl="/" />} />
+        <Route path="/sign-up/sso-callback" element={<AuthenticateWithRedirectCallback signUpForceRedirectUrl="/" />} />
+        <Route path="/sso-callback" element={<AuthenticateWithRedirectCallback signInForceRedirectUrl="/" />} />
         <Route path="/sign-in/*" element={<SignInPage />} />
         <Route path="/sign-up/*" element={<SignUpPage />} />
 

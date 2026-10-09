@@ -11,8 +11,18 @@ const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    {/* @ts-expect-error - ui prop required by Clerk warning but types are outdated */}
-    <ClerkProvider publishableKey={publishableKey} ui={ui}>
+    <ClerkProvider
+      {...({
+        publishableKey,
+        ui,
+        // Allowed origins for Capacitor Android WebView and local development
+        allowedRedirectOrigins: [
+          "https://localhost",
+          "http://localhost",
+          "capacitor://localhost",
+        ],
+      } as any)}
+    >
       <SWRConfig
         value={{
           fetcher,

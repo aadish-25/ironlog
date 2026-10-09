@@ -26,6 +26,9 @@
   --font-body:    'Inter', sans-serif;
 }
 
+
+
+
 @layer utilities {
   .font-display {
     font-family: var(--font-display);

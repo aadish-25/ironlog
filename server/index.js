@@ -63,7 +63,7 @@ app.listen(PORT, () => {
     );
 });
 
-// Import routes
+import authRoutes from "./routes/auth.route.js";
 import userRoutes from "./routes/user.route.js";
 import splitsRoutes from "./routes/splits.route.js";
 import splitDaysRoutes from "./routes/splitDays.route.js";
@@ -73,6 +73,8 @@ import sessionsRouter from "./routes/sessions.route.js";
 import setsRoutes from "./routes/sets.route.js";
 
 // Routes
+// Authentication routes (includes native Google token exchange for Android APK)
+app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/splits", splitsRoutes);
 app.use("/api/split-days", splitDaysRoutes);
