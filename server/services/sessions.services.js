@@ -9,7 +9,7 @@ const createSessionService = async (
 ) => {
     try {
         const splitDayResult = await pool.query(
-            `SELECT sd.is_rest 
+            `SELECT sd.is_rest, sd.label as day_label, s.name as split_name 
              FROM split_days sd
              JOIN splits s ON sd.split_id = s.id
              WHERE sd.id = $1 AND s.user_id = $2`,
@@ -24,13 +24,15 @@ const createSessionService = async (
             throw new Error("Cannot create a session for a rest day");
         }
 
+        const routineName = splitDayResult.rows[0].day_label || splitDayResult.rows[0].split_name || "Workout";
+
         const result = await pool.query(
-            `INSERT INTO sessions (user_id, split_day_id, date, is_skipped) 
-             VALUES ($1, $2, $3, $4) 
+            `INSERT INTO sessions (user_id, split_day_id, date, is_skipped, routine_name) 
+             VALUES ($1, $2, $3, $4, $5) 
              ON CONFLICT (user_id, split_day_id, date) 
-             DO UPDATE SET is_skipped = EXCLUDED.is_skipped, updated_at = now() 
+             DO UPDATE SET is_skipped = EXCLUDED.is_skipped, routine_name = COALESCE(EXCLUDED.routine_name, sessions.routine_name), updated_at = now() 
              RETURNING *`,
-            [userId, splitDayId, date, isSkipped],
+            [userId, splitDayId, date, isSkipped, routineName],
         );
         return result.rows[0];
     } catch (error) {
@@ -76,7 +78,7 @@ const getSessionsService = async (userId) => {
         await autoCompletePastSessionsService(userId);
         const result = await pool.query(
             `SELECT sessions.*,
-             split_days.label as split_day_name,
+             COALESCE(sessions.routine_name, split_days.label, 'Workout') as split_day_name,
              COUNT(sets.id) as sets_logged,
              SUM(CASE WHEN sets.is_pr THEN 1 ELSE 0 END) as prs_hit,
              COALESCE(SUM(sets.weight_kg * sets.reps), 0) as total_volume,
@@ -109,7 +111,7 @@ const getSessionsService = async (userId) => {
 const getSessionByIdService = async (sessionId, userId) => {
     try {
         const sessionResult = await pool.query(
-            `SELECT sessions.*, split_days.label as split_day_label
+            `SELECT sessions.*, COALESCE(sessions.routine_name, split_days.label, 'Workout') as split_day_label
              FROM sessions
              LEFT JOIN split_days ON sessions.split_day_id = split_days.id
              WHERE sessions.id = $1 AND sessions.user_id = $2`,
@@ -300,7 +302,7 @@ const getSessionsHistoryService = async (userId, limit, offset) => {
     try {
         await autoCompletePastSessionsService(userId);
         const result = await pool.query(
-            `SELECT sessions.id, sessions.date, split_days.label as name, 
+            `SELECT sessions.id, sessions.date, COALESCE(sessions.routine_name, split_days.label, 'Workout') as name, 
             COALESCE(SUM(sets.weight_kg * sets.reps), 0) as "volumeKg"
             FROM sessions
             LEFT JOIN split_days ON sessions.split_day_id = split_days.id
