@@ -61,9 +61,9 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
         if (contentView != null) {
             contentView.setBackgroundColor(brandBgColor);
             ViewCompat.setOnApplyWindowInsetsListener(contentView, (v, insets) -> {
-                Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-                v.setPadding(0, systemBars.top, 0, 0);
-                return insets;
+                Insets statusBar = insets.getInsets(WindowInsetsCompat.Type.statusBars());
+                v.setPadding(0, statusBar.top, 0, 0);
+                return WindowInsetsCompat.CONSUMED;
             });
         }
     }

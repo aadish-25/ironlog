@@ -26,8 +26,51 @@ export function BottomNav({
   onNextExercise,
   onFinishWorkout,
 }: BottomNavProps) {
+  const [isKeyboardOpen, setIsKeyboardOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleFocusIn = (e: FocusEvent) => {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement
+      ) {
+        setIsKeyboardOpen(true);
+      }
+    };
+    const handleFocusOut = () => {
+      setIsKeyboardOpen(false);
+    };
+
+    window.addEventListener("focusin", handleFocusIn);
+    window.addEventListener("focusout", handleFocusOut);
+
+    const initialHeight = window.innerHeight;
+    const handleResize = () => {
+      if (window.visualViewport) {
+        const isShrunk = window.visualViewport.height < initialHeight * 0.82;
+        setIsKeyboardOpen(isShrunk);
+      }
+    };
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", handleResize);
+    }
+
+    return () => {
+      window.removeEventListener("focusin", handleFocusIn);
+      window.removeEventListener("focusout", handleFocusOut);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", handleResize);
+      }
+    };
+  }, []);
+
+  if (isKeyboardOpen) {
+    return null;
+  }
+
   return (
-    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-card border-t border-border p-[12px_20px_34px] flex flex-col gap-2 z-50">
+    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-card border-t border-border p-[12px_20px_20px] flex flex-col gap-2 z-50">
       
       {/* Swap / Add buttons */}
       <div className="flex gap-2">
