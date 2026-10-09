@@ -32,17 +32,19 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
-        window.setStatusBarColor(Color.BLACK);
-        window.setNavigationBarColor(Color.BLACK);
+        int brandBgColor = Color.parseColor("#0F0F0F");
+
+        window.setStatusBarColor(brandBgColor);
+        window.setNavigationBarColor(brandBgColor);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            window.setNavigationBarDividerColor(Color.BLACK);
+            window.setNavigationBarDividerColor(brandBgColor);
         }
 
-        // Set pure black on window background and decor view
-        window.setBackgroundDrawable(new ColorDrawable(Color.BLACK));
-        window.getDecorView().setBackgroundColor(Color.BLACK);
+        // Set matching brand background on window and decor view
+        window.setBackgroundDrawable(new ColorDrawable(brandBgColor));
+        window.getDecorView().setBackgroundColor(brandBgColor);
 
-        // Ensure status bar and navigation bar icons/gestures are light (white) on the black background
+        // Ensure status bar and navigation bar icons/gestures are light (white) on the dark background
         WindowInsetsControllerCompat insetsController = WindowCompat.getInsetsController(window, window.getDecorView());
         if (insetsController != null) {
             insetsController.setAppearanceLightStatusBars(false);
@@ -52,7 +54,7 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
         // Pad the root content view by status bar height so WebView starts strictly below the notification bar
         View contentView = findViewById(android.R.id.content);
         if (contentView != null) {
-            contentView.setBackgroundColor(Color.BLACK);
+            contentView.setBackgroundColor(brandBgColor);
             ViewCompat.setOnApplyWindowInsetsListener(contentView, (v, insets) -> {
                 Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
                 v.setPadding(0, systemBars.top, 0, 0);

@@ -11,7 +11,7 @@ export function TabBar() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] h-[58px] bg-bg/95 backdrop-blur-md border-t border-border flex items-center px-6 justify-between z-50">
+    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] h-[64px] bg-bg/95 backdrop-blur-md border-t border-border flex items-start pt-2 px-6 justify-between z-50">
       {links.map((link) => {
         const Icon = link.icon;
         return (
